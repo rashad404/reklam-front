@@ -1,0 +1,165 @@
+{
+  "metadata": {
+    "title": "Reklam.biz - Ad Network",
+    "description": "Ad placement platform for advertisers and revenue generation for publishers"
+  },
+  "nav": {
+    "home": "Home",
+    "advertiser": "Advertiser",
+    "publisher": "Publisher",
+    "admin": "Admin",
+    "settings": "Settings",
+    "signIn": "Sign In",
+    "getStarted": "Get Started",
+    "logout": "Logout"
+  },
+  "home": {
+    "hero": {
+      "title": "Your Ad Network",
+      "subtitle": "Advertisers buy ad space, publishers earn revenue by displaying ads on their websites",
+      "cta": "Get Started",
+      "learnMore": "Learn More"
+    },
+    "forAdvertisers": {
+      "title": "For Advertisers",
+      "description": "Create campaigns, target your audience, and grow your brand",
+      "cta": "Start Advertising"
+    },
+    "forPublishers": {
+      "title": "For Publishers",
+      "description": "Earn revenue by displaying ads on your website",
+      "cta": "Start Earning"
+    },
+    "stats": {
+      "advertisers": "Advertisers",
+      "publishers": "Publishers",
+      "impressions": "Impressions",
+      "revenue": "Revenue Paid"
+    },
+    "howItWorks": {
+      "title": "How It Works",
+      "step1": {
+        "title": "Register",
+        "description": "Sign up as an advertiser or publisher"
+      },
+      "step2": {
+        "title": "Setup",
+        "description": "Create a campaign or add an ad unit to your site"
+      },
+      "step3": {
+        "title": "Earn",
+        "description": "Advertisers gain customers, publishers earn revenue"
+      }
+    }
+  },
+  "auth": {
+    "signIn": "Sign In",
+    "signUp": "Sign Up",
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "name": "Name",
+    "phone": "Phone",
+    "noAccount": "Don't have an account?",
+    "hasAccount": "Already have an account?",
+    "createAccount": "Create Account",
+    "or": "or",
+    "loginWithWallet": "Sign in with Kimlik.az",
+    "popupBlocked": "Popup blocked. Please allow popups.",
+    "backToHome": "Back to Home",
+    "walletLoginInfo": "Sign in securely with your Kimlik.az account",
+    "loginFailed": "Login failed. Please try again."
+  },
+  "login": {
+    "processingWallet": "Processing Kimlik.az response...",
+    "pleaseWait": "Please wait...",
+    "walletAuthSuccess": "Successfully signed in!",
+    "walletAuthFailed": "Kimlik.az login failed",
+    "redirecting": "Redirecting...",
+    "noAuthCode": "No auth code found",
+    "invalidState": "Invalid session"
+  },
+  "advertiser": {
+    "dashboard": "Advertiser Dashboard",
+    "campaigns": "Campaigns",
+    "createCampaign": "Create Campaign",
+    "billing": "Billing",
+    "deposit": "Add Funds",
+    "balance": "Balance",
+    "totalSpent": "Total Spent",
+    "impressions": "Impressions",
+    "clicks": "Clicks",
+    "ctr": "CTR",
+    "spent": "Spent",
+    "status": {
+      "draft": "Draft",
+      "active": "Active",
+      "paused": "Paused",
+      "completed": "Completed"
+    },
+    "register": {
+      "title": "Become an Advertiser",
+      "companyName": "Company Name",
+      "website": "Website",
+      "submit": "Register"
+    }
+  },
+  "publisher": {
+    "dashboard": "Publisher Dashboard",
+    "adUnits": "Ad Units",
+    "createAdUnit": "Create Ad Unit",
+    "earnings": "Earnings",
+    "withdraw": "Withdraw",
+    "totalEarned": "Total Earned",
+    "pendingEarnings": "Pending Earnings",
+    "register": {
+      "title": "Become a Publisher",
+      "websiteUrl": "Website URL",
+      "websiteName": "Website Name",
+      "category": "Category",
+      "submit": "Register"
+    },
+    "embedCode": "Embed Code",
+    "copyCode": "Copy Code",
+    "codeCopied": "Code copied!"
+  },
+  "admin": {
+    "dashboard": "Admin Dashboard",
+    "publishers": "Publishers",
+    "ads": "Ads",
+    "approve": "Approve",
+    "reject": "Reject",
+    "pending": "Pending",
+    "approved": "Approved",
+    "rejected": "Rejected"
+  },
+  "common": {
+    "loading": "Loading...",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create",
+    "search": "Search",
+    "noResults": "No results found",
+    "confirm": "Confirm",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "actions": "Actions",
+    "all": "All",
+    "active": "Active",
+    "inactive": "Inactive",
+    "view": "View",
+    "currency": "AZN"
+  },
+  "footer": {
+    "allRightsReserved": "All rights reserved.",
+    "help": "Help",
+    "privacy": "Privacy",
+    "terms": "Terms",
+    "contact": "Contact",
+    "forAdvertisers": "For Advertisers",
+    "forPublishers": "For Publishers"
+  }
+}

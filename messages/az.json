@@ -1,0 +1,165 @@
+{
+  "metadata": {
+    "title": "Reklam.biz - Reklam Şəbəkəsi",
+    "description": "Reklamçılar üçün reklam yerləşdirmə və naşirlər üçün gəlir qazanma platforması"
+  },
+  "nav": {
+    "home": "Ana Səhifə",
+    "advertiser": "Reklamçı",
+    "publisher": "Naşir",
+    "admin": "Admin",
+    "settings": "Parametrlər",
+    "signIn": "Daxil ol",
+    "getStarted": "Başla",
+    "logout": "Çıxış"
+  },
+  "home": {
+    "hero": {
+      "title": "Reklam Şəbəkəniz",
+      "subtitle": "Reklamçılar reklam sahəsi alır, naşirlər veb saytlarında reklam göstərərək gəlir qazanır",
+      "cta": "İndi Başla",
+      "learnMore": "Daha Ətraflı"
+    },
+    "forAdvertisers": {
+      "title": "Reklamçılar Üçün",
+      "description": "Kampaniyalar yaradın, hədəf auditoriyasını seçin və brendinizi böyüdün",
+      "cta": "Reklam Ver"
+    },
+    "forPublishers": {
+      "title": "Naşirlər Üçün",
+      "description": "Veb saytınızda reklam göstərərək gəlir qazanın",
+      "cta": "Qazanmağa Başla"
+    },
+    "stats": {
+      "advertisers": "Reklamçı",
+      "publishers": "Naşir",
+      "impressions": "Göstərim",
+      "revenue": "Ödənilmiş Gəlir"
+    },
+    "howItWorks": {
+      "title": "Necə İşləyir?",
+      "step1": {
+        "title": "Qeydiyyat",
+        "description": "Reklamçı və ya naşir olaraq qeydiyyatdan keçin"
+      },
+      "step2": {
+        "title": "Quraşdırma",
+        "description": "Kampaniya yaradın və ya reklam blokunu saytınıza əlavə edin"
+      },
+      "step3": {
+        "title": "Qazanc",
+        "description": "Reklamçılar müştəri qazanır, naşirlər gəlir əldə edir"
+      }
+    }
+  },
+  "auth": {
+    "signIn": "Daxil ol",
+    "signUp": "Qeydiyyat",
+    "email": "E-poçt",
+    "password": "Şifrə",
+    "confirmPassword": "Şifrəni təsdiq edin",
+    "name": "Ad",
+    "phone": "Telefon",
+    "noAccount": "Hesabınız yoxdur?",
+    "hasAccount": "Artıq hesabınız var?",
+    "createAccount": "Hesab yaradın",
+    "or": "və ya",
+    "loginWithWallet": "Kimlik.az ilə daxil ol",
+    "popupBlocked": "Popup bloklandı. Zəhmət olmasa popup-lara icazə verin.",
+    "backToHome": "Ana səhifəyə qayıt",
+    "walletLoginInfo": "Kimlik.az hesabınızla təhlükəsiz daxil olun",
+    "loginFailed": "Giriş uğursuz oldu. Yenidən cəhd edin."
+  },
+  "login": {
+    "processingWallet": "Kimlik.az cavabı emal olunur...",
+    "pleaseWait": "Zəhmət olmasa gözləyin...",
+    "walletAuthSuccess": "Uğurla daxil oldunuz!",
+    "walletAuthFailed": "Kimlik.az giriş uğursuz oldu",
+    "redirecting": "Yönləndirilirsiniz...",
+    "noAuthCode": "Giriş kodu tapılmadı",
+    "invalidState": "Etibarsız sessiya"
+  },
+  "advertiser": {
+    "dashboard": "Reklamçı Paneli",
+    "campaigns": "Kampaniyalar",
+    "createCampaign": "Kampaniya Yarat",
+    "billing": "Hesab",
+    "deposit": "Balans Artır",
+    "balance": "Balans",
+    "totalSpent": "Ümumi Xərc",
+    "impressions": "Göstərimlər",
+    "clicks": "Kliklər",
+    "ctr": "CTR",
+    "spent": "Xərclənib",
+    "status": {
+      "draft": "Qaralama",
+      "active": "Aktiv",
+      "paused": "Dayandırılıb",
+      "completed": "Tamamlanıb"
+    },
+    "register": {
+      "title": "Reklamçı olun",
+      "companyName": "Şirkət adı",
+      "website": "Veb sayt",
+      "submit": "Qeydiyyatdan keç"
+    }
+  },
+  "publisher": {
+    "dashboard": "Naşir Paneli",
+    "adUnits": "Reklam Blokları",
+    "createAdUnit": "Reklam Bloku Yarat",
+    "earnings": "Qazanc",
+    "withdraw": "Çıxarış",
+    "totalEarned": "Ümumi Qazanc",
+    "pendingEarnings": "Gözləyən Qazanc",
+    "register": {
+      "title": "Naşir olun",
+      "websiteUrl": "Sayt ünvanı",
+      "websiteName": "Sayt adı",
+      "category": "Kateqoriya",
+      "submit": "Qeydiyyatdan keç"
+    },
+    "embedCode": "Yerləşdirmə Kodu",
+    "copyCode": "Kodu Kopyala",
+    "codeCopied": "Kod kopyalandı!"
+  },
+  "admin": {
+    "dashboard": "Admin Panel",
+    "publishers": "Naşirlər",
+    "ads": "Reklamlar",
+    "approve": "Təsdiq et",
+    "reject": "Rədd et",
+    "pending": "Gözləyən",
+    "approved": "Təsdiqlənmiş",
+    "rejected": "Rədd edilmiş"
+  },
+  "common": {
+    "loading": "Yüklənir...",
+    "save": "Saxla",
+    "cancel": "Ləğv et",
+    "delete": "Sil",
+    "edit": "Redaktə",
+    "create": "Yarat",
+    "search": "Axtar",
+    "noResults": "Nəticə tapılmadı",
+    "confirm": "Təsdiq",
+    "back": "Geri",
+    "next": "Növbəti",
+    "previous": "Əvvəlki",
+    "actions": "Əməliyyatlar",
+    "all": "Hamısı",
+    "active": "Aktiv",
+    "inactive": "Deaktiv",
+    "view": "Bax",
+    "currency": "AZN"
+  },
+  "footer": {
+    "allRightsReserved": "Bütün hüquqlar qorunur.",
+    "help": "Kömək",
+    "privacy": "Məxfilik",
+    "terms": "Şərtlər",
+    "contact": "Əlaqə",
+    "forAdvertisers": "Reklamçılar üçün",
+    "forPublishers": "Naşirlər üçün"
+  }
+}

@@ -1,0 +1,165 @@
+{
+  "metadata": {
+    "title": "Reklam.biz - Рекламная Сеть",
+    "description": "Платформа размещения рекламы для рекламодателей и генерации дохода для издателей"
+  },
+  "nav": {
+    "home": "Главная",
+    "advertiser": "Рекламодатель",
+    "publisher": "Издатель",
+    "admin": "Админ",
+    "settings": "Настройки",
+    "signIn": "Войти",
+    "getStarted": "Начать",
+    "logout": "Выход"
+  },
+  "home": {
+    "hero": {
+      "title": "Ваша Рекламная Сеть",
+      "subtitle": "Рекламодатели покупают рекламные места, издатели зарабатывают на показе рекламы",
+      "cta": "Начать",
+      "learnMore": "Подробнее"
+    },
+    "forAdvertisers": {
+      "title": "Для Рекламодателей",
+      "description": "Создавайте кампании, выбирайте аудиторию и развивайте бренд",
+      "cta": "Начать Рекламу"
+    },
+    "forPublishers": {
+      "title": "Для Издателей",
+      "description": "Зарабатывайте на показе рекламы на вашем сайте",
+      "cta": "Начать Зарабатывать"
+    },
+    "stats": {
+      "advertisers": "Рекламодателей",
+      "publishers": "Издателей",
+      "impressions": "Показов",
+      "revenue": "Выплачено"
+    },
+    "howItWorks": {
+      "title": "Как Это Работает",
+      "step1": {
+        "title": "Регистрация",
+        "description": "Зарегистрируйтесь как рекламодатель или издатель"
+      },
+      "step2": {
+        "title": "Настройка",
+        "description": "Создайте кампанию или добавьте рекламный блок на сайт"
+      },
+      "step3": {
+        "title": "Заработок",
+        "description": "Рекламодатели получают клиентов, издатели — доход"
+      }
+    }
+  },
+  "auth": {
+    "signIn": "Войти",
+    "signUp": "Регистрация",
+    "email": "Эл. почта",
+    "password": "Пароль",
+    "confirmPassword": "Подтвердите пароль",
+    "name": "Имя",
+    "phone": "Телефон",
+    "noAccount": "Нет аккаунта?",
+    "hasAccount": "Уже есть аккаунт?",
+    "createAccount": "Создать аккаунт",
+    "or": "или",
+    "loginWithWallet": "Войти через Kimlik.az",
+    "popupBlocked": "Всплывающее окно заблокировано. Разрешите всплывающие окна.",
+    "backToHome": "На главную",
+    "walletLoginInfo": "Безопасный вход через Kimlik.az",
+    "loginFailed": "Ошибка входа. Попробуйте снова."
+  },
+  "login": {
+    "processingWallet": "Обработка ответа Kimlik.az...",
+    "pleaseWait": "Пожалуйста, подождите...",
+    "walletAuthSuccess": "Успешный вход!",
+    "walletAuthFailed": "Ошибка входа через Kimlik.az",
+    "redirecting": "Перенаправление...",
+    "noAuthCode": "Код авторизации не найден",
+    "invalidState": "Недействительная сессия"
+  },
+  "advertiser": {
+    "dashboard": "Панель Рекламодателя",
+    "campaigns": "Кампании",
+    "createCampaign": "Создать Кампанию",
+    "billing": "Биллинг",
+    "deposit": "Пополнить Баланс",
+    "balance": "Баланс",
+    "totalSpent": "Всего Потрачено",
+    "impressions": "Показы",
+    "clicks": "Клики",
+    "ctr": "CTR",
+    "spent": "Потрачено",
+    "status": {
+      "draft": "Черновик",
+      "active": "Активна",
+      "paused": "Приостановлена",
+      "completed": "Завершена"
+    },
+    "register": {
+      "title": "Стать Рекламодателем",
+      "companyName": "Название компании",
+      "website": "Вебсайт",
+      "submit": "Зарегистрироваться"
+    }
+  },
+  "publisher": {
+    "dashboard": "Панель Издателя",
+    "adUnits": "Рекламные Блоки",
+    "createAdUnit": "Создать Рекламный Блок",
+    "earnings": "Доходы",
+    "withdraw": "Вывести",
+    "totalEarned": "Всего Заработано",
+    "pendingEarnings": "Ожидающий Доход",
+    "register": {
+      "title": "Стать Издателем",
+      "websiteUrl": "URL сайта",
+      "websiteName": "Название сайта",
+      "category": "Категория",
+      "submit": "Зарегистрироваться"
+    },
+    "embedCode": "Код Встраивания",
+    "copyCode": "Копировать Код",
+    "codeCopied": "Код скопирован!"
+  },
+  "admin": {
+    "dashboard": "Панель Администратора",
+    "publishers": "Издатели",
+    "ads": "Реклама",
+    "approve": "Одобрить",
+    "reject": "Отклонить",
+    "pending": "На рассмотрении",
+    "approved": "Одобрено",
+    "rejected": "Отклонено"
+  },
+  "common": {
+    "loading": "Загрузка...",
+    "save": "Сохранить",
+    "cancel": "Отмена",
+    "delete": "Удалить",
+    "edit": "Редактировать",
+    "create": "Создать",
+    "search": "Поиск",
+    "noResults": "Ничего не найдено",
+    "confirm": "Подтвердить",
+    "back": "Назад",
+    "next": "Далее",
+    "previous": "Назад",
+    "actions": "Действия",
+    "all": "Все",
+    "active": "Активно",
+    "inactive": "Неактивно",
+    "view": "Просмотр",
+    "currency": "AZN"
+  },
+  "footer": {
+    "allRightsReserved": "Все права защищены.",
+    "help": "Помощь",
+    "privacy": "Конфиденциальность",
+    "terms": "Условия",
+    "contact": "Контакты",
+    "forAdvertisers": "Для Рекламодателей",
+    "forPublishers": "Для Издателей"
+  }
+}
