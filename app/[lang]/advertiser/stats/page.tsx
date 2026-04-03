@@ -73,8 +73,8 @@ export default function AdvertiserStatsPage() {
         <div className="space-y-6">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             {[
-              { icon: Eye, label: ta('impressions'), value: data.totals.impressions.toLocaleString(), color: 'text-blue-600', bg: 'bg-blue-100 dark:bg-blue-900/30' },
-              { icon: MousePointer, label: ta('clicks'), value: data.totals.clicks.toLocaleString(), color: 'text-purple-600', bg: 'bg-purple-100 dark:bg-purple-900/30' },
+              { icon: Eye, label: ta('impressions'), value: `${data.totals.impressions.toLocaleString()} (${data.totals.unique_impressions} ${tc('uniqueViews').toLowerCase()})`, color: 'text-blue-600', bg: 'bg-blue-100 dark:bg-blue-900/30' },
+              { icon: MousePointer, label: ta('clicks'), value: `${data.totals.clicks.toLocaleString()} (${data.totals.unique_clicks} ${tc('uniqueClicks').toLowerCase()})`, color: 'text-purple-600', bg: 'bg-purple-100 dark:bg-purple-900/30' },
               { icon: TrendingUp, label: 'CTR', value: `${data.totals.ctr}%`, color: 'text-green-600', bg: 'bg-green-100 dark:bg-green-900/30' },
               { icon: BarChart3, label: ta('spent'), value: `${data.totals.total_spent} AZN`, color: 'text-orange-600', bg: 'bg-orange-100 dark:bg-orange-900/30' },
             ].map((stat, i) => (
