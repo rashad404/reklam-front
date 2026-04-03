@@ -112,7 +112,7 @@ function PublisherLanding() {
 
 function PublisherDashboard() {
   const t = useTranslations('publisher');
-  const [stats, setStats] = useState({ total_earned: 0, impressions: 0, clicks: 0, active_ad_units: 0 });
+  const [stats, setStats] = useState({ balance: 0, total_earned: 0, impressions: 0, clicks: 0, active_ad_units: 0 });
   const [totalUnits, setTotalUnits] = useState(0);
 
   useEffect(() => {
