@@ -286,8 +286,9 @@ export default function CreateCampaignPage() {
                     )}
                   </div>
                 ) : (
-                  <div className="border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-xl p-8 text-center text-gray-400 text-sm">
-                    {ta('adImageUpload')}
+                  <div className="rounded-xl bg-gray-50 dark:bg-gray-800/50 p-10 text-center">
+                    <Eye className="w-8 h-8 text-gray-300 dark:text-gray-600 mx-auto mb-2" />
+                    <p className="text-sm text-gray-400">{tc('preview')}</p>
                   </div>
                 )}
               </div>
