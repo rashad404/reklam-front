@@ -25,7 +25,7 @@ function PublisherLanding() {
   const locale = getLocaleFromPathname(pathname);
   const handleLogin = () => { openWalletLogin({ locale }); };
 
-  const embedExample = `<div id="reklam-ad" data-unit="YOUR_ID" data-format="300x250"></div>\n<script src="https://reklam.biz/serve.js"></script>`;
+  const embedExample = `<div id="reklam-ad" data-unit="YOUR_ID" data-format="300x250"></div>\n<script async src="https://reklam.biz/serve.js"></script>`;
 
   return (
     <div>

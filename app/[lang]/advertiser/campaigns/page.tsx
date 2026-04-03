@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/lib/navigation';
-import { Plus, Eye, MousePointer, Play, Pause, DollarSign, Image as ImageIcon } from 'lucide-react';
+import { Plus, Eye, MousePointer, Play, Pause, DollarSign, Image as ImageIcon, Pencil } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import AuthRequiredCard from '@/components/auth/AuthRequiredCard';
 import LoadingSpinner from '@/components/auth/LoadingSpinner';
@@ -182,6 +182,12 @@ export default function CampaignsPage() {
                           <Pause className="w-3.5 h-3.5" /> {t('pauseCampaign')}
                         </button>
                       )}
+                      <Link
+                        href={`/advertiser/campaigns/${c.id}/edit`}
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700 transition-colors"
+                      >
+                        <Pencil className="w-3.5 h-3.5" /> {t('editCampaign')}
+                      </Link>
                     </div>
                   </div>
                 </div>

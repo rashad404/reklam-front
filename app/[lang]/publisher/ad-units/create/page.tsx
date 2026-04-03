@@ -56,8 +56,9 @@ export default function CreateAdUnitPage() {
 
       const unitId = res.data.data.id;
       const format = form.ad_format.replace('banner_', '');
+      const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://reklam.biz';
       setEmbedCode(
-        `<div id="reklam-ad" data-unit="${unitId}" data-format="${format}"></div>\n<script src="https://reklam.biz/serve.js"></script>`
+        `<div id="reklam-ad" data-unit="${unitId}" data-format="${format}"></div>\n<script async src="${siteUrl}/serve.js"></script>`
       );
       setStep(2);
     } catch (err: any) {

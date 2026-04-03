@@ -42,7 +42,8 @@ export default function AdUnitsPage() {
 
   const handleCopy = (unit: AdUnit) => {
     const format = unit.ad_format.replace('banner_', '');
-    const code = `<div id="reklam-ad" data-unit="${unit.id}" data-format="${format}"></div>\n<script src="https://reklam.biz/serve.js"></script>`;
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://reklam.biz';
+    const code = `<div id="reklam-ad" data-unit="${unit.id}" data-format="${format}"></div>\n<script async src="${siteUrl}/serve.js"></script>`;
     try {
       if (navigator.clipboard) {
         navigator.clipboard.writeText(code);

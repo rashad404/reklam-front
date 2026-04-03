@@ -70,10 +70,11 @@ export default function CreateCampaignPage() {
       const campaignId = campaignRes.data.data.id;
 
       // 2. Create ad creative
-      if (form.ad_title && form.ad_destination_url) {
+      const adTitle = form.ad_title || form.name;
+      if (form.ad_destination_url) {
         await apiClient.post('/ads', {
           campaign_id: campaignId,
-          title: form.ad_title,
+          title: adTitle,
           description: form.ad_description || null,
           image_url: form.ad_image_url || null,
           destination_url: form.ad_destination_url,
@@ -261,21 +262,7 @@ export default function CreateCampaignPage() {
         {/* Step 3: Ad Creative */}
         {step === 3 && (
           <div className="card space-y-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{ta('adTitle')}</label>
-              <input type="text" value={form.ad_title}
-                onChange={(e) => setForm({ ...form, ad_title: e.target.value })}
-                placeholder={ta('adTitlePlaceholder')} className={inputClass} />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{ta('adDescription')}</label>
-              <textarea value={form.ad_description}
-                onChange={(e) => setForm({ ...form, ad_description: e.target.value })}
-                placeholder={ta('adDescriptionPlaceholder')} rows={3}
-                className={inputClass + ' resize-none'} />
-            </div>
-
+            {/* Image upload - primary for display ads */}
             {form.type === 'display' && (
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{ta('adImage')}</label>
@@ -289,9 +276,9 @@ export default function CreateCampaignPage() {
                     if (!file) return;
                     setUploading(true);
                     try {
-                      const formData = new FormData();
-                      formData.append('image', file);
-                      const res = await apiClient.post('/upload/image', formData, {
+                      const fd = new FormData();
+                      fd.append('image', file);
+                      const res = await apiClient.post('/upload/image', fd, {
                         headers: { 'Content-Type': 'multipart/form-data' },
                       });
                       setForm(prev => ({ ...prev, ad_image_url: res.data.data.url }));
@@ -328,6 +315,25 @@ export default function CreateCampaignPage() {
               </div>
             )}
 
+            {/* Title & description - required for text/native, optional for display */}
+            {(form.type === 'text' || form.type === 'native') && (
+              <>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{ta('adTitle')}</label>
+                  <input type="text" value={form.ad_title}
+                    onChange={(e) => setForm({ ...form, ad_title: e.target.value })}
+                    placeholder={ta('adTitlePlaceholder')} className={inputClass} />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{ta('adDescription')}</label>
+                  <textarea value={form.ad_description}
+                    onChange={(e) => setForm({ ...form, ad_description: e.target.value })}
+                    placeholder={ta('adDescriptionPlaceholder')} rows={3}
+                    className={inputClass + ' resize-none'} />
+                </div>
+              </>
+            )}
+
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{ta('adDestination')}</label>
               <input type="url" value={form.ad_destination_url}
@@ -339,8 +345,13 @@ export default function CreateCampaignPage() {
               <button type="button" onClick={() => setStep(2)} className="btn-secondary flex-1 flex items-center justify-center gap-2">
                 <ArrowLeft className="w-4 h-4" /> {t('common.back')}
               </button>
-              <button type="button" onClick={() => form.ad_title && form.ad_destination_url ? setStep(4) : null}
-                disabled={!form.ad_title || !form.ad_destination_url}
+              <button type="button" onClick={() => {
+                const canProceed = form.type === 'display'
+                  ? form.ad_image_url && form.ad_destination_url
+                  : form.ad_title && form.ad_destination_url;
+                if (canProceed) setStep(4);
+              }}
+                disabled={form.type === 'display' ? !form.ad_image_url || !form.ad_destination_url : !form.ad_title || !form.ad_destination_url}
                 className="btn-primary flex-1 flex items-center justify-center gap-2 disabled:opacity-50">
                 {t('common.next')} <ArrowRight className="w-4 h-4" />
               </button>

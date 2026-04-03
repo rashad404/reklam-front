@@ -131,6 +131,7 @@
     "lowBalance": "Low balance, top up to run ads",
     "startCampaign": "Start",
     "pauseCampaign": "Pause",
+    "editCampaign": "Edit",
     "creating": "Creating...",
     "created": "Campaign created!",
     "noTransactions": "No transactions yet",
