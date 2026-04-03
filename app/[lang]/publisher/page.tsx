@@ -136,9 +136,9 @@ function PublisherDashboard() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         {[
           { icon: DollarSign, label: t('totalEarned'), value: `${Number(stats.total_earned || 0).toFixed(2)} AZN`, color: 'text-green-600', bg: 'bg-green-100 dark:bg-green-900/30' },
-          { icon: Wallet, label: t('pendingEarnings'), value: '0.00 AZN', color: 'text-yellow-600', bg: 'bg-yellow-100 dark:bg-yellow-900/30' },
+          { icon: Wallet, label: t('pendingEarnings'), value: `${Number(stats.balance || 0).toFixed(2)} AZN`, color: 'text-yellow-600', bg: 'bg-yellow-100 dark:bg-yellow-900/30' },
           { icon: Eye, label: t('adUnits'), value: String(totalUnits), color: 'text-blue-600', bg: 'bg-blue-100 dark:bg-blue-900/30' },
-          { icon: MousePointer, label: t('earnings'), value: `${stats.clicks || 0} clicks`, color: 'text-purple-600', bg: 'bg-purple-100 dark:bg-purple-900/30' },
+          { icon: MousePointer, label: t('earnings'), value: `${stats.clicks || 0}`, color: 'text-purple-600', bg: 'bg-purple-100 dark:bg-purple-900/30' },
         ].map((stat, i) => (
           <div key={i} className="card">
             <div className="flex items-center gap-3">
