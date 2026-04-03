@@ -33,7 +33,7 @@ function WalletCallbackContent() {
       const savedState = localStorage.getItem('wallet_oauth_state');
       if (state !== savedState) {
         setStatus('error');
-        setMessage(`state mismatch: got=${state} saved=${savedState}`);
+        setMessage(t('login.invalidState'));
         return;
       }
 
