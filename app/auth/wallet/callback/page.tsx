@@ -78,9 +78,7 @@ function CallbackContent() {
       } catch (err: any) {
         setStatus('error');
         setMessage(err.message || 'Failed');
-        if (window.opener) {
-          window.opener.postMessage({ type: 'oauth_error', message: err.message }, '*');
-        }
+        // Don't close popup - show error instead
       }
     };
 
