@@ -24,7 +24,7 @@
       "title": "Reklamçılar Üçün",
       "description": "Kampaniyalar yaradın, hədəf auditoriyasını seçin və brendinizi böyüdün",
       "cta": "Reklam Ver",
-      "pricingTypes": "Klik və göstərim əsaslı ödəniş",
+      "pricingTypes": "Klik və baxış əsaslı ödəniş",
       "adFormats": "Şəkilli, sayta uyğun, mətn reklam",
       "analytics": "Real vaxt analitika"
     },
@@ -39,7 +39,7 @@
     "stats": {
       "advertisers": "Reklamçı",
       "publishers": "Yayımçı",
-      "impressions": "Göstərim",
+      "impressions": "Baxış",
       "revenue": "Ödənilmiş Gəlir"
     },
     "howItWorks": {
@@ -94,7 +94,7 @@
     "balance": "Balans",
     "totalSpent": "Ümumi Xərc",
     "totalDeposited": "Ümumi Yatırım",
-    "impressions": "Göstərimlər",
+    "impressions": "Baxışlar",
     "clicks": "Kliklər",
     "ctr": "CTR",
     "spent": "Xərclənib",
@@ -115,10 +115,10 @@
     "pricingModel": "Ödəniş modeli",
     "pricingCpc": "Klik başına ödə",
     "pricingCpcDesc": "Yalnız reklamınıza klik edəndə ödəyirsiniz",
-    "pricingCpm": "Göstərim başına ödə",
-    "pricingCpmDesc": "Hər 1000 göstərim üçün ödəyirsiniz",
+    "pricingCpm": "Baxış başına ödə",
+    "pricingCpmDesc": "Hər 1000 baxış üçün ödəyirsiniz",
     "pricePerClick": "Hər klik üçün qiymət",
-    "pricePer1000Views": "Hər 1000 göstərim üçün qiymət",
+    "pricePer1000Views": "Hər 1000 baxış üçün qiymət",
     "step": "Addım",
     "stepDetails": "Əsas məlumatlar",
     "stepBudget": "Büdcə və ödəniş",
@@ -162,11 +162,11 @@
         },
         "pricing": {
           "title": "CPC və CPM",
-          "desc": "Klik başına və ya 1000 göstərim başına ödəyin. Öz təklifinizi təyin edin."
+          "desc": "Klik başına və ya 1000 baxış başına ödəyin. Öz təklifinizi təyin edin."
         },
         "analytics": {
           "title": "Real vaxt analitika",
-          "desc": "Göstərimləri, klikləri, CTR-i və xərcləri real vaxtda izləyin."
+          "desc": "Baxışları, klikləri, CTR-i və xərcləri real vaxtda izləyin."
         }
       },
       "steps": {
@@ -232,7 +232,7 @@
       "easyIntegration": "Asan İnteqrasiya",
       "easyIntegrationDesc": "Sadəcə 2 sətir kod yapışdırın. İstənilən veb saytla işləyir.",
       "realtimeEarnings": "Real vaxt qazanc",
-      "realtimeEarningsDesc": "Göstərimləri, klikləri və qazancı panelinizdə izləyin.",
+      "realtimeEarningsDesc": "Baxışları, klikləri və qazancı panelinizdə izləyin.",
       "addToWebsite": "Bunu veb saytınıza əlavə edin və qazanmağa başlayın",
       "supportedFormats": "Dəstəklənən Reklam Formatları",
       "ctaTitle": "Veb saytınızı monetizasiya edin",
@@ -257,7 +257,7 @@
     "rejected": "Rədd edilmiş",
     "totalPublishers": "Ümumi Yayımçılar",
     "totalAdvertisers": "Ümumi Reklamçılar",
-    "totalImpressions": "Ümumi Göstərimlər",
+    "totalImpressions": "Ümumi Baxışlar",
     "totalRevenue": "Ümumi Gəlir",
     "reviewPublishers": "Yayımçıları nəzərdən keçirin və təsdiq edin",
     "reviewAds": "Reklam kreativlərini nəzərdən keçirin və təsdiq edin",
@@ -295,7 +295,7 @@
     "days7": "7 gun",
     "days30": "30 gun",
     "days90": "90 gun",
-    "impressionsAndClicks": "Gostərimlər və Kliklər",
+    "impressionsAndClicks": "Baxışlar və Kliklər",
     "perCampaign": "Kampaniyalar uzrə",
     "perAdUnit": "Reklam blokları uzrə"
   },
@@ -314,7 +314,7 @@
     "advertiserQ1": "Necə reklam verə bilərəm?",
     "advertiserA1": "Hesab yaradın, kampaniya yaradın, büdcənizi təyin edin və reklamınızı yükləyin. Reklamınız təsdiq edildikdən sonra yayımçı saytlarında göstəriləcək.",
     "advertiserQ2": "Ödəniş necə hesablanır?",
-    "advertiserA2": "İki model var: Klik başına ödəniş (CPC) - yalnız kimsə reklamınıza klik etdikdə ödəyirsiniz. Göstərim başına ödəniş (CPM) - hər 1000 göstərim üçün ödəyirsiniz.",
+    "advertiserA2": "İki model var: Klik başına ödəniş (CPC) - yalnız kimsə reklamınıza klik etdikdə ödəyirsiniz. Baxış başına ödəniş (CPM) - hər 1000 baxış üçün ödəyirsiniz.",
     "advertiserQ3": "Minimum büdcə nə qədərdir?",
     "advertiserA3": "Minimum büdcə {minBudget} AZN-dir. Gündəlik limit təyin edə bilərsiniz.",
     "publisherTitle": "Yayımçılar üçün",
@@ -334,7 +334,7 @@
     "dataCollection": "Toplanan Məlumatlar",
     "dataCollectionDesc": "Biz aşağıdakı məlumatları toplayırıq: ad, e-poçt ünvanı, telefon nömrəsi (Kimlik.az vasitəsilə), IP ünvanı, cihaz növü, brauzer məlumatları və sayt ziyarət statistikası.",
     "dataUsage": "Məlumatların İstifadəsi",
-    "dataUsageDesc": "Topladığımız məlumatlar hesab idarəçiliyi, reklam göstərimi, statistika hesablanması, saxtakarlığın qarşısının alınması və xidmətin yaxşılaşdırılması üçün istifadə olunur.",
+    "dataUsageDesc": "Topladığımız məlumatlar hesab idarəçiliyi, reklam baxışi, statistika hesablanması, saxtakarlığın qarşısının alınması və xidmətin yaxşılaşdırılması üçün istifadə olunur.",
     "cookies": "Kukilər",
     "cookiesDesc": "Platformamız unikal ziyarətçi identifikasiyası və sessiya idarəçiliyi üçün kukilər və localStorage istifadə edir.",
     "thirdParty": "Üçüncü Tərəflər",
@@ -358,7 +358,7 @@
     "publisher3": "Minimum çıxarış məbləği {minWithdrawal} AZN-dir.",
     "publisher4": "Saxtakarlıq aşkar edilərsə hesab dayandırılacaq.",
     "fraudTitle": "Saxtakarlıq",
-    "fraudDesc": "Süni klik və göstərim yaratmaq, bot istifadəsi və hər hansı manipulyasiya ciddi şəkildə qadağandır. Belə hallar aşkar edildikdə hesab dərhal bağlanacaq.",
+    "fraudDesc": "Süni klik və baxış yaratmaq, bot istifadəsi və hər hansı manipulyasiya ciddi şəkildə qadağandır. Belə hallar aşkar edildikdə hesab dərhal bağlanacaq.",
     "contact": "Suallarınız üçün info@reklam.biz ünvanına yazın."
   },
   "settings": {
