@@ -2,17 +2,155 @@
 
 import { useTranslations } from 'next-intl';
 import { Link } from '@/lib/navigation';
-import { DollarSign, Eye, MousePointer, TrendingUp, Plus, Wallet } from 'lucide-react';
+import { DollarSign, Eye, MousePointer, TrendingUp, Plus, Wallet, Globe, Code, Zap, LogIn, Copy } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
-import AuthRequiredCard from '@/components/auth/AuthRequiredCard';
 import LoadingSpinner from '@/components/auth/LoadingSpinner';
+import { usePathname } from 'next/navigation';
+import { openWalletLogin, getLocaleFromPathname } from '@/lib/utils/walletAuth';
 
-export default function PublisherDashboard() {
-  const t = useTranslations('publisher');
+export default function PublisherPage() {
+  const t = useTranslations();
   const { isAuthenticated, isLoading } = useAuth();
 
   if (isLoading) return <LoadingSpinner />;
-  if (!isAuthenticated) return <AuthRequiredCard />;
+
+  if (isAuthenticated) {
+    return <PublisherDashboard />;
+  }
+
+  return <PublisherLanding />;
+}
+
+function PublisherLanding() {
+  const t = useTranslations();
+  const pathname = usePathname();
+  const locale = getLocaleFromPathname(pathname);
+
+  const handleLogin = () => {
+    openWalletLogin({ locale });
+  };
+
+  const embedExample = `<div id="reklam-ad" data-unit="YOUR_ID" data-format="300x250"></div>\n<script src="https://reklam.biz/serve.js"></script>`;
+
+  return (
+    <div>
+      {/* Hero */}
+      <section className="relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-green-50 via-white to-emerald-50 dark:from-gray-950 dark:via-gray-900 dark:to-green-950/20" />
+        <div className="relative container mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24">
+          <div className="text-center max-w-3xl mx-auto">
+            <div className="inline-flex items-center gap-2 px-3 py-1 bg-green-100 dark:bg-green-900/30 text-green-600 rounded-full text-sm font-medium mb-6">
+              <Globe className="w-4 h-4" />
+              {t('home.forPublishers.title')}
+            </div>
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white mb-4">
+              {t('home.forPublishers.description')}
+            </h1>
+            <p className="text-lg text-gray-600 dark:text-gray-400 mb-8">
+              70% revenue share - minimum 5 AZN withdrawal
+            </p>
+            <button onClick={handleLogin} className="btn-primary inline-flex items-center gap-2 text-lg px-8 py-4 !bg-green-600 hover:!bg-green-700">
+              <LogIn className="w-5 h-5" />
+              {t('nav.getStarted')}
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* Features */}
+      <section className="container mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div className="grid md:grid-cols-3 gap-8">
+          {[
+            {
+              icon: DollarSign,
+              title: '70% Revenue Share',
+              desc: 'Earn 70% of all ad revenue generated on your website.',
+              color: 'text-green-600',
+              bg: 'bg-green-100 dark:bg-green-900/30',
+            },
+            {
+              icon: Code,
+              title: 'Easy Integration',
+              desc: 'Just paste 2 lines of code. Works with any website.',
+              color: 'text-blue-600',
+              bg: 'bg-blue-100 dark:bg-blue-900/30',
+            },
+            {
+              icon: Zap,
+              title: 'Real-time Earnings',
+              desc: 'Track impressions, clicks and earnings in your dashboard.',
+              color: 'text-purple-600',
+              bg: 'bg-purple-100 dark:bg-purple-900/30',
+            },
+          ].map((f, i) => (
+            <div key={i} className="card text-center hover-lift">
+              <div className={`w-12 h-12 rounded-xl ${f.bg} flex items-center justify-center mx-auto mb-4`}>
+                <f.icon className={`w-6 h-6 ${f.color}`} />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">{f.title}</h3>
+              <p className="text-gray-600 dark:text-gray-400">{f.desc}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Code example */}
+      <section className="bg-gray-50 dark:bg-gray-900/50 border-y border-gray-200 dark:border-gray-800">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-16">
+          <div className="max-w-2xl mx-auto text-center">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+              {t('publisher.embedCode')}
+            </h2>
+            <p className="text-gray-600 dark:text-gray-400 mb-6">
+              Add this to your website and start earning
+            </p>
+            <pre className="bg-gray-900 dark:bg-gray-800 rounded-xl p-6 text-left text-sm text-green-400 overflow-x-auto">
+              {embedExample}
+            </pre>
+          </div>
+        </div>
+      </section>
+
+      {/* Ad formats */}
+      <section className="container mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <h2 className="text-2xl font-bold text-center text-gray-900 dark:text-white mb-10">
+          Supported Ad Formats
+        </h2>
+        <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-4 max-w-4xl mx-auto">
+          {[
+            { name: 'Leaderboard', size: '728x90' },
+            { name: 'Medium Rectangle', size: '300x250' },
+            { name: 'Mobile Banner', size: '320x50' },
+            { name: 'Native', size: 'Responsive' },
+            { name: 'Text', size: 'Inline' },
+          ].map((f, i) => (
+            <div key={i} className="card text-center py-4">
+              <p className="font-semibold text-gray-900 dark:text-white text-sm">{f.name}</p>
+              <p className="text-xs text-gray-500">{f.size}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="container mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+          Start monetizing your website
+        </h2>
+        <p className="text-gray-600 dark:text-gray-400 mb-8">
+          Join our publisher network and earn from your traffic
+        </p>
+        <button onClick={handleLogin} className="btn-primary inline-flex items-center gap-2 !bg-green-600 hover:!bg-green-700">
+          <LogIn className="w-4 h-4" />
+          {t('auth.loginWithWallet')}
+        </button>
+      </section>
+    </div>
+  );
+}
+
+function PublisherDashboard() {
+  const t = useTranslations('publisher');
 
   return (
     <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -24,7 +162,6 @@ export default function PublisherDashboard() {
         </Link>
       </div>
 
-      {/* Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         {[
           { icon: DollarSign, label: t('totalEarned'), value: '0.00 AZN', color: 'text-green-600', bg: 'bg-green-100 dark:bg-green-900/30' },
@@ -46,7 +183,6 @@ export default function PublisherDashboard() {
         ))}
       </div>
 
-      {/* Quick Actions */}
       <div className="grid md:grid-cols-2 gap-4">
         <Link href="/publisher/ad-units" className="card hover-lift flex items-center gap-4">
           <div className="w-12 h-12 rounded-xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">

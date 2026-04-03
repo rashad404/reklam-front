@@ -2,17 +2,137 @@
 
 import { useTranslations } from 'next-intl';
 import { Link } from '@/lib/navigation';
-import { DollarSign, Eye, MousePointer, TrendingUp, Plus, CreditCard } from 'lucide-react';
+import { DollarSign, Eye, MousePointer, TrendingUp, Plus, CreditCard, BarChart3, Target, Zap, ArrowRight, LogIn } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
-import AuthRequiredCard from '@/components/auth/AuthRequiredCard';
 import LoadingSpinner from '@/components/auth/LoadingSpinner';
+import { usePathname } from 'next/navigation';
+import { openWalletLogin, getLocaleFromPathname } from '@/lib/utils/walletAuth';
 
-export default function AdvertiserDashboard() {
-  const t = useTranslations('advertiser');
-  const { isAuthenticated, isLoading } = useAuth();
+export default function AdvertiserPage() {
+  const t = useTranslations();
+  const ta = useTranslations('advertiser');
+  const { user, isAuthenticated, isLoading } = useAuth();
 
   if (isLoading) return <LoadingSpinner />;
-  if (!isAuthenticated) return <AuthRequiredCard />;
+
+  // Authenticated: show dashboard
+  if (isAuthenticated) {
+    return <AdvertiserDashboard />;
+  }
+
+  // Not authenticated: show public landing
+  return <AdvertiserLanding />;
+}
+
+function AdvertiserLanding() {
+  const t = useTranslations();
+  const pathname = usePathname();
+  const locale = getLocaleFromPathname(pathname);
+
+  const handleLogin = () => {
+    openWalletLogin({ locale });
+  };
+
+  return (
+    <div>
+      {/* Hero */}
+      <section className="relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-red-50 via-white to-orange-50 dark:from-gray-950 dark:via-gray-900 dark:to-red-950/20" />
+        <div className="relative container mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24">
+          <div className="text-center max-w-3xl mx-auto">
+            <div className="inline-flex items-center gap-2 px-3 py-1 bg-red-100 dark:bg-red-900/30 text-[#FF3131] rounded-full text-sm font-medium mb-6">
+              <Target className="w-4 h-4" />
+              {t('home.forAdvertisers.title')}
+            </div>
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white mb-4">
+              {t('home.forAdvertisers.description')}
+            </h1>
+            <p className="text-lg text-gray-600 dark:text-gray-400 mb-8">
+              CPC & CPM - Banner, Native, Text
+            </p>
+            <button onClick={handleLogin} className="btn-primary inline-flex items-center gap-2 text-lg px-8 py-4">
+              <LogIn className="w-5 h-5" />
+              {t('nav.getStarted')}
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* Features */}
+      <section className="container mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div className="grid md:grid-cols-3 gap-8">
+          {[
+            {
+              icon: Target,
+              title: 'Display, Native & Text',
+              desc: 'Banner 728x90, 300x250, 320x50, native ads, text ads',
+            },
+            {
+              icon: BarChart3,
+              title: 'CPC & CPM',
+              desc: 'Pay per click or per 1000 impressions. Set your own bids.',
+            },
+            {
+              icon: TrendingUp,
+              title: 'Real-time Analytics',
+              desc: 'Track impressions, clicks, CTR, and spend in real time.',
+            },
+          ].map((f, i) => (
+            <div key={i} className="card text-center hover-lift">
+              <div className="w-12 h-12 rounded-xl bg-red-100 dark:bg-red-900/30 flex items-center justify-center mx-auto mb-4">
+                <f.icon className="w-6 h-6 text-[#FF3131]" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">{f.title}</h3>
+              <p className="text-gray-600 dark:text-gray-400">{f.desc}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* How it works */}
+      <section className="bg-gray-50 dark:bg-gray-900/50 border-y border-gray-200 dark:border-gray-800">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-16">
+          <h2 className="text-2xl font-bold text-center text-gray-900 dark:text-white mb-10">
+            {t('home.howItWorks.title')}
+          </h2>
+          <div className="grid md:grid-cols-4 gap-6 max-w-4xl mx-auto">
+            {[
+              { step: '1', title: 'Register', desc: 'Create account via Kimlik.az' },
+              { step: '2', title: 'Create Campaign', desc: 'Set budget, bids, targeting' },
+              { step: '3', title: 'Upload Ads', desc: 'Add banners or text creatives' },
+              { step: '4', title: 'Get Results', desc: 'Track clicks & conversions' },
+            ].map((s, i) => (
+              <div key={i} className="text-center">
+                <div className="w-10 h-10 rounded-full bg-[#FF3131] text-white font-bold flex items-center justify-center mx-auto mb-3">
+                  {s.step}
+                </div>
+                <h3 className="font-semibold text-gray-900 dark:text-white mb-1">{s.title}</h3>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{s.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="container mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+          Ready to grow your business?
+        </h2>
+        <p className="text-gray-600 dark:text-gray-400 mb-8">
+          Start advertising to thousands of websites in Azerbaijan
+        </p>
+        <button onClick={handleLogin} className="btn-primary inline-flex items-center gap-2">
+          <LogIn className="w-4 h-4" />
+          {t('auth.loginWithWallet')}
+        </button>
+      </section>
+    </div>
+  );
+}
+
+function AdvertiserDashboard() {
+  const t = useTranslations('advertiser');
 
   return (
     <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -24,7 +144,6 @@ export default function AdvertiserDashboard() {
         </Link>
       </div>
 
-      {/* Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         {[
           { icon: DollarSign, label: t('balance'), value: '0.00 AZN', color: 'text-green-600', bg: 'bg-green-100 dark:bg-green-900/30' },
@@ -46,8 +165,7 @@ export default function AdvertiserDashboard() {
         ))}
       </div>
 
-      {/* Quick Actions */}
-      <div className="grid md:grid-cols-2 gap-4 mb-8">
+      <div className="grid md:grid-cols-2 gap-4">
         <Link href="/advertiser/campaigns" className="card hover-lift flex items-center gap-4">
           <div className="w-12 h-12 rounded-xl bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
             <TrendingUp className="w-6 h-6 text-[#FF3131]" />
