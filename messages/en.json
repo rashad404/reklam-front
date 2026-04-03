@@ -283,7 +283,21 @@
     "inactive": "Inactive",
     "view": "View",
     "currency": "AZN",
-    "realTimeAnalytics": "Real-time Analytics"
+    "realTimeAnalytics": "Real-time Analytics",
+    "statistics": "Statistics",
+    "device": "Device",
+    "country": "Country",
+    "browser": "Browser",
+    "desktop": "Desktop",
+    "mobile": "Mobile",
+    "tablet": "Tablet",
+    "unknown": "Unknown",
+    "days7": "7 days",
+    "days30": "30 days",
+    "days90": "90 days",
+    "impressionsAndClicks": "Impressions & Clicks",
+    "perCampaign": "By Campaign",
+    "perAdUnit": "By Ad Unit"
   },
   "footer": {
     "allRightsReserved": "All rights reserved.",

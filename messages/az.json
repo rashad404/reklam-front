@@ -283,7 +283,21 @@
     "inactive": "Deaktiv",
     "view": "Bax",
     "currency": "AZN",
-    "realTimeAnalytics": "Real vaxt analitika"
+    "realTimeAnalytics": "Real vaxt analitika",
+    "statistics": "Statistika",
+    "device": "Cihaz",
+    "country": "Olkə",
+    "browser": "Brauzer",
+    "desktop": "Kompyuter",
+    "mobile": "Mobil",
+    "tablet": "Planşet",
+    "unknown": "Naməlum",
+    "days7": "7 gun",
+    "days30": "30 gun",
+    "days90": "90 gun",
+    "impressionsAndClicks": "Gostərimlər və Kliklər",
+    "perCampaign": "Kampaniyalar uzrə",
+    "perAdUnit": "Reklam blokları uzrə"
   },
   "footer": {
     "allRightsReserved": "Bütün hüquqlar qorunur.",

@@ -2,8 +2,9 @@
 
 import { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
+import { useParams } from 'next/navigation';
 import { Link } from '@/lib/navigation';
-import { ArrowLeft, Eye, MousePointer, TrendingUp, Globe, Monitor, Smartphone, Tablet, BarChart3 } from 'lucide-react';
+import { ArrowLeft, Eye, MousePointer, TrendingUp, Globe, Monitor, Smartphone, Tablet } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import AuthRequiredCard from '@/components/auth/AuthRequiredCard';
 import LoadingSpinner from '@/components/auth/LoadingSpinner';
@@ -11,25 +12,30 @@ import apiClient from '@/lib/api/client';
 
 interface DailyData { date: string; impressions: number; clicks: number; ctr: number }
 interface BreakdownData { label: string; impressions: number; clicks: number; ctr: number }
-interface CampaignData { campaign_id: number; name: string; impressions: number; clicks: number; ctr: number }
 
-export default function AdvertiserStatsPage() {
+export default function CampaignStatsPage() {
   const t = useTranslations();
   const ta = useTranslations('advertiser');
   const tc = useTranslations('common');
+  const params = useParams();
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   const [loading, setLoading] = useState(true);
   const [range, setRange] = useState('30');
   const [data, setData] = useState<any>(null);
+  const [campaignName, setCampaignName] = useState('');
 
   const fetchStats = (days: string) => {
     setLoading(true);
     const from = new Date(Date.now() - parseInt(days) * 86400000).toISOString().split('T')[0];
     const to = new Date().toISOString().split('T')[0];
-    apiClient.get(`/stats/advertiser?from=${from}&to=${to}`)
-      .then(res => setData(res.data.data))
-      .catch(() => {})
-      .finally(() => setLoading(false));
+    Promise.all([
+      apiClient.get(`/stats/campaign/${params.id}?from=${from}&to=${to}`),
+      apiClient.get(`/campaigns/${params.id}`),
+    ]).then(([statsRes, campRes]) => {
+      setData(statsRes.data.data);
+      setCampaignName(campRes.data.data?.name || '');
+    }).catch(() => {})
+    .finally(() => setLoading(false));
   };
 
   useEffect(() => {
@@ -52,10 +58,13 @@ export default function AdvertiserStatsPage() {
     <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
-          <Link href="/advertiser" className="w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center hover:bg-gray-200 dark:hover:bg-gray-700">
+          <Link href="/advertiser/stats" className="w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center hover:bg-gray-200 dark:hover:bg-gray-700">
             <ArrowLeft className="w-4 h-4" />
           </Link>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{tc('statistics')}</h1>
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{campaignName}</h1>
+            <p className="text-sm text-gray-500">{tc('statistics')}</p>
+          </div>
         </div>
         <div className="flex gap-1 bg-gray-100 dark:bg-gray-800 rounded-lg p-1">
           {[['7', tc('days7')], ['30', tc('days30')], ['90', tc('days90')]].map(([val, label]) => (
@@ -76,7 +85,7 @@ export default function AdvertiserStatsPage() {
               { icon: Eye, label: ta('impressions'), value: data.totals.impressions.toLocaleString(), color: 'text-blue-600', bg: 'bg-blue-100 dark:bg-blue-900/30' },
               { icon: MousePointer, label: ta('clicks'), value: data.totals.clicks.toLocaleString(), color: 'text-purple-600', bg: 'bg-purple-100 dark:bg-purple-900/30' },
               { icon: TrendingUp, label: 'CTR', value: `${data.totals.ctr}%`, color: 'text-green-600', bg: 'bg-green-100 dark:bg-green-900/30' },
-              { icon: BarChart3, label: ta('spent'), value: `${data.totals.total_spent} AZN`, color: 'text-orange-600', bg: 'bg-orange-100 dark:bg-orange-900/30' },
+              { icon: TrendingUp, label: ta('spent'), value: `${data.totals.spent} / ${data.totals.budget} AZN`, color: 'text-orange-600', bg: 'bg-orange-100 dark:bg-orange-900/30' },
             ].map((stat, i) => (
               <div key={i} className="card">
                 <div className="flex items-center gap-3">
@@ -165,40 +174,6 @@ export default function AdvertiserStatsPage() {
               </div>
             </div>
           </div>
-
-          {data.by_campaign && data.by_campaign.length > 0 && (
-            <div className="card">
-              <h2 className="text-sm font-semibold text-gray-900 dark:text-white mb-4">{tc('perCampaign')}</h2>
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="text-left text-gray-500 border-b border-gray-200 dark:border-gray-700">
-                      <th className="pb-2 font-medium">{ta('campaignName')}</th>
-                      <th className="pb-2 font-medium text-right">{ta('impressions')}</th>
-                      <th className="pb-2 font-medium text-right">{ta('clicks')}</th>
-                      <th className="pb-2 font-medium text-right">CTR</th>
-                      <th className="pb-2 font-medium text-right"></th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {(data.by_campaign as CampaignData[]).map((c, i) => (
-                      <tr key={i} className="border-b border-gray-100 dark:border-gray-800">
-                        <td className="py-2 text-gray-900 dark:text-white">{c.name}</td>
-                        <td className="py-2 text-right text-gray-600 dark:text-gray-400">{c.impressions}</td>
-                        <td className="py-2 text-right text-gray-600 dark:text-gray-400">{c.clicks}</td>
-                        <td className="py-2 text-right text-gray-600 dark:text-gray-400">{c.ctr}%</td>
-                        <td className="py-2 text-right">
-                          <Link href={`/advertiser/stats/${c.campaign_id}`} className="text-xs text-[#FF3131] font-medium hover:underline">
-                            {tc('view')}
-                          </Link>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          )}
 
           {data.by_browser && data.by_browser.length > 0 && (
             <div className="card">
