@@ -5,6 +5,7 @@ import { DollarSign, ArrowUpCircle, Clock } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import AuthRequiredCard from '@/components/auth/AuthRequiredCard';
 import LoadingSpinner from '@/components/auth/LoadingSpinner';
+import { PLATFORM_CONFIG } from '@/lib/config';
 
 export default function EarningsPage() {
   const t = useTranslations('publisher');
@@ -51,7 +52,7 @@ export default function EarningsPage() {
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t('earningsHistory')}</h2>
           <button className="btn-primary text-sm" disabled>
-            {t('minWithdraw')}
+            {t('minWithdraw', { minWithdrawal: PLATFORM_CONFIG.minWithdrawal })}
           </button>
         </div>
         <div className="text-center py-8 text-gray-500 dark:text-gray-400">

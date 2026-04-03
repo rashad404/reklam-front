@@ -2,9 +2,11 @@
 
 import { useTranslations } from 'next-intl';
 import { FileText } from 'lucide-react';
+import { PLATFORM_CONFIG } from '@/lib/config';
 
 export default function TermsPage() {
   const t = useTranslations('terms');
+  const cfg = PLATFORM_CONFIG;
 
   return (
     <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 max-w-3xl">
@@ -46,7 +48,7 @@ export default function TermsPage() {
             {['publisher1', 'publisher2', 'publisher3', 'publisher4'].map(k => (
               <li key={k} className="flex gap-2 text-sm text-gray-600 dark:text-gray-400">
                 <span className="text-[#FF3131] shrink-0">-</span>
-                {t(k)}
+                {t(k, { revenueShare: cfg.publisherRevenueShare, commission: cfg.platformCommission, minWithdrawal: cfg.minWithdrawal })}
               </li>
             ))}
           </ul>

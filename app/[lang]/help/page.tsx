@@ -2,9 +2,11 @@
 
 import { useTranslations } from 'next-intl';
 import { HelpCircle, Megaphone, Globe, Mail } from 'lucide-react';
+import { PLATFORM_CONFIG } from '@/lib/config';
 
 export default function HelpPage() {
   const t = useTranslations('help');
+  const cfg = PLATFORM_CONFIG;
 
   return (
     <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 max-w-3xl">
@@ -24,7 +26,7 @@ export default function HelpPage() {
             {['Q1', 'Q2', 'Q3'].map(q => (
               <div key={q}>
                 <h3 className="font-semibold text-gray-900 dark:text-white mb-1">{t(`advertiser${q}`)}</h3>
-                <p className="text-gray-600 dark:text-gray-400 text-sm">{t(`advertiser${q.replace('Q', 'A')}`)}</p>
+                <p className="text-gray-600 dark:text-gray-400 text-sm">{t(`advertiser${q.replace('Q', 'A')}`, { minBudget: cfg.minBudget })}</p>
               </div>
             ))}
           </div>
@@ -40,7 +42,7 @@ export default function HelpPage() {
             {['Q1', 'Q2', 'Q3'].map(q => (
               <div key={q}>
                 <h3 className="font-semibold text-gray-900 dark:text-white mb-1">{t(`publisher${q}`)}</h3>
-                <p className="text-gray-600 dark:text-gray-400 text-sm">{t(`publisher${q.replace('Q', 'A')}`)}</p>
+                <p className="text-gray-600 dark:text-gray-400 text-sm">{t(`publisher${q.replace('Q', 'A')}`, { revenueShare: cfg.publisherRevenueShare, minWithdrawal: cfg.minWithdrawal })}</p>
               </div>
             ))}
           </div>

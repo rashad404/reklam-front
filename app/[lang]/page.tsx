@@ -3,6 +3,7 @@
 import { useTranslations } from 'next-intl';
 import { Link } from '@/lib/navigation';
 import { Megaphone, Globe, TrendingUp, Users, Eye, DollarSign, ArrowRight, BarChart3, MousePointer, Zap } from 'lucide-react';
+import { PLATFORM_CONFIG } from '@/lib/config';
 
 export default function HomePage() {
   const t = useTranslations();
@@ -101,7 +102,7 @@ export default function HomePage() {
             <ul className="space-y-2 mb-6 text-sm text-gray-600 dark:text-gray-400">
               <li className="flex items-center gap-2">
                 <DollarSign className="w-4 h-4 text-green-600" />
-                {t('home.forPublishers.revenueShare')}
+                {t('home.forPublishers.revenueShare', { revenueShare: PLATFORM_CONFIG.publisherRevenueShare })}
               </li>
               <li className="flex items-center gap-2">
                 <Zap className="w-4 h-4 text-green-600" />

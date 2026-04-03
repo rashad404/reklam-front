@@ -9,6 +9,7 @@ import LoadingSpinner from '@/components/auth/LoadingSpinner';
 import { usePathname } from 'next/navigation';
 import { openWalletLogin, getLocaleFromPathname } from '@/lib/utils/walletAuth';
 import apiClient from '@/lib/api/client';
+import { PLATFORM_CONFIG } from '@/lib/config';
 
 export default function PublisherPage() {
   const { isAuthenticated, isLoading } = useAuth();
@@ -41,7 +42,7 @@ function PublisherLanding() {
               {t('home.forPublishers.description')}
             </h1>
             <p className="text-lg text-gray-600 dark:text-gray-400 mb-8">
-              {tp('revenueShare')} - {t('publisher.minWithdraw')}
+              {tp('revenueShare', { revenueShare: PLATFORM_CONFIG.publisherRevenueShare })} - {t('publisher.minWithdraw', { minWithdrawal: PLATFORM_CONFIG.minWithdrawal })}
             </p>
             <button onClick={handleLogin} className="btn-primary inline-flex items-center gap-2 text-lg px-8 py-4 !bg-green-600 hover:!bg-green-700">
               <LogIn className="w-5 h-5" />
@@ -54,7 +55,7 @@ function PublisherLanding() {
       <section className="container mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="grid md:grid-cols-3 gap-8">
           {[
-            { icon: DollarSign, title: tp('revenueShare'), desc: tp('revenueShareDesc'), color: 'text-green-600', bg: 'bg-green-100 dark:bg-green-900/30' },
+            { icon: DollarSign, title: tp('revenueShare', { revenueShare: PLATFORM_CONFIG.publisherRevenueShare }), desc: tp('revenueShareDesc', { revenueShare: PLATFORM_CONFIG.publisherRevenueShare }), color: 'text-green-600', bg: 'bg-green-100 dark:bg-green-900/30' },
             { icon: Code, title: tp('easyIntegration'), desc: tp('easyIntegrationDesc'), color: 'text-blue-600', bg: 'bg-blue-100 dark:bg-blue-900/30' },
             { icon: Zap, title: tp('realtimeEarnings'), desc: tp('realtimeEarningsDesc'), color: 'text-purple-600', bg: 'bg-purple-100 dark:bg-purple-900/30' },
           ].map((f, i) => (
