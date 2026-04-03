@@ -23,12 +23,18 @@
     "forAdvertisers": {
       "title": "For Advertisers",
       "description": "Create campaigns, target your audience, and grow your brand",
-      "cta": "Start Advertising"
+      "cta": "Start Advertising",
+      "pricingTypes": "Pay per click or per view",
+      "adFormats": "Image, native, text ads",
+      "analytics": "Real-time analytics"
     },
     "forPublishers": {
       "title": "For Publishers",
       "description": "Earn revenue by displaying ads on your website",
-      "cta": "Start Earning"
+      "cta": "Start Earning",
+      "revenueShare": "70% revenue share",
+      "easyEmbed": "Easy embed code",
+      "earningsDashboard": "Earnings dashboard"
     },
     "stats": {
       "advertisers": "Advertisers",

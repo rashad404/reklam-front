@@ -23,12 +23,18 @@
     "forAdvertisers": {
       "title": "Reklamçılar Üçün",
       "description": "Kampaniyalar yaradın, hədəf auditoriyasını seçin və brendinizi böyüdün",
-      "cta": "Reklam Ver"
+      "cta": "Reklam Ver",
+      "pricingTypes": "Klik və göstərim əsaslı ödəniş",
+      "adFormats": "Şəkilli, sayta uyğun, mətn reklam",
+      "analytics": "Real vaxt analitika"
     },
     "forPublishers": {
       "title": "Yayımçılar Üçün",
       "description": "Veb saytınızda reklam göstərərək gəlir qazanın",
-      "cta": "Qazanmağa Başla"
+      "cta": "Qazanmağa Başla",
+      "revenueShare": "70% gəlir payı",
+      "easyEmbed": "Asan yerləşdirmə kodu",
+      "earningsDashboard": "Qazanc paneli"
     },
     "stats": {
       "advertisers": "Reklamçı",

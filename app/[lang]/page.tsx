@@ -71,15 +71,15 @@ export default function HomePage() {
             <ul className="space-y-2 mb-6 text-sm text-gray-600 dark:text-gray-400">
               <li className="flex items-center gap-2">
                 <BarChart3 className="w-4 h-4 text-[#FF3131]" />
-                CPC & CPM
+                {t('home.forAdvertisers.pricingTypes')}
               </li>
               <li className="flex items-center gap-2">
                 <MousePointer className="w-4 h-4 text-[#FF3131]" />
-                Display, Native, Text
+                {t('home.forAdvertisers.adFormats')}
               </li>
               <li className="flex items-center gap-2">
                 <TrendingUp className="w-4 h-4 text-[#FF3131]" />
-                {t('common.realTimeAnalytics')}
+                {t('home.forAdvertisers.analytics')}
               </li>
             </ul>
             <Link href="/advertiser" className="text-[#FF3131] font-medium text-sm flex items-center gap-1 hover:gap-2 transition-all">
@@ -101,15 +101,15 @@ export default function HomePage() {
             <ul className="space-y-2 mb-6 text-sm text-gray-600 dark:text-gray-400">
               <li className="flex items-center gap-2">
                 <DollarSign className="w-4 h-4 text-green-600" />
-                70% Revenue Share
+                {t('home.forPublishers.revenueShare')}
               </li>
               <li className="flex items-center gap-2">
                 <Zap className="w-4 h-4 text-green-600" />
-                Easy JS Embed
+                {t('home.forPublishers.easyEmbed')}
               </li>
               <li className="flex items-center gap-2">
                 <TrendingUp className="w-4 h-4 text-green-600" />
-                Earnings Dashboard
+                {t('home.forPublishers.earningsDashboard')}
               </li>
             </ul>
             <Link href="/publisher" className="text-green-600 font-medium text-sm flex items-center gap-1 hover:gap-2 transition-all">

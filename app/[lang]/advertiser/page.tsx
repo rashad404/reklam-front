@@ -37,7 +37,7 @@ function AdvertiserLanding() {
             <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white mb-4">
               {t('home.forAdvertisers.description')}
             </h1>
-            <p className="text-lg text-gray-600 dark:text-gray-400 mb-8">CPC & CPM - Banner, Native, Text</p>
+            <p className="text-lg text-gray-600 dark:text-gray-400 mb-8">{t('home.forAdvertisers.pricingTypes')} - {t('home.forAdvertisers.adFormats')}</p>
             <button onClick={handleLogin} className="btn-primary inline-flex items-center gap-2 text-lg px-8 py-4">
               <LogIn className="w-5 h-5" />
               {t('nav.getStarted')}
