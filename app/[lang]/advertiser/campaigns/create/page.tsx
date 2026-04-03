@@ -11,11 +11,8 @@ import LoadingSpinner from '@/components/auth/LoadingSpinner';
 
 export default function CreateCampaignPage() {
   const t = useTranslations();
-  const { isAuthenticated, isLoading } = useAuth();
-
-  if (isLoading) return <LoadingSpinner />;
-  if (!isAuthenticated) return <AuthRequiredCard />;
   const router = useRouter();
+  const { isAuthenticated, isLoading } = useAuth();
   const [form, setForm] = useState({
     name: '',
     type: 'display',
@@ -26,6 +23,9 @@ export default function CreateCampaignPage() {
     start_date: '',
     end_date: '',
   });
+
+  if (isLoading) return <LoadingSpinner />;
+  if (!isAuthenticated) return <AuthRequiredCard />;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -44,7 +44,7 @@ export default function CreateCampaignPage() {
 
       <form onSubmit={handleSubmit} className="card space-y-6">
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Campaign Name</label>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('advertiser.campaigns')}</label>
           <input
             type="text"
             value={form.name}
@@ -69,7 +69,7 @@ export default function CreateCampaignPage() {
 
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Budget (AZN)</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('advertiser.balance')} (AZN)</label>
             <input
               type="number"
               step="0.01"

@@ -11,11 +11,8 @@ import LoadingSpinner from '@/components/auth/LoadingSpinner';
 
 export default function CreateAdUnitPage() {
   const t = useTranslations();
-  const { isAuthenticated, isLoading } = useAuth();
-
-  if (isLoading) return <LoadingSpinner />;
-  if (!isAuthenticated) return <AuthRequiredCard />;
   const router = useRouter();
+  const { isAuthenticated, isLoading } = useAuth();
   const [copied, setCopied] = useState(false);
   const [form, setForm] = useState({
     name: '',
@@ -23,6 +20,9 @@ export default function CreateAdUnitPage() {
     website_url: '',
     page_url: '',
   });
+
+  if (isLoading) return <LoadingSpinner />;
+  if (!isAuthenticated) return <AuthRequiredCard />;
 
   const embedCode = `<div id="reklam-ad" data-unit="UNIT_ID" data-format="${form.ad_format.replace('banner_', '')}"></div>\n<script src="https://reklam.biz/serve.js"></script>`;
 
