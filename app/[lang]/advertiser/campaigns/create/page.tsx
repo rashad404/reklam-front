@@ -242,22 +242,25 @@ export default function CreateCampaignPage() {
                 <p className="text-xs font-medium text-gray-500 mb-3 uppercase tracking-wider">{tc('preview')}</p>
 
                 {/* Preview tabs if multiple images */}
-                {uploadedSizes.length > 1 && (
+                {(uploadedSizes.length > 1 || (uploadedSizes.length >= 1 && hasText)) && (
                   <div className="flex gap-1 mb-3 bg-gray-100 dark:bg-gray-800 rounded-lg p-1">
-                    {uploadedSizes.map(([size]) => (
-                      <button key={size} type="button" onClick={() => setPreviewTab(size)}
-                        className={`flex-1 px-2 py-1 text-[10px] font-medium rounded-md transition-colors ${
-                          activePreviewSize === size ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm' : 'text-gray-500'
-                        }`}>
-                        {size}
-                      </button>
-                    ))}
+                    {uploadedSizes.map(([size]) => {
+                      const sizeLabel = adSizes.find(s => s.key === size)?.label || size;
+                      return (
+                        <button key={size} type="button" onClick={() => setPreviewTab(size)}
+                          className={`flex-1 px-2 py-1 text-[10px] font-medium rounded-md transition-colors ${
+                            activePreviewSize === size && previewTab !== 'text' ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm' : 'text-gray-500'
+                          }`}>
+                          {sizeLabel}
+                        </button>
+                      );
+                    })}
                     {hasText && (
                       <button type="button" onClick={() => setPreviewTab('text')}
                         className={`flex-1 px-2 py-1 text-[10px] font-medium rounded-md transition-colors ${
                           previewTab === 'text' ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm' : 'text-gray-500'
                         }`}>
-                        Text
+                        {ta('formatText')}
                       </button>
                     )}
                   </div>
@@ -352,7 +355,7 @@ export default function CreateCampaignPage() {
                 <div className="flex justify-between"><span className="text-gray-500">{form.pricing === 'cpc' ? ta('pricePerClick') : ta('pricePer1000Views')}</span><span className="font-medium text-gray-900 dark:text-white">{form.bid} AZN</span></div>
                 <div className="flex justify-between"><span className="text-gray-500">{ta('budget')}</span><span className="font-medium text-gray-900 dark:text-white">{form.budget} AZN</span></div>
                 {hasAnyImage && <div className="flex justify-between"><span className="text-gray-500">{ta('adImage')}</span><span className="font-medium text-gray-900 dark:text-white">{uploadedSizes.map(([k]) => k).join(', ')}</span></div>}
-                {hasText && <div className="flex justify-between"><span className="text-gray-500">Text</span><span className="font-medium text-green-600">+</span></div>}
+                {hasText && <div className="flex justify-between"><span className="text-gray-500">{ta('formatText')}</span><span className="font-medium text-green-600">+</span></div>}
               </div>
               <div className="flex gap-3">
                 <button type="button" onClick={() => setStep(2)} className="btn-secondary flex-1 flex items-center justify-center gap-2"><ArrowLeft className="w-4 h-4" /> {t('common.back')}</button>
