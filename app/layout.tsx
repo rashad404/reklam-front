@@ -4,7 +4,7 @@ import { ThemeProvider } from "@/providers/theme-provider";
 
 export const metadata: Metadata = {
   title: "Reklam.biz - Reklam Şəbəkəsi",
-  description: "Reklamçılar üçün reklam yerləşdirmə və naşirlər üçün gəlir qazanma platforması",
+  description: "Reklamçılar üçün reklam yerləşdirmə və yayımçılar üçün gəlir qazanma platforması",
   icons: {
     icon: '/favicon.ico',
   },

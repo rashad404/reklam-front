@@ -1,12 +1,12 @@
 {
   "metadata": {
     "title": "Reklam.biz - Reklam Şəbəkəsi",
-    "description": "Reklamçılar üçün reklam yerləşdirmə və naşirlər üçün gəlir qazanma platforması"
+    "description": "Reklamçılar üçün reklam yerləşdirmə və yayımçılar üçün gəlir qazanma platforması"
   },
   "nav": {
     "home": "Ana Səhifə",
     "advertiser": "Reklamçı",
-    "publisher": "Naşir",
+    "publisher": "Yayımçı",
     "admin": "Admin",
     "settings": "Parametrlər",
     "signIn": "Daxil ol",
@@ -16,7 +16,7 @@
   "home": {
     "hero": {
       "title": "Reklam Şəbəkəniz",
-      "subtitle": "Reklamçılar reklam sahəsi alır, naşirlər veb saytlarında reklam göstərərək gəlir qazanır",
+      "subtitle": "Reklamçılar reklam sahəsi alır, yayımçılar veb saytlarında reklam göstərərək gəlir qazanır",
       "cta": "İndi Başla",
       "learnMore": "Daha Ətraflı"
     },
@@ -26,13 +26,13 @@
       "cta": "Reklam Ver"
     },
     "forPublishers": {
-      "title": "Naşirlər Üçün",
+      "title": "Yayımçılar Üçün",
       "description": "Veb saytınızda reklam göstərərək gəlir qazanın",
       "cta": "Qazanmağa Başla"
     },
     "stats": {
       "advertisers": "Reklamçı",
-      "publishers": "Naşir",
+      "publishers": "Yayımçı",
       "impressions": "Göstərim",
       "revenue": "Ödənilmiş Gəlir"
     },
@@ -40,7 +40,7 @@
       "title": "Necə İşləyir?",
       "step1": {
         "title": "Qeydiyyat",
-        "description": "Reklamçı və ya naşir olaraq qeydiyyatdan keçin"
+        "description": "Reklamçı və ya yayımçı olaraq qeydiyyatdan keçin"
       },
       "step2": {
         "title": "Quraşdırma",
@@ -48,7 +48,7 @@
       },
       "step3": {
         "title": "Qazanc",
-        "description": "Reklamçılar müştəri qazanır, naşirlər gəlir əldə edir"
+        "description": "Reklamçılar müştəri qazanır, yayımçılar gəlir əldə edir"
       }
     }
   },
@@ -105,7 +105,7 @@
     }
   },
   "publisher": {
-    "dashboard": "Naşir Paneli",
+    "dashboard": "Yayımçı Paneli",
     "adUnits": "Reklam Blokları",
     "createAdUnit": "Reklam Bloku Yarat",
     "earnings": "Qazanc",
@@ -113,7 +113,7 @@
     "totalEarned": "Ümumi Qazanc",
     "pendingEarnings": "Gözləyən Qazanc",
     "register": {
-      "title": "Naşir olun",
+      "title": "Yayımçı olun",
       "websiteUrl": "Sayt ünvanı",
       "websiteName": "Sayt adı",
       "category": "Kateqoriya",
@@ -125,7 +125,7 @@
   },
   "admin": {
     "dashboard": "Admin Panel",
-    "publishers": "Naşirlər",
+    "publishers": "Yayımçılar",
     "ads": "Reklamlar",
     "approve": "Təsdiq et",
     "reject": "Rədd et",
@@ -160,6 +160,6 @@
     "terms": "Şərtlər",
     "contact": "Əlaqə",
     "forAdvertisers": "Reklamçılar üçün",
-    "forPublishers": "Naşirlər üçün"
+    "forPublishers": "Yayımçılar üçün"
   }
 }
