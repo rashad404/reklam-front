@@ -17,9 +17,13 @@ export default function CreateCampaignPage() {
   const { isAuthenticated, isLoading } = useAuth();
   const [step, setStep] = useState(1);
   const [submitting, setSubmitting] = useState(false);
-  const [uploading, setUploading] = useState(false);
+  const [uploadingSize, setUploadingSize] = useState('');
   const [error, setError] = useState('');
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const fileRefs = {
+    '300x250': useRef<HTMLInputElement>(null),
+    '728x90': useRef<HTMLInputElement>(null),
+    '320x50': useRef<HTMLInputElement>(null),
+  };
   const [form, setForm] = useState({
     name: '',
     type: 'display',
@@ -31,14 +35,28 @@ export default function CreateCampaignPage() {
     end_date: '',
     ad_title: '',
     ad_description: '',
-    ad_image_url: '',
     ad_destination_url: '',
+    images: { '300x250': '', '728x90': '', '320x50': '' } as Record<string, string>,
   });
 
   if (isLoading) return <LoadingSpinner />;
   if (!isAuthenticated) return <AuthRequiredCard />;
 
-  const totalSteps = 4;
+  const handleUpload = async (size: string, file: File) => {
+    setUploadingSize(size);
+    try {
+      const fd = new FormData();
+      fd.append('image', file);
+      const res = await apiClient.post('/upload/image', fd, { headers: { 'Content-Type': 'multipart/form-data' } });
+      setForm(prev => ({ ...prev, images: { ...prev.images, [size]: res.data.data.url } }));
+    } catch {
+      setError('Image upload failed');
+    } finally {
+      setUploadingSize('');
+    }
+  };
+
+  const hasAnyImage = Object.values(form.images).some(v => v);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -46,16 +64,11 @@ export default function CreateCampaignPage() {
     setError('');
 
     try {
-      // Auto-register as advertiser if not already (uses user's name)
       try {
         const userRes = await apiClient.get('/auth/user');
-        const userName = userRes.data.data?.name || 'Advertiser';
-        await apiClient.post('/advertiser/register', { company_name: userName });
-      } catch {
-        // Already registered, ignore
-      }
+        await apiClient.post('/advertiser/register', { company_name: userRes.data.data?.name || 'Advertiser' });
+      } catch {}
 
-      // 1. Create campaign
       const campaignRes = await apiClient.post('/campaigns', {
         name: form.name,
         type: form.type,
@@ -68,17 +81,31 @@ export default function CreateCampaignPage() {
       });
 
       const campaignId = campaignRes.data.data.id;
-
-      // 2. Create ad creative
       const adTitle = form.ad_title || form.name;
-      if (form.ad_destination_url) {
+
+      if (form.type === 'display') {
+        // Create one ad per uploaded size
+        for (const [size, imageUrl] of Object.entries(form.images)) {
+          if (imageUrl) {
+            await apiClient.post('/ads', {
+              campaign_id: campaignId,
+              title: adTitle,
+              description: form.ad_description || null,
+              image_url: imageUrl,
+              destination_url: form.ad_destination_url,
+              ad_format: `banner_${size}`,
+            });
+          }
+        }
+      } else {
+        // Text/native ad
         await apiClient.post('/ads', {
           campaign_id: campaignId,
           title: adTitle,
           description: form.ad_description || null,
-          image_url: form.ad_image_url || null,
+          image_url: null,
           destination_url: form.ad_destination_url,
-          ad_format: form.type === 'display' ? 'banner_300x250' : form.type,
+          ad_format: form.type,
         });
       }
 
@@ -98,6 +125,12 @@ export default function CreateCampaignPage() {
   ];
 
   const inputClass = "w-full px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-[#FF3131] focus:border-transparent text-base";
+
+  const adSizes = [
+    { key: '300x250', label: ta('adSize300'), ratio: 'aspect-[300/250]' },
+    { key: '728x90', label: ta('adSize728'), ratio: 'aspect-[728/90]' },
+    { key: '320x50', label: ta('adSize320'), ratio: 'aspect-[320/50]' },
+  ];
 
   return (
     <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 max-w-xl">
@@ -128,9 +161,7 @@ export default function CreateCampaignPage() {
       </div>
 
       {error && (
-        <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl text-red-600 text-sm">
-          {error}
-        </div>
+        <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl text-red-600 text-sm">{error}</div>
       )}
 
       <form onSubmit={handleSubmit}>
@@ -139,15 +170,9 @@ export default function CreateCampaignPage() {
           <div className="card space-y-6">
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{ta('campaignName')}</label>
-              <input
-                type="text"
-                value={form.name}
-                onChange={(e) => setForm({ ...form, name: e.target.value })}
-                placeholder={ta('campaignNamePlaceholder')}
-                className={inputClass}
-              />
+              <input type="text" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })}
+                placeholder={ta('campaignNamePlaceholder')} className={inputClass} />
             </div>
-
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{ta('campaignType')}</label>
               <div className="grid grid-cols-3 gap-3">
@@ -156,28 +181,19 @@ export default function CreateCampaignPage() {
                   { value: 'native', label: ta('formatNative') },
                   { value: 'text', label: ta('formatText') },
                 ].map((opt) => (
-                  <button
-                    key={opt.value}
-                    type="button"
-                    onClick={() => setForm({ ...form, type: opt.value })}
+                  <button key={opt.value} type="button" onClick={() => setForm({ ...form, type: opt.value })}
                     className={`px-4 py-3 rounded-xl border text-sm font-medium transition-all ${
                       form.type === opt.value
                         ? 'border-[#FF3131] bg-red-50 dark:bg-red-900/20 text-[#FF3131]'
                         : 'border-gray-300 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:border-gray-400'
-                    }`}
-                  >
+                    }`}>
                     {opt.label}
                   </button>
                 ))}
               </div>
             </div>
-
-            <button
-              type="button"
-              onClick={() => form.name ? setStep(2) : null}
-              disabled={!form.name}
-              className="btn-primary w-full flex items-center justify-center gap-2 disabled:opacity-50"
-            >
+            <button type="button" onClick={() => form.name ? setStep(2) : null} disabled={!form.name}
+              className="btn-primary w-full flex items-center justify-center gap-2 disabled:opacity-50">
               {t('common.next')} <ArrowRight className="w-4 h-4" />
             </button>
           </div>
@@ -189,63 +205,39 @@ export default function CreateCampaignPage() {
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{ta('pricingModel')}</label>
               <div className="grid grid-cols-2 gap-3">
-                <button
-                  type="button"
-                  onClick={() => setForm({ ...form, pricing: 'cpc' })}
-                  className={`p-4 rounded-xl border text-left transition-all ${
-                    form.pricing === 'cpc'
-                      ? 'border-[#FF3131] bg-red-50 dark:bg-red-900/20'
-                      : 'border-gray-300 dark:border-gray-700 hover:border-gray-400'
-                  }`}
-                >
-                  <MousePointer className={`w-5 h-5 mb-2 ${form.pricing === 'cpc' ? 'text-[#FF3131]' : 'text-gray-400'}`} />
-                  <p className={`font-medium text-sm ${form.pricing === 'cpc' ? 'text-[#FF3131]' : 'text-gray-900 dark:text-white'}`}>
-                    {ta('pricingCpc')}
-                  </p>
-                  <p className="text-xs text-gray-500 mt-1">{ta('pricingCpcDesc')}</p>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setForm({ ...form, pricing: 'cpm' })}
-                  className={`p-4 rounded-xl border text-left transition-all ${
-                    form.pricing === 'cpm'
-                      ? 'border-[#FF3131] bg-red-50 dark:bg-red-900/20'
-                      : 'border-gray-300 dark:border-gray-700 hover:border-gray-400'
-                  }`}
-                >
-                  <Eye className={`w-5 h-5 mb-2 ${form.pricing === 'cpm' ? 'text-[#FF3131]' : 'text-gray-400'}`} />
-                  <p className={`font-medium text-sm ${form.pricing === 'cpm' ? 'text-[#FF3131]' : 'text-gray-900 dark:text-white'}`}>
-                    {ta('pricingCpm')}
-                  </p>
-                  <p className="text-xs text-gray-500 mt-1">{ta('pricingCpmDesc')}</p>
-                </button>
+                {[
+                  { val: 'cpc', icon: MousePointer, label: ta('pricingCpc'), desc: ta('pricingCpcDesc') },
+                  { val: 'cpm', icon: Eye, label: ta('pricingCpm'), desc: ta('pricingCpmDesc') },
+                ].map((opt) => (
+                  <button key={opt.val} type="button" onClick={() => setForm({ ...form, pricing: opt.val as 'cpc' | 'cpm' })}
+                    className={`p-4 rounded-xl border text-left transition-all ${
+                      form.pricing === opt.val ? 'border-[#FF3131] bg-red-50 dark:bg-red-900/20' : 'border-gray-300 dark:border-gray-700 hover:border-gray-400'
+                    }`}>
+                    <opt.icon className={`w-5 h-5 mb-2 ${form.pricing === opt.val ? 'text-[#FF3131]' : 'text-gray-400'}`} />
+                    <p className={`font-medium text-sm ${form.pricing === opt.val ? 'text-[#FF3131]' : 'text-gray-900 dark:text-white'}`}>{opt.label}</p>
+                    <p className="text-xs text-gray-500 mt-1">{opt.desc}</p>
+                  </button>
+                ))}
               </div>
             </div>
-
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 {form.pricing === 'cpc' ? ta('pricePerClick') : ta('pricePer1000Views')} (AZN)
               </label>
               <input type="number" step="0.01" min="0.01" value={form.bid}
-                onChange={(e) => setForm({ ...form, bid: e.target.value })}
-                placeholder="0.10" className={inputClass} />
+                onChange={(e) => setForm({ ...form, bid: e.target.value })} placeholder="0.10" className={inputClass} />
             </div>
-
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{ta('budget')} (AZN)</label>
               <input type="number" step="1" min="1" value={form.budget}
-                onChange={(e) => setForm({ ...form, budget: e.target.value })}
-                placeholder="100" className={inputClass} />
+                onChange={(e) => setForm({ ...form, budget: e.target.value })} placeholder="100" className={inputClass} />
             </div>
-
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{ta('dailyBudget')} (AZN)</label>
               <input type="number" step="1" min="1" value={form.daily_budget}
-                onChange={(e) => setForm({ ...form, daily_budget: e.target.value })}
-                className={inputClass} />
+                onChange={(e) => setForm({ ...form, daily_budget: e.target.value })} className={inputClass} />
               <p className="text-xs text-gray-500 mt-1">{ta('dailyBudgetHint')}</p>
             </div>
-
             <div className="flex gap-3">
               <button type="button" onClick={() => setStep(1)} className="btn-secondary flex-1 flex items-center justify-center gap-2">
                 <ArrowLeft className="w-4 h-4" /> {t('common.back')}
@@ -262,81 +254,61 @@ export default function CreateCampaignPage() {
         {/* Step 3: Ad Creative */}
         {step === 3 && (
           <div className="card space-y-6">
-            {/* Image upload - primary for display ads */}
+            {/* Multi-size image uploads for display ads */}
             {form.type === 'display' && (
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{ta('adImage')}</label>
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/jpeg,image/png,image/gif,image/webp"
-                  className="hidden"
-                  onChange={async (e) => {
-                    const file = e.target.files?.[0];
-                    if (!file) return;
-                    setUploading(true);
-                    try {
-                      const fd = new FormData();
-                      fd.append('image', file);
-                      const res = await apiClient.post('/upload/image', fd, {
-                        headers: { 'Content-Type': 'multipart/form-data' },
-                      });
-                      setForm(prev => ({ ...prev, ad_image_url: res.data.data.url }));
-                    } catch {
-                      setError('Image upload failed');
-                    } finally {
-                      setUploading(false);
-                    }
-                  }}
-                />
-                {form.ad_image_url ? (
-                  <div className="relative border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={form.ad_image_url} alt="Preview" className="max-w-full h-auto" />
-                    <button type="button"
-                      onClick={() => { setForm(prev => ({ ...prev, ad_image_url: '' })); if (fileInputRef.current) fileInputRef.current.value = ''; }}
-                      className="absolute top-2 right-2 w-7 h-7 bg-black/60 text-white rounded-full flex items-center justify-center hover:bg-black/80">
-                      <X className="w-4 h-4" />
-                    </button>
-                  </div>
-                ) : (
-                  <button type="button"
-                    onClick={() => fileInputRef.current?.click()}
-                    disabled={uploading}
-                    className="w-full py-8 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-xl flex flex-col items-center gap-2 hover:border-[#FF3131] transition-colors">
-                    {uploading ? (
-                      <><Loader2 className="w-6 h-6 text-gray-400 animate-spin" /><span className="text-sm text-gray-500">{ta('adImageUploading')}</span></>
-                    ) : (
-                      <><Upload className="w-6 h-6 text-gray-400" /><span className="text-sm text-gray-500">{ta('adImageUpload')}</span></>
-                    )}
-                  </button>
-                )}
-                <p className="text-xs text-gray-500 mt-2">{ta('adImageHint')}</p>
+                <p className="text-xs text-gray-500 mb-3">{ta('adImageHint')}</p>
+                <div className="space-y-3">
+                  {adSizes.map(({ key, label }) => (
+                    <div key={key}>
+                      <input ref={fileRefs[key as keyof typeof fileRefs]} type="file" accept="image/jpeg,image/png,image/gif,image/webp" className="hidden"
+                        onChange={(e) => { const f = e.target.files?.[0]; if (f) handleUpload(key, f); }} />
+                      {form.images[key] ? (
+                        <div className="relative border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden">
+                          <div className="absolute top-2 left-2 px-2 py-0.5 bg-black/60 text-white text-[10px] font-medium rounded">{label}</div>
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img src={form.images[key]} alt={label} className="w-full h-auto" />
+                          <button type="button"
+                            onClick={() => { setForm(prev => ({ ...prev, images: { ...prev.images, [key]: '' } })); const ref = fileRefs[key as keyof typeof fileRefs]; if (ref.current) ref.current.value = ''; }}
+                            className="absolute top-2 right-2 w-7 h-7 bg-black/60 text-white rounded-full flex items-center justify-center hover:bg-black/80">
+                            <X className="w-4 h-4" />
+                          </button>
+                        </div>
+                      ) : (
+                        <button type="button"
+                          onClick={() => fileRefs[key as keyof typeof fileRefs].current?.click()}
+                          disabled={uploadingSize === key}
+                          className="w-full py-4 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-xl flex items-center justify-center gap-3 hover:border-[#FF3131] transition-colors">
+                          {uploadingSize === key ? (
+                            <Loader2 className="w-4 h-4 text-gray-400 animate-spin" />
+                          ) : (
+                            <Upload className="w-4 h-4 text-gray-400" />
+                          )}
+                          <span className="text-sm text-gray-500">{label}</span>
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
 
-            {/* Title & description - required for text/native, optional for display */}
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{ta('adTitle')}</label>
-              <input type="text" value={form.ad_title}
-                onChange={(e) => setForm({ ...form, ad_title: e.target.value })}
+              <input type="text" value={form.ad_title} onChange={(e) => setForm({ ...form, ad_title: e.target.value })}
                 placeholder={ta('adTitlePlaceholder')} className={inputClass} />
-              {form.type === 'display' && (
-                <p className="text-xs text-gray-500 mt-1">{ta('adTitleHint')}</p>
-              )}
+              {form.type === 'display' && <p className="text-xs text-gray-500 mt-1">{ta('adTitleHint')}</p>}
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{ta('adDescription')}</label>
-              <textarea value={form.ad_description}
-                onChange={(e) => setForm({ ...form, ad_description: e.target.value })}
-                placeholder={ta('adDescriptionPlaceholder')} rows={3}
-                className={inputClass + ' resize-none'} />
+              <textarea value={form.ad_description} onChange={(e) => setForm({ ...form, ad_description: e.target.value })}
+                placeholder={ta('adDescriptionPlaceholder')} rows={3} className={inputClass + ' resize-none'} />
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{ta('adDestination')}</label>
-              <input type="url" value={form.ad_destination_url}
-                onChange={(e) => setForm({ ...form, ad_destination_url: e.target.value })}
+              <input type="url" value={form.ad_destination_url} onChange={(e) => setForm({ ...form, ad_destination_url: e.target.value })}
                 placeholder={ta('adDestinationPlaceholder')} className={inputClass} />
             </div>
 
@@ -346,11 +318,11 @@ export default function CreateCampaignPage() {
               </button>
               <button type="button" onClick={() => {
                 const canProceed = form.type === 'display'
-                  ? form.ad_image_url && form.ad_destination_url
+                  ? hasAnyImage && form.ad_destination_url
                   : form.ad_title && form.ad_destination_url;
                 if (canProceed) setStep(4);
               }}
-                disabled={form.type === 'display' ? !form.ad_image_url || !form.ad_destination_url : !form.ad_title || !form.ad_destination_url}
+                disabled={form.type === 'display' ? !hasAnyImage || !form.ad_destination_url : !form.ad_title || !form.ad_destination_url}
                 className="btn-primary flex-1 flex items-center justify-center gap-2 disabled:opacity-50">
                 {t('common.next')} <ArrowRight className="w-4 h-4" />
               </button>
@@ -364,15 +336,11 @@ export default function CreateCampaignPage() {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{ta('startDate')}</label>
-                <input type="date" value={form.start_date}
-                  onChange={(e) => setForm({ ...form, start_date: e.target.value })}
-                  className={inputClass} />
+                <input type="date" value={form.start_date} onChange={(e) => setForm({ ...form, start_date: e.target.value })} className={inputClass} />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{ta('endDate')}</label>
-                <input type="date" value={form.end_date}
-                  onChange={(e) => setForm({ ...form, end_date: e.target.value })}
-                  className={inputClass} />
+                <input type="date" value={form.end_date} onChange={(e) => setForm({ ...form, end_date: e.target.value })} className={inputClass} />
               </div>
             </div>
 
@@ -400,10 +368,14 @@ export default function CreateCampaignPage() {
                 <span className="text-gray-500">{ta('budget')}</span>
                 <span className="font-medium text-gray-900 dark:text-white">{form.budget} AZN</span>
               </div>
-              <div className="flex justify-between">
-                <span className="text-gray-500">{ta('adTitle')}</span>
-                <span className="font-medium text-gray-900 dark:text-white">{form.ad_title}</span>
-              </div>
+              {form.type === 'display' && (
+                <div className="flex justify-between">
+                  <span className="text-gray-500">{ta('adImage')}</span>
+                  <span className="font-medium text-gray-900 dark:text-white">
+                    {Object.entries(form.images).filter(([,v]) => v).map(([k]) => k).join(', ')}
+                  </span>
+                </div>
+              )}
             </div>
 
             <div className="flex gap-3">
