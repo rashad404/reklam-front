@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { Link } from '@/lib/navigation';
-import { User, Shield, ChevronRight, Phone, Wallet, ExternalLink, Edit2 } from 'lucide-react';
+import { useSearchParams } from 'next/navigation';
+import { User, Shield, ChevronRight, Phone, Wallet, ExternalLink, Edit2, Loader2 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useAuth } from '@/hooks/useAuth';
 import AuthRequiredCard from '@/components/auth/AuthRequiredCard';
@@ -11,17 +12,40 @@ import apiClient from '@/lib/api/client';
 
 export default function SettingsPage() {
   const t = useTranslations();
-  const { user: authUser, isAuthenticated, isLoading: authLoading } = useAuth();
+  const searchParams = useSearchParams();
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [syncing, setSyncing] = useState(false);
 
   useEffect(() => {
     if (!isAuthenticated) return;
-    apiClient.get('/auth/user')
-      .then(res => setUser(res.data.data))
-      .catch(() => {})
-      .finally(() => setLoading(false));
-  }, [isAuthenticated]);
+
+    const walletUpdated = searchParams.get('wallet_updated');
+
+    const fetchUser = async () => {
+      if (walletUpdated === '1') {
+        setSyncing(true);
+        try {
+          const syncRes = await apiClient.post('/auth/sync-from-wallet');
+          setUser(syncRes.data.data);
+          window.history.replaceState({}, '', window.location.pathname);
+          setLoading(false);
+          setSyncing(false);
+          return;
+        } catch {}
+        setSyncing(false);
+        window.history.replaceState({}, '', window.location.pathname);
+      }
+
+      apiClient.get('/auth/user')
+        .then(res => setUser(res.data.data))
+        .catch(() => {})
+        .finally(() => setLoading(false));
+    };
+
+    fetchUser();
+  }, [isAuthenticated, searchParams]);
 
   if (authLoading || loading) return <LoadingSpinner />;
   if (!isAuthenticated) return <AuthRequiredCard />;
@@ -94,7 +118,7 @@ export default function SettingsPage() {
 
             {user.wallet_id ? (
               <a
-                href={`${process.env.NEXT_PUBLIC_WALLET_URL || 'https://kimlik.az'}/settings/profile?return_url=${encodeURIComponent(typeof window !== 'undefined' ? window.location.origin + '/settings' : '')}`}
+                href={`${process.env.NEXT_PUBLIC_WALLET_URL || 'https://kimlik.az'}/settings/profile?return_url=${encodeURIComponent(typeof window !== 'undefined' ? window.location.origin + '/settings?wallet_updated=1' : '')}`}
                 className="btn-primary w-full flex items-center justify-center gap-2 text-sm"
               >
                 <ExternalLink className="w-4 h-4" />

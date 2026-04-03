@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { Link } from '@/lib/navigation';
+import { useSearchParams } from 'next/navigation';
 import { ArrowLeft, User, Mail, Phone, Calendar } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useAuth } from '@/hooks/useAuth';
@@ -11,17 +12,36 @@ import apiClient from '@/lib/api/client';
 
 export default function ProfilePage() {
   const t = useTranslations();
+  const searchParams = useSearchParams();
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!isAuthenticated) return;
-    apiClient.get('/auth/user')
-      .then(res => setUser(res.data.data))
-      .catch(() => {})
-      .finally(() => setLoading(false));
-  }, [isAuthenticated]);
+
+    const synced = searchParams.get('synced');
+
+    const fetchUser = async () => {
+      if (synced === '1') {
+        try {
+          const syncRes = await apiClient.post('/auth/sync-from-wallet');
+          setUser(syncRes.data.data);
+          window.history.replaceState({}, '', window.location.pathname);
+          setLoading(false);
+          return;
+        } catch {}
+        window.history.replaceState({}, '', window.location.pathname);
+      }
+
+      apiClient.get('/auth/user')
+        .then(res => setUser(res.data.data))
+        .catch(() => {})
+        .finally(() => setLoading(false));
+    };
+
+    fetchUser();
+  }, [isAuthenticated, searchParams]);
 
   if (authLoading || loading) return <LoadingSpinner />;
   if (!isAuthenticated) return <AuthRequiredCard />;
@@ -74,9 +94,7 @@ export default function ProfilePage() {
         {user.wallet_id && (
           <div className="mt-6 pt-4 border-t border-gray-100 dark:border-gray-800">
             <a
-              href={`${process.env.NEXT_PUBLIC_WALLET_URL || 'https://kimlik.az'}/settings/profile`}
-              target="_blank"
-              rel="noopener"
+              href={`${process.env.NEXT_PUBLIC_WALLET_URL || 'https://kimlik.az'}/settings/profile?return_url=${encodeURIComponent(typeof window !== 'undefined' ? window.location.origin + '/settings/profile?synced=1' : '')}`}
               className="btn-primary w-full flex items-center justify-center gap-2 text-sm"
             >
               {t('settings.editOnWallet')}
