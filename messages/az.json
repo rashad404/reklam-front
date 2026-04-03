@@ -71,7 +71,7 @@
     "loginFailed": "Giriş uğursuz oldu. Yenidən cəhd edin."
   },
   "login": {
-    "processingWallet": "Kimlik.az cavabı emal olunur...",
+    "processingWallet": "Giriş yoxlanılır...",
     "pleaseWait": "Zəhmət olmasa gözləyin...",
     "walletAuthSuccess": "Uğurla daxil oldunuz!",
     "walletAuthFailed": "Kimlik.az giriş uğursuz oldu",

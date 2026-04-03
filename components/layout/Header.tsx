@@ -8,7 +8,6 @@ import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { LanguageSwitcher } from '@/components/ui/language-switcher';
 import { useTranslations } from 'next-intl';
 import { openWalletLogin } from '@/lib/utils/walletAuth';
-import Image from 'next/image';
 
 export default function Header() {
   const t = useTranslations();
@@ -66,26 +65,14 @@ export default function Header() {
         <div className="flex items-center justify-between h-14">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 group">
-            <Image
-              src="/images/logo.svg"
-              alt="Reklam.biz"
-              width={130}
-              height={32}
-              className="dark:hidden"
-              priority
-            />
-            <Image
-              src="/images/logo-white.svg"
-              alt="Reklam.biz"
-              width={130}
-              height={32}
-              className="hidden dark:block"
-              priority
-            />
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/images/logo.svg" alt="Reklam.biz" width={130} height={32} className="dark:hidden" />
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/images/logo-white.svg" alt="Reklam.biz" width={130} height={32} className="hidden dark:block" />
           </Link>
 
           {/* Desktop Navigation */}
-          <div className={`hidden md:flex items-center gap-6 transition-opacity duration-300 ${isMounted ? 'opacity-100' : 'opacity-0'}`}>
+          <div className="hidden md:flex items-center gap-6">
             {isAuthenticated && (
               <>
                 <Link
@@ -165,7 +152,7 @@ export default function Header() {
         </div>
 
         {/* Mobile Navigation */}
-        {isMenuOpen && isMounted && (
+        {isMenuOpen && (
           <div className="md:hidden py-3 border-t border-gray-200 dark:border-gray-800">
             {isAuthenticated ? (
               <div className="space-y-1">

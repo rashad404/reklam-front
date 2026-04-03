@@ -5,6 +5,7 @@ const withNextIntl = createNextIntlPlugin('./i18n/request.ts');
 
 const nextConfig: NextConfig = {
   distDir: process.env.DIST_DIR || '.next',
+  allowedDevOrigins: ['http://100.89.150.50:3059', '100.89.150.50'],
   images: {
     remotePatterns: [
       {
