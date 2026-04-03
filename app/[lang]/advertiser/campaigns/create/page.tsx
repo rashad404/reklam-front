@@ -274,8 +274,10 @@ export default function CreateCampaignPage() {
                   </div>
                 ) : activePreviewImage ? (
                   <div className="bg-white dark:bg-gray-900 rounded-xl shadow-md overflow-hidden border border-gray-100 dark:border-gray-800">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={activePreviewImage} alt="" className="w-full h-auto" />
+                    <div style={{ aspectRatio: activePreviewSize === '728x90' ? '728/90' : activePreviewSize === '320x50' ? '320/50' : '300/250' }} className="overflow-hidden bg-gray-100 dark:bg-gray-800">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={activePreviewImage} alt="" className="w-full h-full object-cover" />
+                    </div>
                     {(form.ad_title || form.ad_description) && (
                       <div className="p-3">
                         {form.ad_title && <div className="font-bold text-sm text-gray-900 dark:text-white mb-1">{form.ad_title}</div>}
