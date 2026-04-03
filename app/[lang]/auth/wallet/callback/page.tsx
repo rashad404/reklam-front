@@ -1,11 +1,11 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { Loader2, CheckCircle, XCircle } from 'lucide-react';
 
-export default function WalletCallbackPage() {
+function WalletCallbackContent() {
   const t = useTranslations();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -39,7 +39,7 @@ export default function WalletCallbackPage() {
 
       try {
         const codeVerifier = localStorage.getItem('wallet_code_verifier');
-        const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8059/api';
+        const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.reklam.biz/api';
 
         const response = await fetch(`${API_URL}/auth/wallet/callback`, {
           method: 'POST',
@@ -131,5 +131,17 @@ export default function WalletCallbackPage() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function WalletCallbackPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-[60vh] flex items-center justify-center">
+        <Loader2 className="w-16 h-16 text-[#FF3131] animate-spin" />
+      </div>
+    }>
+      <WalletCallbackContent />
+    </Suspense>
   );
 }
