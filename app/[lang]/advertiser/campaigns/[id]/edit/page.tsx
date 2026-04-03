@@ -10,20 +10,26 @@ import AuthRequiredCard from '@/components/auth/AuthRequiredCard';
 import LoadingSpinner from '@/components/auth/LoadingSpinner';
 import apiClient from '@/lib/api/client';
 
+interface AdRecord { id: number; ad_format: string; title: string; description: string | null; image_url: string | null; destination_url: string; campaign_id: number }
+
 export default function EditCampaignPage() {
   const t = useTranslations();
   const ta = useTranslations('advertiser');
   const router = useRouter();
   const params = useParams();
   const { isAuthenticated, isLoading: authLoading } = useAuth();
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const fileRefs = {
+    '300x250': useRef<HTMLInputElement>(null),
+    '728x90': useRef<HTMLInputElement>(null),
+    '320x50': useRef<HTMLInputElement>(null),
+  };
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [uploading, setUploading] = useState(false);
+  const [uploadingSize, setUploadingSize] = useState('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [campaign, setCampaign] = useState<any>(null);
-  const [ad, setAd] = useState<any>(null);
+  const [ads, setAds] = useState<AdRecord[]>([]);
   const [form, setForm] = useState({
     name: '',
     budget: '',
@@ -34,8 +40,8 @@ export default function EditCampaignPage() {
     end_date: '',
     ad_title: '',
     ad_description: '',
-    ad_image_url: '',
     ad_destination_url: '',
+    images: { '300x250': '', '728x90': '', '320x50': '' } as Record<string, string>,
   });
 
   useEffect(() => {
@@ -47,11 +53,23 @@ export default function EditCampaignPage() {
       apiClient.get('/ads'),
     ]).then(([campRes, adsRes]) => {
       const c = campRes.data.data;
-      const ads = (adsRes.data.data?.data || []).filter((a: any) => a.campaign_id === Number(id));
-      const firstAd = ads[0] || null;
+      const campaignAds: AdRecord[] = (adsRes.data.data?.data || []).filter((a: any) => a.campaign_id === Number(id));
 
       setCampaign(c);
-      setAd(firstAd);
+      setAds(campaignAds);
+
+      // Build images map from existing ads
+      const images: Record<string, string> = { '300x250': '', '728x90': '', '320x50': '' };
+      campaignAds.forEach((a: AdRecord) => {
+        const size = a.ad_format.replace('banner_', '');
+        if (images.hasOwnProperty(size)) {
+          images[size] = a.image_url || '';
+        }
+      });
+
+      // Get title/description/destination from first ad
+      const firstAd = campaignAds[0];
+
       setForm({
         name: c.name || '',
         budget: c.budget || '',
@@ -62,8 +80,8 @@ export default function EditCampaignPage() {
         end_date: c.end_date || '',
         ad_title: firstAd?.title || '',
         ad_description: firstAd?.description || '',
-        ad_image_url: firstAd?.image_url || '',
         ad_destination_url: firstAd?.destination_url || '',
+        images,
       });
     }).catch(() => {
       setError('Campaign not found');
@@ -74,12 +92,31 @@ export default function EditCampaignPage() {
   if (!isAuthenticated) return <AuthRequiredCard />;
   if (!campaign) return <div className="container mx-auto px-4 py-8 text-center text-gray-500">{error}</div>;
 
+  const handleUpload = async (size: string, file: File) => {
+    setUploadingSize(size);
+    try {
+      const fd = new FormData();
+      fd.append('image', file);
+      const res = await apiClient.post('/upload/image', fd, { headers: { 'Content-Type': 'multipart/form-data' } });
+      setForm(prev => ({ ...prev, images: { ...prev.images, [size]: res.data.data.url } }));
+    } catch { setError('Upload failed'); }
+    finally { setUploadingSize(''); }
+  };
+
+  const isDisplay = campaign.type === 'display';
+  const adSizes = [
+    { key: '300x250', label: ta('adSize300') },
+    { key: '728x90', label: ta('adSize728') },
+    { key: '320x50', label: ta('adSize320') },
+  ];
+
   const handleSave = async () => {
     setSaving(true);
     setError('');
     setSuccess('');
 
     try {
+      // Update campaign
       await apiClient.put(`/campaigns/${campaign.id}`, {
         name: form.name,
         budget: parseFloat(form.budget),
@@ -90,13 +127,46 @@ export default function EditCampaignPage() {
         end_date: form.end_date || null,
       });
 
-      if (ad) {
-        await apiClient.put(`/ads/${ad.id}`, {
-          title: form.ad_title || form.name,
-          description: form.ad_description || null,
-          image_url: form.ad_image_url || null,
-          destination_url: form.ad_destination_url,
-        });
+      const adTitle = form.ad_title || form.name;
+
+      if (isDisplay) {
+        // Update or create ads per size
+        for (const { key } of adSizes) {
+          const format = `banner_${key}`;
+          const existingAd = ads.find(a => a.ad_format === format);
+          const imageUrl = form.images[key];
+
+          if (imageUrl && existingAd) {
+            // Update existing
+            await apiClient.put(`/ads/${existingAd.id}`, {
+              title: adTitle,
+              description: form.ad_description || null,
+              image_url: imageUrl,
+              destination_url: form.ad_destination_url,
+            });
+          } else if (imageUrl && !existingAd) {
+            // Create new
+            await apiClient.post('/ads', {
+              campaign_id: campaign.id,
+              title: adTitle,
+              description: form.ad_description || null,
+              image_url: imageUrl,
+              destination_url: form.ad_destination_url,
+              ad_format: format,
+            });
+          }
+          // If no image and existing ad, leave it (don't delete)
+        }
+      } else {
+        // Text/native - update first ad
+        const firstAd = ads[0];
+        if (firstAd) {
+          await apiClient.put(`/ads/${firstAd.id}`, {
+            title: adTitle,
+            description: form.ad_description || null,
+            destination_url: form.ad_destination_url,
+          });
+        }
       }
 
       setSuccess(ta('created'));
@@ -126,12 +196,10 @@ export default function EditCampaignPage() {
         {/* Campaign details */}
         <div className="card space-y-4">
           <h2 className="font-semibold text-gray-900 dark:text-white">{ta('stepDetails')}</h2>
-
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{ta('campaignName')}</label>
             <input type="text" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className={inputClass} />
           </div>
-
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{ta('budget')} (AZN)</label>
@@ -142,7 +210,6 @@ export default function EditCampaignPage() {
               <input type="number" step="1" value={form.daily_budget} onChange={(e) => setForm({ ...form, daily_budget: e.target.value })} className={inputClass} />
             </div>
           </div>
-
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{ta('pricePerClick')} (AZN)</label>
@@ -153,7 +220,6 @@ export default function EditCampaignPage() {
               <input type="number" step="0.01" value={form.cpm_bid} onChange={(e) => setForm({ ...form, cpm_bid: e.target.value })} className={inputClass} />
             </div>
           </div>
-
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{ta('startDate')}</label>
@@ -167,69 +233,64 @@ export default function EditCampaignPage() {
         </div>
 
         {/* Ad creative */}
-        {ad && (
-          <div className="card space-y-4">
-            <h2 className="font-semibold text-gray-900 dark:text-white">{ta('stepAd')}</h2>
+        <div className="card space-y-4">
+          <h2 className="font-semibold text-gray-900 dark:text-white">{ta('stepAd')}</h2>
 
-            {ad.ad_format?.startsWith('banner') && (
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{ta('adImage')}</label>
-                <input ref={fileInputRef} type="file" accept="image/jpeg,image/png,image/gif,image/webp" className="hidden"
-                  onChange={async (e) => {
-                    const file = e.target.files?.[0];
-                    if (!file) return;
-                    setUploading(true);
-                    try {
-                      const fd = new FormData();
-                      fd.append('image', file);
-                      const res = await apiClient.post('/upload/image', fd, { headers: { 'Content-Type': 'multipart/form-data' } });
-                      setForm(prev => ({ ...prev, ad_image_url: res.data.data.url }));
-                    } catch { setError('Upload failed'); }
-                    finally { setUploading(false); }
-                  }}
-                />
-                {form.ad_image_url ? (
-                  <div className="relative border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={form.ad_image_url} alt="Preview" className="max-w-full h-auto" />
-                    <button type="button" onClick={() => { setForm(prev => ({ ...prev, ad_image_url: '' })); if (fileInputRef.current) fileInputRef.current.value = ''; }}
-                      className="absolute top-2 right-2 w-7 h-7 bg-black/60 text-white rounded-full flex items-center justify-center hover:bg-black/80">
-                      <X className="w-4 h-4" />
-                    </button>
+          {/* Multi-size images for display ads */}
+          {isDisplay && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{ta('adImage')}</label>
+              <p className="text-xs text-gray-500 mb-3">{ta('adImageHint')}</p>
+              <div className="space-y-3">
+                {adSizes.map(({ key, label }) => (
+                  <div key={key}>
+                    <input ref={fileRefs[key as keyof typeof fileRefs]} type="file" accept="image/jpeg,image/png,image/gif,image/webp" className="hidden"
+                      onChange={(e) => { const f = e.target.files?.[0]; if (f) handleUpload(key, f); }} />
+                    {form.images[key] ? (
+                      <div className="relative border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden">
+                        <div className="absolute top-2 left-2 px-2 py-0.5 bg-black/60 text-white text-[10px] font-medium rounded">{label}</div>
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={form.images[key]} alt={label} className="w-full h-auto" />
+                        <button type="button"
+                          onClick={() => { setForm(prev => ({ ...prev, images: { ...prev.images, [key]: '' } })); const ref = fileRefs[key as keyof typeof fileRefs]; if (ref.current) ref.current.value = ''; }}
+                          className="absolute top-2 right-2 w-7 h-7 bg-black/60 text-white rounded-full flex items-center justify-center hover:bg-black/80">
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+                    ) : (
+                      <button type="button"
+                        onClick={() => fileRefs[key as keyof typeof fileRefs].current?.click()}
+                        disabled={uploadingSize === key}
+                        className="w-full py-4 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-xl flex items-center justify-center gap-3 hover:border-[#FF3131] transition-colors">
+                        {uploadingSize === key ? <Loader2 className="w-4 h-4 text-gray-400 animate-spin" /> : <Upload className="w-4 h-4 text-gray-400" />}
+                        <span className="text-sm text-gray-500">{label}</span>
+                      </button>
+                    )}
                   </div>
-                ) : (
-                  <button type="button" onClick={() => fileInputRef.current?.click()} disabled={uploading}
-                    className="w-full py-8 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-xl flex flex-col items-center gap-2 hover:border-[#FF3131] transition-colors">
-                    {uploading ? <><Loader2 className="w-6 h-6 text-gray-400 animate-spin" /><span className="text-sm text-gray-500">{ta('adImageUploading')}</span></>
-                      : <><Upload className="w-6 h-6 text-gray-400" /><span className="text-sm text-gray-500">{ta('adImageUpload')}</span></>}
-                  </button>
-                )}
+                ))}
               </div>
-            )}
+            </div>
+          )}
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{ta('adTitle')}</label>
-              <input type="text" value={form.ad_title} onChange={(e) => setForm({ ...form, ad_title: e.target.value })} className={inputClass} />
-              {ad.ad_format?.startsWith('banner') && (
-                <p className="text-xs text-gray-500 mt-1">{ta('adTitleHint')}</p>
-              )}
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{ta('adDescription')}</label>
-              <textarea value={form.ad_description} onChange={(e) => setForm({ ...form, ad_description: e.target.value })} rows={3} className={inputClass + ' resize-none'} />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{ta('adDestination')}</label>
-              <input type="url" value={form.ad_destination_url} onChange={(e) => setForm({ ...form, ad_destination_url: e.target.value })} className={inputClass} />
-            </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{ta('adTitle')}</label>
+            <input type="text" value={form.ad_title} onChange={(e) => setForm({ ...form, ad_title: e.target.value })} className={inputClass} />
+            {isDisplay && <p className="text-xs text-gray-500 mt-1">{ta('adTitleHint')}</p>}
           </div>
-        )}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{ta('adDescription')}</label>
+            <textarea value={form.ad_description} onChange={(e) => setForm({ ...form, ad_description: e.target.value })} rows={3} className={inputClass + ' resize-none'} />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{ta('adDestination')}</label>
+            <input type="url" value={form.ad_destination_url} onChange={(e) => setForm({ ...form, ad_destination_url: e.target.value })} className={inputClass} />
+          </div>
+        </div>
 
         {/* Save */}
         <div className="flex gap-3">
           <button onClick={handleSave} disabled={saving} className="btn-primary flex-1 flex items-center justify-center gap-2 disabled:opacity-50">
-            {saving ? <><Loader2 className="w-4 h-4 animate-spin" /></> : <><Check className="w-4 h-4" /> {t('common.save')}</>}
+            {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <><Check className="w-4 h-4" /> {t('common.save')}</>}
           </button>
           <Link href="/advertiser/campaigns" className="btn-secondary flex-1 text-center">{t('common.cancel')}</Link>
         </div>
