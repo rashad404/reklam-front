@@ -140,12 +140,19 @@ function AdvertiserDashboard() {
           </div>
         ))}
       </div>
-      <div className="grid md:grid-cols-2 gap-4">
+      <div className="grid md:grid-cols-3 gap-4">
         <Link href="/advertiser/campaigns" className="card hover-lift flex items-center gap-4">
           <div className="w-12 h-12 rounded-xl bg-red-100 dark:bg-red-900/30 flex items-center justify-center"><TrendingUp className="w-6 h-6 text-[#FF3131]" /></div>
           <div>
             <h3 className="font-semibold text-gray-900 dark:text-white">{t('campaigns')}</h3>
             <p className="text-sm text-gray-600 dark:text-gray-400">{stats.total_campaigns} {t('campaigns').toLowerCase()}</p>
+          </div>
+        </Link>
+        <Link href="/advertiser/stats" className="card hover-lift flex items-center gap-4">
+          <div className="w-12 h-12 rounded-xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center"><BarChart3 className="w-6 h-6 text-blue-600" /></div>
+          <div>
+            <h3 className="font-semibold text-gray-900 dark:text-white">Statistika</h3>
+            <p className="text-sm text-gray-600 dark:text-gray-400">{t('impressions')}, {t('clicks')}, CTR</p>
           </div>
         </Link>
         <Link href="/advertiser/billing" className="card hover-lift flex items-center gap-4">
