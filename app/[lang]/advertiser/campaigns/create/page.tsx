@@ -212,7 +212,6 @@ export default function CreateCampaignPage() {
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{ta('adTitle')}</label>
                 <input type="text" value={form.ad_title} onChange={(e) => setForm({ ...form, ad_title: e.target.value })}
                   placeholder={ta('adTitlePlaceholder')} className={inputClass} />
-                {!hasAnyImage && !hasText && <p className="text-xs text-[#FF3131] mt-1">*</p>}
               </div>
 
               {/* Description */}
