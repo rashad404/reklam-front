@@ -39,8 +39,8 @@ export default function CampaignsPage() {
         <div className="w-16 h-16 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center mx-auto mb-4">
           <Plus className="w-8 h-8 text-gray-400" />
         </div>
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">No campaigns yet</h3>
-        <p className="text-gray-600 dark:text-gray-400 mb-6">Create your first campaign to start advertising</p>
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">{t('noCampaigns')}</h3>
+        <p className="text-gray-600 dark:text-gray-400 mb-6">{t('noCampaignsDesc')}</p>
         <Link href="/advertiser/campaigns/create" className="btn-primary inline-flex items-center gap-2">
           <Plus className="w-4 h-4" />
           {t('createCampaign')}

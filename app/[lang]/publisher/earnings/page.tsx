@@ -40,7 +40,7 @@ export default function EarningsPage() {
           <div className="flex items-center gap-3">
             <ArrowUpCircle className="w-8 h-8 text-blue-500" />
             <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Withdrawn</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">{t('withdrawn')}</p>
               <p className="text-xl font-bold text-gray-900 dark:text-white">0.00 AZN</p>
             </div>
           </div>
@@ -49,13 +49,13 @@ export default function EarningsPage() {
 
       <div className="card">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Earnings History</h2>
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t('earningsHistory')}</h2>
           <button className="btn-primary text-sm" disabled>
-            {t('withdraw')} (min. 5 AZN)
+            {t('minWithdraw')}
           </button>
         </div>
         <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-          No earnings yet
+          {t('noEarnings')}
         </div>
       </div>
     </div>

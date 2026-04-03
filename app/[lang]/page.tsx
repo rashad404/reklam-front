@@ -79,7 +79,7 @@ export default function HomePage() {
               </li>
               <li className="flex items-center gap-2">
                 <TrendingUp className="w-4 h-4 text-[#FF3131]" />
-                Real-time Analytics
+                {t('common.realTimeAnalytics')}
               </li>
             </ul>
             <Link href="/advertiser" className="text-[#FF3131] font-medium text-sm flex items-center gap-1 hover:gap-2 transition-all">

@@ -21,10 +21,10 @@ export default function AdminDashboard() {
       {/* Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         {[
-          { icon: Users, label: 'Total Publishers', value: '0', color: 'text-blue-600', bg: 'bg-blue-100 dark:bg-blue-900/30' },
-          { icon: Megaphone, label: 'Total Advertisers', value: '0', color: 'text-purple-600', bg: 'bg-purple-100 dark:bg-purple-900/30' },
-          { icon: Eye, label: 'Total Impressions', value: '0', color: 'text-green-600', bg: 'bg-green-100 dark:bg-green-900/30' },
-          { icon: DollarSign, label: 'Total Revenue', value: '0 AZN', color: 'text-orange-600', bg: 'bg-orange-100 dark:bg-orange-900/30' },
+          { icon: Users, label: t('totalPublishers'), value: '0', color: 'text-blue-600', bg: 'bg-blue-100 dark:bg-blue-900/30' },
+          { icon: Megaphone, label: t('totalAdvertisers'), value: '0', color: 'text-purple-600', bg: 'bg-purple-100 dark:bg-purple-900/30' },
+          { icon: Eye, label: t('totalImpressions'), value: '0', color: 'text-green-600', bg: 'bg-green-100 dark:bg-green-900/30' },
+          { icon: DollarSign, label: t('totalRevenue'), value: '0 AZN', color: 'text-orange-600', bg: 'bg-orange-100 dark:bg-orange-900/30' },
         ].map((stat, i) => (
           <div key={i} className="card">
             <div className="flex items-center gap-3">
@@ -48,7 +48,7 @@ export default function AdminDashboard() {
           </div>
           <div>
             <h3 className="font-semibold text-gray-900 dark:text-white">{t('publishers')}</h3>
-            <p className="text-sm text-gray-600 dark:text-gray-400">Review & approve publishers</p>
+            <p className="text-sm text-gray-600 dark:text-gray-400">{t('reviewPublishers')}</p>
           </div>
         </Link>
         <Link href="/admin/ads" className="card hover-lift flex items-center gap-4">
@@ -57,7 +57,7 @@ export default function AdminDashboard() {
           </div>
           <div>
             <h3 className="font-semibold text-gray-900 dark:text-white">{t('ads')}</h3>
-            <p className="text-sm text-gray-600 dark:text-gray-400">Review & approve ad creatives</p>
+            <p className="text-sm text-gray-600 dark:text-gray-400">{t('reviewAds')}</p>
           </div>
         </Link>
       </div>

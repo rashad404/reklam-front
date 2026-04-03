@@ -24,7 +24,7 @@ export default function AdminPublishersPage() {
         </div>
 
         <div className="text-center py-12 text-gray-500 dark:text-gray-400">
-          No pending publishers
+          {t('noPendingPublishers')}
         </div>
       </div>
     </div>

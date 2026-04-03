@@ -87,10 +87,16 @@
     "deposit": "Balans Artır",
     "balance": "Balans",
     "totalSpent": "Ümumi Xərc",
+    "totalDeposited": "Ümumi Yatırım",
     "impressions": "Göstərimlər",
     "clicks": "Kliklər",
     "ctr": "CTR",
     "spent": "Xərclənib",
+    "activeCampaigns": "{count} aktiv kampaniya",
+    "noCampaigns": "Hələ kampaniya yoxdur",
+    "noCampaignsDesc": "İlk kampaniyanızı yaradın və reklam verməyə başlayın",
+    "noTransactions": "Hələ əməliyyat yoxdur",
+    "transactionHistory": "Əməliyyat Tarixçəsi",
     "status": {
       "draft": "Qaralama",
       "active": "Aktiv",
@@ -102,6 +108,33 @@
       "companyName": "Şirkət adı",
       "website": "Veb sayt",
       "submit": "Qeydiyyatdan keç"
+    },
+    "landing": {
+      "features": {
+        "formats": {
+          "title": "Display, Native və Mətn",
+          "desc": "Banner 728x90, 300x250, 320x50, native reklamlar, mətn reklamlar"
+        },
+        "pricing": {
+          "title": "CPC və CPM",
+          "desc": "Klik başına və ya 1000 göstərim başına ödəyin. Öz təklifinizi təyin edin."
+        },
+        "analytics": {
+          "title": "Real vaxt analitika",
+          "desc": "Göstərimləri, klikləri, CTR-i və xərcləri real vaxtda izləyin."
+        }
+      },
+      "steps": {
+        "step1": "Kimlik.az ilə qeydiyyat",
+        "step2": "Kampaniya yaradın",
+        "step2desc": "Büdcə, təkliflər, hədəfləmə",
+        "step3": "Reklamları yükləyin",
+        "step3desc": "Banner və ya mətn kreativlər əlavə edin",
+        "step4": "Nəticələr əldə edin",
+        "step4desc": "Klikləri və konversiyaları izləyin"
+      },
+      "ctaTitle": "Biznesinizi böyütməyə hazırsınız?",
+      "ctaDesc": "Azərbaycanda minlərlə veb saytda reklam verin"
     }
   },
   "publisher": {
@@ -112,6 +145,13 @@
     "withdraw": "Çıxarış",
     "totalEarned": "Ümumi Qazanc",
     "pendingEarnings": "Gözləyən Qazanc",
+    "withdrawn": "Çıxarılmış",
+    "activeAdUnits": "{count} aktiv reklam bloku",
+    "noAdUnits": "Hələ reklam bloku yoxdur",
+    "noAdUnitsDesc": "İlk reklam blokunuzu yaradın və qazanmağa başlayın",
+    "noEarnings": "Hələ qazanc yoxdur",
+    "earningsHistory": "Qazanc Tarixçəsi",
+    "minWithdraw": "Minimum çıxarış: 5 AZN",
     "register": {
       "title": "Yayımçı olun",
       "websiteUrl": "Sayt ünvanı",
@@ -121,7 +161,26 @@
     },
     "embedCode": "Yerləşdirmə Kodu",
     "copyCode": "Kodu Kopyala",
-    "codeCopied": "Kod kopyalandı!"
+    "codeCopied": "Kod kopyalandı!",
+    "landing": {
+      "revenueShare": "70% Gəlir Payı",
+      "revenueShareDesc": "Veb saytınızda yaradılan bütün reklam gəlirinin 70%-ni qazanın.",
+      "easyIntegration": "Asan İnteqrasiya",
+      "easyIntegrationDesc": "Sadəcə 2 sətir kod yapışdırın. İstənilən veb saytla işləyir.",
+      "realtimeEarnings": "Real vaxt qazanc",
+      "realtimeEarningsDesc": "Göstərimləri, klikləri və qazancı panelinizdə izləyin.",
+      "addToWebsite": "Bunu veb saytınıza əlavə edin və qazanmağa başlayın",
+      "supportedFormats": "Dəstəklənən Reklam Formatları",
+      "ctaTitle": "Veb saytınızı monetizasiya edin",
+      "ctaDesc": "Yayımçı şəbəkəmizə qoşulun və trafikinizdən qazanın",
+      "leaderboard": "Leaderboard",
+      "mediumRect": "Orta Düzbucaq",
+      "mobileBanner": "Mobil Banner",
+      "native": "Native",
+      "text": "Mətn",
+      "responsive": "Adaptiv",
+      "inline": "Sətirdaxili"
+    }
   },
   "admin": {
     "dashboard": "Admin Panel",
@@ -131,7 +190,15 @@
     "reject": "Rədd et",
     "pending": "Gözləyən",
     "approved": "Təsdiqlənmiş",
-    "rejected": "Rədd edilmiş"
+    "rejected": "Rədd edilmiş",
+    "totalPublishers": "Ümumi Yayımçılar",
+    "totalAdvertisers": "Ümumi Reklamçılar",
+    "totalImpressions": "Ümumi Göstərimlər",
+    "totalRevenue": "Ümumi Gəlir",
+    "reviewPublishers": "Yayımçıları nəzərdən keçirin və təsdiq edin",
+    "reviewAds": "Reklam kreativlərini nəzərdən keçirin və təsdiq edin",
+    "noPendingPublishers": "Gözləyən yayımçı yoxdur",
+    "noPendingAds": "Gözləyən reklam yoxdur"
   },
   "common": {
     "loading": "Yüklənir...",
@@ -151,7 +218,8 @@
     "active": "Aktiv",
     "inactive": "Deaktiv",
     "view": "Bax",
-    "currency": "AZN"
+    "currency": "AZN",
+    "realTimeAnalytics": "Real vaxt analitika"
   },
   "footer": {
     "allRightsReserved": "Bütün hüquqlar qorunur.",

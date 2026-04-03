@@ -87,10 +87,16 @@
     "deposit": "Add Funds",
     "balance": "Balance",
     "totalSpent": "Total Spent",
+    "totalDeposited": "Total Deposited",
     "impressions": "Impressions",
     "clicks": "Clicks",
     "ctr": "CTR",
     "spent": "Spent",
+    "activeCampaigns": "{count} active campaigns",
+    "noCampaigns": "No campaigns yet",
+    "noCampaignsDesc": "Create your first campaign to start advertising",
+    "noTransactions": "No transactions yet",
+    "transactionHistory": "Transaction History",
     "status": {
       "draft": "Draft",
       "active": "Active",
@@ -102,6 +108,33 @@
       "companyName": "Company Name",
       "website": "Website",
       "submit": "Register"
+    },
+    "landing": {
+      "features": {
+        "formats": {
+          "title": "Display, Native & Text",
+          "desc": "Banner 728x90, 300x250, 320x50, native ads, text ads"
+        },
+        "pricing": {
+          "title": "CPC & CPM",
+          "desc": "Pay per click or per 1000 impressions. Set your own bids."
+        },
+        "analytics": {
+          "title": "Real-time Analytics",
+          "desc": "Track impressions, clicks, CTR, and spend in real time."
+        }
+      },
+      "steps": {
+        "step1": "Create account via Kimlik.az",
+        "step2": "Create Campaign",
+        "step2desc": "Set budget, bids, targeting",
+        "step3": "Upload Ads",
+        "step3desc": "Add banners or text creatives",
+        "step4": "Get Results",
+        "step4desc": "Track clicks & conversions"
+      },
+      "ctaTitle": "Ready to grow your business?",
+      "ctaDesc": "Start advertising to thousands of websites in Azerbaijan"
     }
   },
   "publisher": {
@@ -112,6 +145,13 @@
     "withdraw": "Withdraw",
     "totalEarned": "Total Earned",
     "pendingEarnings": "Pending Earnings",
+    "withdrawn": "Withdrawn",
+    "activeAdUnits": "{count} active ad units",
+    "noAdUnits": "No ad units yet",
+    "noAdUnitsDesc": "Create your first ad unit to start earning",
+    "noEarnings": "No earnings yet",
+    "earningsHistory": "Earnings History",
+    "minWithdraw": "Minimum withdrawal: 5 AZN",
     "register": {
       "title": "Become a Publisher",
       "websiteUrl": "Website URL",
@@ -121,7 +161,26 @@
     },
     "embedCode": "Embed Code",
     "copyCode": "Copy Code",
-    "codeCopied": "Code copied!"
+    "codeCopied": "Code copied!",
+    "landing": {
+      "revenueShare": "70% Revenue Share",
+      "revenueShareDesc": "Earn 70% of all ad revenue generated on your website.",
+      "easyIntegration": "Easy Integration",
+      "easyIntegrationDesc": "Just paste 2 lines of code. Works with any website.",
+      "realtimeEarnings": "Real-time Earnings",
+      "realtimeEarningsDesc": "Track impressions, clicks and earnings in your dashboard.",
+      "addToWebsite": "Add this to your website and start earning",
+      "supportedFormats": "Supported Ad Formats",
+      "ctaTitle": "Start monetizing your website",
+      "ctaDesc": "Join our publisher network and earn from your traffic",
+      "leaderboard": "Leaderboard",
+      "mediumRect": "Medium Rectangle",
+      "mobileBanner": "Mobile Banner",
+      "native": "Native",
+      "text": "Text",
+      "responsive": "Responsive",
+      "inline": "Inline"
+    }
   },
   "admin": {
     "dashboard": "Admin Dashboard",
@@ -131,7 +190,15 @@
     "reject": "Reject",
     "pending": "Pending",
     "approved": "Approved",
-    "rejected": "Rejected"
+    "rejected": "Rejected",
+    "totalPublishers": "Total Publishers",
+    "totalAdvertisers": "Total Advertisers",
+    "totalImpressions": "Total Impressions",
+    "totalRevenue": "Total Revenue",
+    "reviewPublishers": "Review & approve publishers",
+    "reviewAds": "Review & approve ad creatives",
+    "noPendingPublishers": "No pending publishers",
+    "noPendingAds": "No pending ads"
   },
   "common": {
     "loading": "Loading...",
@@ -151,7 +218,8 @@
     "active": "Active",
     "inactive": "Inactive",
     "view": "View",
-    "currency": "AZN"
+    "currency": "AZN",
+    "realTimeAnalytics": "Real-time Analytics"
   },
   "footer": {
     "allRightsReserved": "All rights reserved.",

@@ -2,39 +2,31 @@
 
 import { useTranslations } from 'next-intl';
 import { Link } from '@/lib/navigation';
-import { DollarSign, Eye, MousePointer, TrendingUp, Plus, Wallet, Globe, Code, Zap, LogIn, Copy } from 'lucide-react';
+import { DollarSign, Eye, MousePointer, TrendingUp, Plus, Wallet, Globe, Code, Zap, LogIn } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import LoadingSpinner from '@/components/auth/LoadingSpinner';
 import { usePathname } from 'next/navigation';
 import { openWalletLogin, getLocaleFromPathname } from '@/lib/utils/walletAuth';
 
 export default function PublisherPage() {
-  const t = useTranslations();
   const { isAuthenticated, isLoading } = useAuth();
 
   if (isLoading) return <LoadingSpinner />;
-
-  if (isAuthenticated) {
-    return <PublisherDashboard />;
-  }
-
+  if (isAuthenticated) return <PublisherDashboard />;
   return <PublisherLanding />;
 }
 
 function PublisherLanding() {
   const t = useTranslations();
+  const tp = useTranslations('publisher.landing');
   const pathname = usePathname();
   const locale = getLocaleFromPathname(pathname);
-
-  const handleLogin = () => {
-    openWalletLogin({ locale });
-  };
+  const handleLogin = () => { openWalletLogin({ locale }); };
 
   const embedExample = `<div id="reklam-ad" data-unit="YOUR_ID" data-format="300x250"></div>\n<script src="https://reklam.biz/serve.js"></script>`;
 
   return (
     <div>
-      {/* Hero */}
       <section className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-green-50 via-white to-emerald-50 dark:from-gray-950 dark:via-gray-900 dark:to-green-950/20" />
         <div className="relative container mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24">
@@ -47,7 +39,7 @@ function PublisherLanding() {
               {t('home.forPublishers.description')}
             </h1>
             <p className="text-lg text-gray-600 dark:text-gray-400 mb-8">
-              70% revenue share - minimum 5 AZN withdrawal
+              {tp('revenueShare')} - {t('publisher.minWithdraw')}
             </p>
             <button onClick={handleLogin} className="btn-primary inline-flex items-center gap-2 text-lg px-8 py-4 !bg-green-600 hover:!bg-green-700">
               <LogIn className="w-5 h-5" />
@@ -57,31 +49,12 @@ function PublisherLanding() {
         </div>
       </section>
 
-      {/* Features */}
       <section className="container mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="grid md:grid-cols-3 gap-8">
           {[
-            {
-              icon: DollarSign,
-              title: '70% Revenue Share',
-              desc: 'Earn 70% of all ad revenue generated on your website.',
-              color: 'text-green-600',
-              bg: 'bg-green-100 dark:bg-green-900/30',
-            },
-            {
-              icon: Code,
-              title: 'Easy Integration',
-              desc: 'Just paste 2 lines of code. Works with any website.',
-              color: 'text-blue-600',
-              bg: 'bg-blue-100 dark:bg-blue-900/30',
-            },
-            {
-              icon: Zap,
-              title: 'Real-time Earnings',
-              desc: 'Track impressions, clicks and earnings in your dashboard.',
-              color: 'text-purple-600',
-              bg: 'bg-purple-100 dark:bg-purple-900/30',
-            },
+            { icon: DollarSign, title: tp('revenueShare'), desc: tp('revenueShareDesc'), color: 'text-green-600', bg: 'bg-green-100 dark:bg-green-900/30' },
+            { icon: Code, title: tp('easyIntegration'), desc: tp('easyIntegrationDesc'), color: 'text-blue-600', bg: 'bg-blue-100 dark:bg-blue-900/30' },
+            { icon: Zap, title: tp('realtimeEarnings'), desc: tp('realtimeEarningsDesc'), color: 'text-purple-600', bg: 'bg-purple-100 dark:bg-purple-900/30' },
           ].map((f, i) => (
             <div key={i} className="card text-center hover-lift">
               <div className={`w-12 h-12 rounded-xl ${f.bg} flex items-center justify-center mx-auto mb-4`}>
@@ -94,35 +67,25 @@ function PublisherLanding() {
         </div>
       </section>
 
-      {/* Code example */}
       <section className="bg-gray-50 dark:bg-gray-900/50 border-y border-gray-200 dark:border-gray-800">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <div className="max-w-2xl mx-auto text-center">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-              {t('publisher.embedCode')}
-            </h2>
-            <p className="text-gray-600 dark:text-gray-400 mb-6">
-              Add this to your website and start earning
-            </p>
-            <pre className="bg-gray-900 dark:bg-gray-800 rounded-xl p-6 text-left text-sm text-green-400 overflow-x-auto">
-              {embedExample}
-            </pre>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">{t('publisher.embedCode')}</h2>
+            <p className="text-gray-600 dark:text-gray-400 mb-6">{tp('addToWebsite')}</p>
+            <pre className="bg-gray-900 dark:bg-gray-800 rounded-xl p-6 text-left text-sm text-green-400 overflow-x-auto">{embedExample}</pre>
           </div>
         </div>
       </section>
 
-      {/* Ad formats */}
       <section className="container mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <h2 className="text-2xl font-bold text-center text-gray-900 dark:text-white mb-10">
-          Supported Ad Formats
-        </h2>
+        <h2 className="text-2xl font-bold text-center text-gray-900 dark:text-white mb-10">{tp('supportedFormats')}</h2>
         <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-4 max-w-4xl mx-auto">
           {[
-            { name: 'Leaderboard', size: '728x90' },
-            { name: 'Medium Rectangle', size: '300x250' },
-            { name: 'Mobile Banner', size: '320x50' },
-            { name: 'Native', size: 'Responsive' },
-            { name: 'Text', size: 'Inline' },
+            { name: tp('leaderboard'), size: '728x90' },
+            { name: tp('mediumRect'), size: '300x250' },
+            { name: tp('mobileBanner'), size: '320x50' },
+            { name: tp('native'), size: tp('responsive') },
+            { name: tp('text'), size: tp('inline') },
           ].map((f, i) => (
             <div key={i} className="card text-center py-4">
               <p className="font-semibold text-gray-900 dark:text-white text-sm">{f.name}</p>
@@ -132,14 +95,9 @@ function PublisherLanding() {
         </div>
       </section>
 
-      {/* CTA */}
       <section className="container mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
-          Start monetizing your website
-        </h2>
-        <p className="text-gray-600 dark:text-gray-400 mb-8">
-          Join our publisher network and earn from your traffic
-        </p>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{tp('ctaTitle')}</h2>
+        <p className="text-gray-600 dark:text-gray-400 mb-8">{tp('ctaDesc')}</p>
         <button onClick={handleLogin} className="btn-primary inline-flex items-center gap-2 !bg-green-600 hover:!bg-green-700">
           <LogIn className="w-4 h-4" />
           {t('auth.loginWithWallet')}
@@ -157,11 +115,9 @@ function PublisherDashboard() {
       <div className="flex items-center justify-between mb-8">
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('dashboard')}</h1>
         <Link href="/publisher/ad-units/create" className="btn-primary flex items-center gap-2 text-sm">
-          <Plus className="w-4 h-4" />
-          {t('createAdUnit')}
+          <Plus className="w-4 h-4" /> {t('createAdUnit')}
         </Link>
       </div>
-
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         {[
           { icon: DollarSign, label: t('totalEarned'), value: '0.00 AZN', color: 'text-green-600', bg: 'bg-green-100 dark:bg-green-900/30' },
@@ -182,21 +138,16 @@ function PublisherDashboard() {
           </div>
         ))}
       </div>
-
       <div className="grid md:grid-cols-2 gap-4">
         <Link href="/publisher/ad-units" className="card hover-lift flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
-            <TrendingUp className="w-6 h-6 text-blue-600" />
-          </div>
+          <div className="w-12 h-12 rounded-xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center"><TrendingUp className="w-6 h-6 text-blue-600" /></div>
           <div>
             <h3 className="font-semibold text-gray-900 dark:text-white">{t('adUnits')}</h3>
-            <p className="text-sm text-gray-600 dark:text-gray-400">0 active ad units</p>
+            <p className="text-sm text-gray-600 dark:text-gray-400">{t('activeAdUnits', { count: 0 })}</p>
           </div>
         </Link>
         <Link href="/publisher/earnings" className="card hover-lift flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
-            <DollarSign className="w-6 h-6 text-green-600" />
-          </div>
+          <div className="w-12 h-12 rounded-xl bg-green-100 dark:bg-green-900/30 flex items-center justify-center"><DollarSign className="w-6 h-6 text-green-600" /></div>
           <div>
             <h3 className="font-semibold text-gray-900 dark:text-white">{t('earnings')}</h3>
             <p className="text-sm text-gray-600 dark:text-gray-400">{t('withdraw')}</p>
