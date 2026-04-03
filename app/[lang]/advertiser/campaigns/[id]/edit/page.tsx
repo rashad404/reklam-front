@@ -207,18 +207,17 @@ export default function EditCampaignPage() {
               </div>
             )}
 
-            {(ad.ad_format === 'text' || ad.ad_format === 'native') && (
-              <>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{ta('adTitle')}</label>
-                  <input type="text" value={form.ad_title} onChange={(e) => setForm({ ...form, ad_title: e.target.value })} className={inputClass} />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{ta('adDescription')}</label>
-                  <textarea value={form.ad_description} onChange={(e) => setForm({ ...form, ad_description: e.target.value })} rows={3} className={inputClass + ' resize-none'} />
-                </div>
-              </>
-            )}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{ta('adTitle')}</label>
+              <input type="text" value={form.ad_title} onChange={(e) => setForm({ ...form, ad_title: e.target.value })} className={inputClass} />
+              {ad.ad_format?.startsWith('banner') && (
+                <p className="text-xs text-gray-500 mt-1">{ta('adTitleHint')}</p>
+              )}
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{ta('adDescription')}</label>
+              <textarea value={form.ad_description} onChange={(e) => setForm({ ...form, ad_description: e.target.value })} rows={3} className={inputClass + ' resize-none'} />
+            </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{ta('adDestination')}</label>

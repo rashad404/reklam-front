@@ -126,6 +126,7 @@
     "stepAd": "Ad creative",
     "adTitle": "Ad title",
     "adTitlePlaceholder": "e.g. 50% off!",
+    "adTitleHint": "Optional. If you add a title to image ads, they will show as a rich card.",
     "adDescription": "Description",
     "adDescriptionPlaceholder": "Short ad text",
     "adImage": "Ad image",

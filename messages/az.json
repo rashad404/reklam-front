@@ -126,6 +126,7 @@
     "stepAd": "Reklam",
     "adTitle": "Reklam başlığı",
     "adTitlePlaceholder": "Məsələn: 50% endirim!",
+    "adTitleHint": "İstəyə bağlı. Şəkilli reklamlarda başlıq əlavə etsəniz, zəngin kart formatında göstəriləcək.",
     "adDescription": "Təsvir",
     "adDescriptionPlaceholder": "Qısa reklam mətni",
     "adImage": "Reklam şəkli",
