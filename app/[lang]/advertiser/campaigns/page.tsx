@@ -3,9 +3,16 @@
 import { useTranslations } from 'next-intl';
 import { Link } from '@/lib/navigation';
 import { Plus, Search } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
+import AuthRequiredCard from '@/components/auth/AuthRequiredCard';
+import LoadingSpinner from '@/components/auth/LoadingSpinner';
 
 export default function CampaignsPage() {
   const t = useTranslations('advertiser');
+  const { isAuthenticated, isLoading } = useAuth();
+
+  if (isLoading) return <LoadingSpinner />;
+  if (!isAuthenticated) return <AuthRequiredCard />;
 
   return (
     <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -17,7 +24,6 @@ export default function CampaignsPage() {
         </Link>
       </div>
 
-      {/* Search & Filter */}
       <div className="card mb-6">
         <div className="flex items-center gap-2">
           <Search className="w-5 h-5 text-gray-400" />
@@ -29,7 +35,6 @@ export default function CampaignsPage() {
         </div>
       </div>
 
-      {/* Empty State */}
       <div className="card text-center py-16">
         <div className="w-16 h-16 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center mx-auto mb-4">
           <Plus className="w-8 h-8 text-gray-400" />

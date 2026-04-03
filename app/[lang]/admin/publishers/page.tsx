@@ -1,9 +1,16 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
+import { useAuth } from '@/hooks/useAuth';
+import AuthRequiredCard from '@/components/auth/AuthRequiredCard';
+import LoadingSpinner from '@/components/auth/LoadingSpinner';
 
 export default function AdminPublishersPage() {
   const t = useTranslations('admin');
+  const { isAuthenticated, isLoading } = useAuth();
+
+  if (isLoading) return <LoadingSpinner />;
+  if (!isAuthenticated) return <AuthRequiredCard />;
 
   return (
     <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">

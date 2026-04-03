@@ -3,9 +3,16 @@
 import { useTranslations } from 'next-intl';
 import { Link } from '@/lib/navigation';
 import { Plus } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
+import AuthRequiredCard from '@/components/auth/AuthRequiredCard';
+import LoadingSpinner from '@/components/auth/LoadingSpinner';
 
 export default function AdUnitsPage() {
   const t = useTranslations('publisher');
+  const { isAuthenticated, isLoading } = useAuth();
+
+  if (isLoading) return <LoadingSpinner />;
+  if (!isAuthenticated) return <AuthRequiredCard />;
 
   return (
     <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">

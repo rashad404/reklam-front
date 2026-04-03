@@ -5,9 +5,16 @@ import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft } from 'lucide-react';
 import { Link } from '@/lib/navigation';
+import { useAuth } from '@/hooks/useAuth';
+import AuthRequiredCard from '@/components/auth/AuthRequiredCard';
+import LoadingSpinner from '@/components/auth/LoadingSpinner';
 
 export default function CreateCampaignPage() {
   const t = useTranslations();
+  const { isAuthenticated, isLoading } = useAuth();
+
+  if (isLoading) return <LoadingSpinner />;
+  if (!isAuthenticated) return <AuthRequiredCard />;
   const router = useRouter();
   const [form, setForm] = useState({
     name: '',
