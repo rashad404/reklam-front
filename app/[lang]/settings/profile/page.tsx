@@ -46,10 +46,15 @@ export default function ProfilePage() {
       <div className="card">
         <div className="flex justify-center mb-6">
           <div className="w-20 h-20 rounded-full bg-gradient-to-br from-[#FF3131] to-red-600 p-0.5">
-            <div className="w-full h-full rounded-full bg-white dark:bg-gray-900 flex items-center justify-center">
-              <span className="text-2xl font-bold text-[#FF3131]">
-                {user.name?.charAt(0)?.toUpperCase() || 'U'}
-              </span>
+            <div className="w-full h-full rounded-full bg-white dark:bg-gray-900 flex items-center justify-center overflow-hidden">
+              {user.avatar ? (
+                /* eslint-disable-next-line @next/next/no-img-element */
+                <img src={user.avatar} alt={user.name} className="w-full h-full object-cover" />
+              ) : (
+                <span className="text-2xl font-bold text-[#FF3131]">
+                  {user.name?.charAt(0)?.toUpperCase() || 'U'}
+                </span>
+              )}
             </div>
           </div>
         </div>

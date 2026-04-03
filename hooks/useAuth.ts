@@ -8,6 +8,7 @@ interface User {
   name: string;
   email: string;
   phone?: string;
+  avatar?: string;
   wallet_id?: string;
   is_admin: boolean;
   advertiser?: any;
