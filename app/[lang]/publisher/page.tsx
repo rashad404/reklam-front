@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/lib/navigation';
 import { DollarSign, Eye, MousePointer, TrendingUp, Plus, Wallet, Globe, Code, Zap, LogIn } from 'lucide-react';
@@ -7,6 +8,7 @@ import { useAuth } from '@/hooks/useAuth';
 import LoadingSpinner from '@/components/auth/LoadingSpinner';
 import { usePathname } from 'next/navigation';
 import { openWalletLogin, getLocaleFromPathname } from '@/lib/utils/walletAuth';
+import apiClient from '@/lib/api/client';
 
 export default function PublisherPage() {
   const { isAuthenticated, isLoading } = useAuth();
@@ -109,21 +111,33 @@ function PublisherLanding() {
 
 function PublisherDashboard() {
   const t = useTranslations('publisher');
+  const [stats, setStats] = useState({ total_earned: 0, impressions: 0, clicks: 0, active_ad_units: 0 });
+  const [totalUnits, setTotalUnits] = useState(0);
+
+  useEffect(() => {
+    Promise.all([
+      apiClient.get('/publisher/dashboard').catch(() => ({ data: { data: {} } })),
+      apiClient.get('/ad-units').catch(() => ({ data: { data: { total: 0 } } })),
+    ]).then(([dashRes, unitsRes]) => {
+      setStats(dashRes.data.data || {});
+      setTotalUnits(unitsRes.data.data?.total || unitsRes.data.data?.data?.length || 0);
+    });
+  }, []);
 
   return (
     <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="flex items-center justify-between mb-8">
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('dashboard')}</h1>
-        <Link href="/publisher/ad-units/create" className="btn-primary flex items-center gap-2 text-sm">
+        <Link href="/publisher/ad-units/create" className="btn-primary flex items-center gap-2 text-sm !bg-green-600 hover:!bg-green-700">
           <Plus className="w-4 h-4" /> {t('createAdUnit')}
         </Link>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         {[
-          { icon: DollarSign, label: t('totalEarned'), value: '0.00 AZN', color: 'text-green-600', bg: 'bg-green-100 dark:bg-green-900/30' },
+          { icon: DollarSign, label: t('totalEarned'), value: `${Number(stats.total_earned || 0).toFixed(2)} AZN`, color: 'text-green-600', bg: 'bg-green-100 dark:bg-green-900/30' },
           { icon: Wallet, label: t('pendingEarnings'), value: '0.00 AZN', color: 'text-yellow-600', bg: 'bg-yellow-100 dark:bg-yellow-900/30' },
-          { icon: Eye, label: 'Impressions', value: '0', color: 'text-blue-600', bg: 'bg-blue-100 dark:bg-blue-900/30' },
-          { icon: MousePointer, label: 'Clicks', value: '0', color: 'text-purple-600', bg: 'bg-purple-100 dark:bg-purple-900/30' },
+          { icon: Eye, label: t('adUnits'), value: String(totalUnits), color: 'text-blue-600', bg: 'bg-blue-100 dark:bg-blue-900/30' },
+          { icon: MousePointer, label: t('earnings'), value: `${stats.clicks || 0} clicks`, color: 'text-purple-600', bg: 'bg-purple-100 dark:bg-purple-900/30' },
         ].map((stat, i) => (
           <div key={i} className="card">
             <div className="flex items-center gap-3">
@@ -143,7 +157,7 @@ function PublisherDashboard() {
           <div className="w-12 h-12 rounded-xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center"><TrendingUp className="w-6 h-6 text-blue-600" /></div>
           <div>
             <h3 className="font-semibold text-gray-900 dark:text-white">{t('adUnits')}</h3>
-            <p className="text-sm text-gray-600 dark:text-gray-400">{t('activeAdUnits', { count: 0 })}</p>
+            <p className="text-sm text-gray-600 dark:text-gray-400">{totalUnits} {t('adUnits').toLowerCase()}</p>
           </div>
         </Link>
         <Link href="/publisher/earnings" className="card hover-lift flex items-center gap-4">

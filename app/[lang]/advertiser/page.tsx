@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/lib/navigation';
 import { DollarSign, Eye, MousePointer, TrendingUp, Plus, CreditCard, BarChart3, Target, LogIn } from 'lucide-react';
@@ -7,6 +8,7 @@ import { useAuth } from '@/hooks/useAuth';
 import LoadingSpinner from '@/components/auth/LoadingSpinner';
 import { usePathname } from 'next/navigation';
 import { openWalletLogin, getLocaleFromPathname } from '@/lib/utils/walletAuth';
+import apiClient from '@/lib/api/client';
 
 export default function AdvertiserPage() {
   const { isAuthenticated, isLoading } = useAuth();
@@ -96,6 +98,19 @@ function AdvertiserLanding() {
 
 function AdvertiserDashboard() {
   const t = useTranslations('advertiser');
+  const [stats, setStats] = useState({ balance: '0.00', impressions: 0, clicks: 0, ctr: 0, active_campaigns: 0, total_campaigns: 0 });
+
+  useEffect(() => {
+    Promise.all([
+      apiClient.get('/advertiser/dashboard').catch(() => ({ data: { data: {} } })),
+      apiClient.get('/campaigns').catch(() => ({ data: { data: { total: 0 } } })),
+    ]).then(([dashRes, campRes]) => {
+      setStats({
+        ...dashRes.data.data,
+        total_campaigns: campRes.data.data?.total || 0,
+      });
+    });
+  }, []);
 
   return (
     <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -107,10 +122,10 @@ function AdvertiserDashboard() {
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         {[
-          { icon: DollarSign, label: t('balance'), value: '0.00 AZN', color: 'text-green-600', bg: 'bg-green-100 dark:bg-green-900/30' },
-          { icon: Eye, label: t('impressions'), value: '0', color: 'text-blue-600', bg: 'bg-blue-100 dark:bg-blue-900/30' },
-          { icon: MousePointer, label: t('clicks'), value: '0', color: 'text-purple-600', bg: 'bg-purple-100 dark:bg-purple-900/30' },
-          { icon: TrendingUp, label: t('ctr'), value: '0%', color: 'text-orange-600', bg: 'bg-orange-100 dark:bg-orange-900/30' },
+          { icon: DollarSign, label: t('balance'), value: `${stats.balance} AZN`, color: 'text-green-600', bg: 'bg-green-100 dark:bg-green-900/30' },
+          { icon: Eye, label: t('impressions'), value: String(stats.impressions), color: 'text-blue-600', bg: 'bg-blue-100 dark:bg-blue-900/30' },
+          { icon: MousePointer, label: t('clicks'), value: String(stats.clicks), color: 'text-purple-600', bg: 'bg-purple-100 dark:bg-purple-900/30' },
+          { icon: TrendingUp, label: t('ctr'), value: `${stats.ctr}%`, color: 'text-orange-600', bg: 'bg-orange-100 dark:bg-orange-900/30' },
         ].map((stat, i) => (
           <div key={i} className="card">
             <div className="flex items-center gap-3">
@@ -130,7 +145,7 @@ function AdvertiserDashboard() {
           <div className="w-12 h-12 rounded-xl bg-red-100 dark:bg-red-900/30 flex items-center justify-center"><TrendingUp className="w-6 h-6 text-[#FF3131]" /></div>
           <div>
             <h3 className="font-semibold text-gray-900 dark:text-white">{t('campaigns')}</h3>
-            <p className="text-sm text-gray-600 dark:text-gray-400">{t('activeCampaigns', { count: 0 })}</p>
+            <p className="text-sm text-gray-600 dark:text-gray-400">{stats.total_campaigns} {t('campaigns').toLowerCase()}</p>
           </div>
         </Link>
         <Link href="/advertiser/billing" className="card hover-lift flex items-center gap-4">
