@@ -360,5 +360,30 @@
     "fraudTitle": "Fraud Policy",
     "fraudDesc": "Generating artificial clicks/impressions, using bots, and any manipulation is strictly prohibited. Detected cases result in immediate account termination.",
     "contact": "For questions, email info@reklam.biz."
+  },
+  "settings": {
+    "title": "Settings",
+    "manageAccount": "Manage your account",
+    "connectedViaWallet": "Connected via Kimlik.az",
+    "editOnWallet": "Edit on Kimlik.az",
+    "profile": {
+      "title": "Profile",
+      "description": "Name, email, phone number",
+      "editProfile": "Edit Profile",
+      "name": "Name",
+      "email": "Email",
+      "phone": "Phone",
+      "memberSince": "Member since"
+    },
+    "security": {
+      "title": "Security",
+      "description": "Connected accounts and sessions",
+      "connectedAccounts": "Connected accounts",
+      "kimlikConnected": "Your Kimlik.az account is connected",
+      "kimlikNotConnected": "Kimlik.az account not connected",
+      "logout": "Log out",
+      "logoutAll": "Log out from all devices",
+      "logoutConfirm": "Are you sure you want to log out?"
+    }
   }
 }

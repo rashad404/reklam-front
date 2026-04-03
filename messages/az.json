@@ -360,5 +360,30 @@
     "fraudTitle": "Saxtakarlıq",
     "fraudDesc": "Süni klik və göstərim yaratmaq, bot istifadəsi və hər hansı manipulyasiya ciddi şəkildə qadağandır. Belə hallar aşkar edildikdə hesab dərhal bağlanacaq.",
     "contact": "Suallarınız üçün info@reklam.biz ünvanına yazın."
+  },
+  "settings": {
+    "title": "Parametrlər",
+    "manageAccount": "Hesabınızı idarə edin",
+    "connectedViaWallet": "Kimlik.az ilə bağlı",
+    "editOnWallet": "Kimlik.az-da redaktə et",
+    "profile": {
+      "title": "Profil",
+      "description": "Ad, e-poçt, telefon nömrəsi",
+      "editProfile": "Profili redaktə et",
+      "name": "Ad",
+      "email": "E-poçt",
+      "phone": "Telefon",
+      "memberSince": "Qeydiyyat tarixi"
+    },
+    "security": {
+      "title": "Təhlükəsizlik",
+      "description": "Hesab bağlantıları və sessiyalar",
+      "connectedAccounts": "Bağlı hesablar",
+      "kimlikConnected": "Kimlik.az hesabınız bağlıdır",
+      "kimlikNotConnected": "Kimlik.az hesabı bağlı deyil",
+      "logout": "Hesabdan çıx",
+      "logoutAll": "Bütün cihazlardan çıx",
+      "logoutConfirm": "Çıxmaq istədiyinizə əminsiniz?"
+    }
   }
 }

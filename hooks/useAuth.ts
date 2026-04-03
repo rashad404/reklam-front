@@ -7,9 +7,12 @@ interface User {
   id: number;
   name: string;
   email: string;
+  phone?: string;
+  wallet_id?: string;
   is_admin: boolean;
   advertiser?: any;
   publisher?: any;
+  created_at?: string;
 }
 
 export function useAuth() {
