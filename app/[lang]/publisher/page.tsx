@@ -112,6 +112,7 @@ function PublisherLanding() {
 
 function PublisherDashboard() {
   const t = useTranslations('publisher');
+  const tc = useTranslations('common');
   const [stats, setStats] = useState({ balance: 0, total_earned: 0, impressions: 0, clicks: 0, active_ad_units: 0 });
   const [totalUnits, setTotalUnits] = useState(0);
 
@@ -137,8 +138,8 @@ function PublisherDashboard() {
         {[
           { icon: DollarSign, label: t('totalEarned'), value: `${Number(stats.total_earned || 0).toFixed(2)} AZN`, color: 'text-green-600', bg: 'bg-green-100 dark:bg-green-900/30' },
           { icon: Wallet, label: t('pendingEarnings'), value: `${Number(stats.balance || 0).toFixed(2)} AZN`, color: 'text-yellow-600', bg: 'bg-yellow-100 dark:bg-yellow-900/30' },
-          { icon: Eye, label: t('adUnits'), value: String(totalUnits), color: 'text-blue-600', bg: 'bg-blue-100 dark:bg-blue-900/30' },
-          { icon: MousePointer, label: t('earnings'), value: `${stats.clicks || 0}`, color: 'text-purple-600', bg: 'bg-purple-100 dark:bg-purple-900/30' },
+          { icon: Eye, label: tc('impressionsAndClicks').split(' ')[0], value: String(stats.impressions || 0), color: 'text-blue-600', bg: 'bg-blue-100 dark:bg-blue-900/30' },
+          { icon: MousePointer, label: tc('uniqueClicks'), value: String(stats.clicks || 0), color: 'text-purple-600', bg: 'bg-purple-100 dark:bg-purple-900/30' },
         ].map((stat, i) => (
           <div key={i} className="card">
             <div className="flex items-center gap-3">
