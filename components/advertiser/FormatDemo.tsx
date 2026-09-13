@@ -1,7 +1,6 @@
 "use client";
 import { useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
-import { PanelsTopLeft, ArrowUpRight } from "lucide-react";
 import AdPreview from "./AdPreview";
 export default function FormatDemo() {
   const t = useTranslations("product"),
@@ -10,12 +9,7 @@ export default function FormatDemo() {
   return (
     <div className="ad-studio">
       <div className="studio-top">
-        <div>
-          <span className="studio-icon">
-            <PanelsTopLeft size={19} />
-          </span>
-          <span>{t("formats")}</span>
-        </div>
+        <span>{t("formats")}</span>
         <span className="studio-format">
           {format === "text" ? t("textFormat") : format.replace("banner_", "")}
         </span>
@@ -35,12 +29,6 @@ export default function FormatDemo() {
             }}
           />
         </div>
-      </div>
-      <div className="studio-bottom">
-        <span className="studio-wordmark">
-          reklam<span>.</span>biz
-        </span>
-        <ArrowUpRight size={20} />
       </div>
       <div className="format-options" aria-label={t("format")}>
         {["banner_300x250", "banner_728x90", "banner_320x50", "text"].map(

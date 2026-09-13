@@ -49,6 +49,10 @@ test("public pages have correct language, metadata and usable mobile layouts", a
     }
   }
   await page.goto("/en");
+  const question = page.locator(".market-questions details").first();
+  await question.locator("summary").click();
+  await expect(question).toHaveAttribute("open", "");
+  await expect(question.locator("p")).toBeVisible();
   await expect(page.locator(".studio-ad img")).toBeVisible();
   const accessibility = await new AxeBuilder({ page })
     .withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa", "best-practice"])

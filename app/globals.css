@@ -1940,3 +1940,285 @@ details p {
     scroll-behavior: auto !important;
   }
 }
+
+/* Public pages: let the two audiences and the ad formats shape the composition. */
+.marketing .hero {
+  padding-block: 84px 76px;
+}
+.marketing .hero-home h1 {
+  font-size: clamp(2.6rem, 4.6vw, 4.25rem);
+  letter-spacing: -0.055em;
+}
+.marketing .hero-home h1 span {
+  max-width: 560px;
+}
+.hero-copy .hero-footnote {
+  font-size: 0.76rem;
+  line-height: 1.65;
+  margin-top: 26px;
+  max-width: 380px;
+}
+.marketing .ad-studio {
+  border: 0;
+  border-radius: 0;
+  padding: 0;
+  box-shadow: none;
+  background: transparent;
+}
+.marketing .studio-top {
+  padding: 0 0 13px;
+  color: var(--muted);
+  font-weight: 600;
+}
+.marketing .studio-canvas {
+  background-image: none;
+  border-radius: 4px;
+}
+.marketing .format-options {
+  gap: 0;
+  margin-top: 5px;
+  border-bottom: 1px solid var(--line);
+}
+.marketing .format-options button {
+  border: 0;
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
+  background: transparent;
+  min-height: 65px;
+}
+.marketing .format-options button[aria-pressed="true"] {
+  border-bottom-color: var(--brand);
+  background: transparent;
+}
+.audience-story,
+.format-specifications {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 100px;
+  padding-block: 70px 80px;
+  border-top: 1px solid var(--line);
+}
+.story-label {
+  display: block;
+  font-size: 0.82rem;
+  font-weight: 650;
+  color: var(--muted);
+  margin-bottom: 20px;
+}
+.story-intro h2 {
+  font-size: clamp(1.85rem, 3.3vw, 2.9rem);
+  letter-spacing: -0.045em;
+  line-height: 1.15;
+  max-width: 540px;
+}
+.story-intro > p {
+  font-size: 0.96rem;
+  line-height: 1.85;
+  max-width: 500px;
+  margin: 24px 0;
+}
+.story-intro .text-link {
+  padding-left: 0;
+  color: var(--brand);
+}
+.market-facts {
+  margin: 43px 0 0;
+}
+.market-facts > div + div {
+  border-top: 1px solid var(--line);
+  padding-top: 23px;
+  margin-top: 23px;
+}
+.market-facts dt {
+  font-weight: 750;
+  font-size: 1rem;
+  letter-spacing: -0.015em;
+}
+.market-facts dd {
+  margin: 10px 0 0;
+  color: var(--muted);
+  font-size: 0.88rem;
+  line-height: 1.85;
+}
+.publisher-story {
+  background: #20232a;
+  color: #fff;
+  padding: 55px;
+  display: grid;
+  grid-template-columns: 1.15fr 1fr;
+  gap: 90px;
+  border-left: 4px solid #d82c40;
+}
+.publisher-story .story-label {
+  color: #ff9ca6;
+}
+.publisher-story p {
+  color: #c6c9d1;
+}
+.publisher-notes {
+  align-self: center;
+  border-left: 1px solid #454851;
+  padding-left: 40px;
+}
+.publisher-notes > p {
+  font-size: 1rem;
+  line-height: 1.85;
+}
+.publisher-format-list {
+  display: flex;
+  gap: 12px 22px;
+  flex-wrap: wrap;
+  padding-block: 25px;
+  font-size: 0.78rem;
+  font-variant-numeric: tabular-nums;
+  color: #fff;
+}
+.publisher-notes .text-link {
+  color: #fff;
+  padding-left: 0;
+}
+.market-faq {
+  display: grid;
+  grid-template-columns: 1fr 1.5fr;
+  gap: 90px;
+  padding-block: 85px 60px;
+}
+.market-faq h2 {
+  font-size: 1.7rem;
+  line-height: 1.2;
+  letter-spacing: -0.04em;
+  margin-bottom: 17px;
+}
+.market-faq > div > .text-link {
+  padding-left: 0;
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+.market-questions details {
+  padding: 0;
+  border-bottom: 0;
+  border-top: 1px solid var(--line);
+}
+.market-questions details:last-child {
+  border-bottom: 1px solid var(--line);
+}
+.market-questions summary {
+  list-style: none;
+  cursor: pointer;
+  min-height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding-block: 18px;
+  font-size: 0.93rem;
+  font-weight: 650;
+}
+.market-questions summary::-webkit-details-marker {
+  display: none;
+}
+.market-questions summary svg {
+  flex-shrink: 0;
+  color: var(--muted);
+}
+.market-questions details[open] summary svg {
+  transform: rotate(45deg);
+}
+.market-questions details p {
+  font-size: 0.88rem;
+  line-height: 1.8;
+  padding-bottom: 24px;
+  max-width: 590px;
+}
+.market-signoff {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 30px;
+  padding: 38px 0 55px;
+}
+.market-signoff > p {
+  color: var(--ink);
+  font-size: 1.35rem;
+  letter-spacing: -0.025em;
+  font-weight: 600;
+}
+@media (max-width: 900px) {
+  .audience-story,
+  .format-specifications {
+    gap: 45px;
+  }
+  .publisher-story {
+    padding: 35px;
+    gap: 35px;
+  }
+  .publisher-notes {
+    padding-left: 25px;
+  }
+  .market-faq {
+    gap: 40px;
+  }
+}
+@media (max-width: 600px) {
+  .marketing .hero {
+    padding-block: 43px 47px;
+    gap: 39px;
+  }
+  .marketing .hero-home h1 {
+    font-size: 2.75rem;
+    max-width: 400px;
+  }
+  .hero-copy .hero-footnote {
+    font-size: 0.72rem;
+    margin-top: 20px;
+  }
+  .audience-story,
+  .format-specifications {
+    grid-template-columns: 1fr;
+    gap: 28px;
+    padding-block: 40px 47px;
+  }
+  .story-label {
+    margin-bottom: 15px;
+  }
+  .story-intro h2 {
+    font-size: 2rem;
+  }
+  .story-intro > p {
+    margin-block: 19px;
+    font-size: 0.93rem;
+  }
+  .market-facts {
+    margin: 0;
+  }
+  .publisher-story {
+    grid-template-columns: 1fr;
+    padding: 30px 24px;
+    gap: 35px;
+    margin-inline: -8px;
+  }
+  .publisher-notes {
+    border-left: 0;
+    border-top: 1px solid #454851;
+    padding: 26px 0 0;
+  }
+  .publisher-notes > p {
+    font-size: 0.92rem;
+  }
+  .market-faq {
+    grid-template-columns: 1fr;
+    gap: 20px;
+    padding-block: 46px 30px;
+  }
+  .market-signoff {
+    align-items: flex-start;
+    flex-direction: column;
+    padding-block: 20px 40px;
+    gap: 20px;
+  }
+}
+@media (max-width: 360px) {
+  .marketing .hero-home h1 {
+    font-size: 2.3rem;
+  }
+}

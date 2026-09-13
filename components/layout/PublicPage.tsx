@@ -1,17 +1,9 @@
 import { getTranslations } from "next-intl/server";
-import {
-  ArrowRight,
-  ArrowUpRight,
-  Megaphone,
-  PanelsTopLeft,
-  MousePointer2,
-  BarChart3,
-  Layers3,
-  ShieldCheck,
-} from "lucide-react";
+import { ArrowRight, ArrowUpRight, Plus } from "lucide-react";
 import { Link } from "@/lib/navigation";
 import FormatDemo from "@/components/advertiser/FormatDemo";
 import { site } from "@/lib/seo";
+
 export default async function PublicPage({
   kind = "home",
 }: {
@@ -19,6 +11,61 @@ export default async function PublicPage({
 }) {
   const t = await getTranslations("product");
   const publisher = kind === "forPublishers";
+  const advertiserStory = (
+    <section
+      className="audience-story"
+      aria-labelledby="advertiser-story-title"
+    >
+      <div className="story-intro">
+        <span className="story-label">{t("navAdvertisers")}</span>
+        <h2 id="advertiser-story-title">{t("advertiserStoryTitle")}</h2>
+        <p>{t("advertiserStoryBody")}</p>
+        <Link className="text-link" href="/advertiser/campaigns/create">
+          {t("createCampaign")}
+          <ArrowUpRight size={19} />
+        </Link>
+      </div>
+      <dl className="market-facts">
+        <div>
+          <dt>{t("publicBudgetTitle")}</dt>
+          <dd>{t("publicBudgetBody")}</dd>
+        </div>
+        <div>
+          <dt>{t("publicReportsTitle")}</dt>
+          <dd>{t("publicReportsBody")}</dd>
+        </div>
+      </dl>
+    </section>
+  );
+  const publisherStory = (
+    <section
+      className="publisher-story"
+      aria-labelledby="publisher-story-title"
+    >
+      <div className="story-intro">
+        <span className="story-label">{t("navPublishers")}</span>
+        <h2 id="publisher-story-title">{t("publisherStoryTitle")}</h2>
+        <p>{t("publisherStoryBody")}</p>
+        <Link className="btn-primary" href="/publisher/site">
+          {t("joinWebsite")}
+          <ArrowUpRight size={19} />
+        </Link>
+      </div>
+      <div className="publisher-notes">
+        <p>{t("publisherPlacementNote")}</p>
+        <div className="publisher-format-list" aria-label={t("formats")}>
+          <span>300x250</span>
+          <span>728x90</span>
+          <span>320x50</span>
+          <span>{t("textFormat")}</span>
+        </div>
+        <Link className="text-link" href="/ad-formats">
+          {t("viewFormats")}
+          <ArrowRight size={18} />
+        </Link>
+      </div>
+    </section>
+  );
   return (
     <div className="marketing">
       <div className="wrap">
@@ -26,10 +73,6 @@ export default async function PublicPage({
           className={`hero ${kind === "home" ? "hero-home" : "hero-inner"}`}
         >
           <div className="hero-copy">
-            <span className="eyebrow hero-kicker">
-              <span />
-              {t("platform")}
-            </span>
             <h1>
               {kind === "home" ? (
                 <>
@@ -55,217 +98,95 @@ export default async function PublicPage({
               </Link>
               <Link
                 className="text-link"
-                href={publisher ? "/help" : "/for-publishers"}
+                href={publisher ? "/ad-formats" : "/for-publishers"}
               >
-                {t(publisher ? "help" : "navPublishers")}
+                {t(publisher ? "viewFormats" : "navPublishers")}
                 <ArrowRight size={18} />
               </Link>
             </div>
-            <div className="hero-caption">
-              <Layers3 size={16} />
-              {t("bannerAndText")}
-              <span className="caption-divider" />
-              <BarChart3 size={16} />
-              {t("reports")}
-            </div>
+            <p className="hero-footnote">{t("heroFootnote")}</p>
           </div>
           <div className="hero-visual">
             <FormatDemo />
           </div>
         </section>
-      </div>
-      <div className="capability-band">
-        <div className="wrap capability-grid">
-          {[
-            {
-              icon: MousePointer2,
-              title: "capCreative",
-              body: "capCreativeBody",
-            },
-            { icon: ShieldCheck, title: "capControl", body: "capControlBody" },
-            { icon: BarChart3, title: "capReports", body: "capReportsBody" },
-          ].map(({ icon: Icon, title, body }) => (
-            <div className="capability" key={title}>
-              <span className="capability-icon">
-                <Icon size={23} />
-              </span>
-              <div>
-                <h2>{t(title)}</h2>
-                <p>{t(body)}</p>
-              </div>
+        {kind === "home" && (
+          <>
+            {advertiserStory}
+            {publisherStory}
+          </>
+        )}
+        {kind === "forAdvertisers" && advertiserStory}
+        {kind === "forPublishers" && publisherStory}
+        {kind === "formats" && (
+          <section className="format-specifications">
+            <div className="story-intro">
+              <span className="story-label">{t("formats")}</span>
+              <h2>{t("formatChoiceTitle")}</h2>
+              <p>{t("formatChoiceBody")}</p>
             </div>
-          ))}
-        </div>
-      </div>
-      <div className="wrap">
-        {kind === "home" ? (
-          <section className="audiences-section">
-            <div className="section-heading">
-              <span className="eyebrow">{t("platform")}</span>
-              <h2>{t("audienceHeading")}</h2>
-            </div>
-            <div className="audience-grid">
-              <article className="audience-panel advertiser-panel">
-                <div className="audience-icon">
-                  <Megaphone size={28} />
-                </div>
-                <h3>{t("navAdvertisers")}</h3>
-                <p>{t("forAdvertisersDescription")}</p>
-                <Link
-                  className="btn-primary"
-                  href="/advertiser/campaigns/create"
-                >
-                  {t("createCampaign")}
-                  <ArrowUpRight size={18} />
-                </Link>
-                <div className="panel-orbit" aria-hidden="true" />
-              </article>
-              <article className="audience-panel publisher-panel">
-                <div className="audience-icon">
-                  <PanelsTopLeft size={28} />
-                </div>
-                <h3>{t("navPublishers")}</h3>
-                <p>{t("forPublishersDescription")}</p>
-                <Link className="btn-secondary" href="/publisher/site">
-                  {t("joinWebsite")}
-                  <ArrowUpRight size={18} />
-                </Link>
-                <div className="panel-grid-art" aria-hidden="true">
-                  <span />
-                  <span />
-                  <span />
-                </div>
-              </article>
-            </div>
-          </section>
-        ) : (
-          <section className="product-details">
-            <div className="section-heading">
-              <span className="eyebrow">{t(kind)}</span>
-              <h2>
-                {t(
-                  publisher
-                    ? "publicPublisherHeading"
-                    : kind === "formats"
-                      ? "formats"
-                      : "publicAdvertiserHeading",
-                )}
-              </h2>
-            </div>
-            <div className="detail-grid">
-              <div className="detail-copy">
-                <h3>
-                  {t(
-                    publisher
-                      ? "publicPublisherTitle"
-                      : kind === "formats"
-                        ? "content"
-                        : "publicBudgetTitle",
-                  )}
-                </h3>
-                <p>
-                  {t(
-                    publisher
-                      ? "publicPublisherBody"
-                      : kind === "formats"
-                        ? "uploadHint"
-                        : "publicBudgetBody",
-                  )}
-                </p>
-                <h3>
-                  {t(publisher ? "publicPlacementTitle" : "publicReportsTitle")}
-                </h3>
-                <p>
-                  {t(publisher ? "publicPlacementBody" : "publicReportsBody")}
-                </p>
-              </div>
-              <div className="detail-surface">
-                {kind === "formats" ? (
-                  <div className="table-wrap">
-                    <table>
-                      <thead>
-                        <tr>
-                          <th>{t("format")}</th>
-                          <th>{t("content")}</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {["300x250", "728x90", "320x50"].map((size) => (
-                          <tr key={size}>
-                            <th scope="row">{size}</th>
-                            <td>PNG / JPEG / WebP</td>
-                          </tr>
-                        ))}
-                        <tr>
-                          <th scope="row">{t("textFormat")}</th>
-                          <td>
-                            {t("adTitle")} + {t("adText")}
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                ) : (
-                  <>
-                    <ShieldCheck size={32} />
-                    <h3>
-                      {t(
-                        publisher
-                          ? "publicPublisherCardTitle"
-                          : "publicAdvertiserCardTitle",
-                      )}
-                    </h3>
-                    <p>
-                      {t(
-                        publisher
-                          ? "publicPublisherCardBody"
-                          : "publicAdvertiserCardBody",
-                      )}
-                    </p>
-                    <Link className="text-link" href="/help">
-                      {t("help")}
-                      <ArrowUpRight size={17} />
-                    </Link>
-                  </>
-                )}
-              </div>
+            <div className="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>{t("format")}</th>
+                    <th>{t("content")}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {["300x250", "728x90", "320x50"].map((size) => (
+                    <tr key={size}>
+                      <th scope="row">{size}</th>
+                      <td>PNG / JPEG / WebP</td>
+                    </tr>
+                  ))}
+                  <tr>
+                    <th scope="row">{t("textFormat")}</th>
+                    <td>
+                      {t("adTitle")} + {t("adText")}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </section>
         )}
-        <section className="process-section">
-          <div className="section-heading">
-            <span className="eyebrow">{t("process")}</span>
-            <h2>{t("processHeading")}</h2>
+        <section className="market-faq" aria-labelledby="market-faq-title">
+          <div>
+            <h2 id="market-faq-title">{t("beforeJoining")}</h2>
+            <Link className="text-link" href="/help">
+              {t("help")}
+              <ArrowRight size={17} />
+            </Link>
           </div>
-          <div className="process-grid">
-            {[1, 2, 3].map((n) => (
-              <article className="process-card" key={n}>
-                <div className="process-top">
-                  <span>0{n}</span>
-                  <ArrowRight size={22} />
-                </div>
-                <h3>{t(`process${n}`)}</h3>
-                <p>{t(`process${n}Body`)}</p>
-              </article>
+          <div className="market-questions">
+            {(publisher
+              ? [3, 4]
+              : kind === "forAdvertisers" || kind === "formats"
+                ? [1, 2]
+                : [1, 2, 3]
+            ).map((n) => (
+              <details key={n}>
+                <summary>
+                  {t(`marketQuestion${n}`)}
+                  <Plus size={18} aria-hidden="true" />
+                </summary>
+                <p>{t(`marketAnswer${n}`)}</p>
+              </details>
             ))}
           </div>
         </section>
-        <section className="closing-cta">
-          <div>
-            <span className="eyebrow">REKLAM.BIZ</span>
-            <h2>{t("closingTitle")}</h2>
-            <p>{t("closingBody")}</p>
-          </div>
-          <div className="closing-actions">
-            <Link className="btn-primary" href="/advertiser/campaigns/create">
-              {t("createCampaign")}
-              <ArrowUpRight size={18} />
-            </Link>
-            <Link className="text-link" href="/publisher/site">
-              {t("joinWebsite")}
-              <ArrowRight size={18} />
-            </Link>
-          </div>
+        <section className="market-signoff">
+          <p>{t(publisher ? "publisherSignoff" : "advertiserSignoff")}</p>
+          <Link
+            className="btn-primary"
+            href={
+              publisher ? "/publisher/site" : "/advertiser/campaigns/create"
+            }
+          >
+            {t(publisher ? "joinWebsite" : "createCampaign")}
+            <ArrowUpRight size={19} />
+          </Link>
         </section>
       </div>
       {kind === "home" && (
