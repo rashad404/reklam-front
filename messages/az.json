@@ -532,6 +532,7 @@
     "contactBody": "Səhifənin ünvanını və məsələni info@reklam.biz ünvanına göndərin. Şifrə və giriş tokeni göndərməyin.",
     "notFound": "Səhifə tapılmadı",
     "returnHome": "Ana səhifəyə keç",
-    "localLogin": "Yerli yoxlama girişi"
+    "localLogin": "Yerli yoxlama girişi",
+    "textFormat": "Mətn reklamı"
   }
 }

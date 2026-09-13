@@ -17,3 +17,59 @@ jobs:
           NEXT_PUBLIC_SITE_URL: https://reklam.biz
           NEXT_PUBLIC_INDEXABLE: 'true'
           NEXT_PUBLIC_LOCAL_TEST_LOGIN: 'false'
+  journeys:
+    runs-on: ubuntu-latest
+    env:
+      APP_ENV: local
+      DB_CONNECTION: sqlite
+      DB_DATABASE: /tmp/reklam-preview.sqlite
+      DB_URL: ''
+      CACHE_STORE: file
+      APP_URL: http://127.0.0.1:8059
+      FRONTEND_URL: http://localhost:3059
+      CORS_ALLOWED_ORIGINS: http://localhost:3059
+      EMBED_URL: http://127.0.0.1:8059/serve.js
+      AD_DELIVERY_ENABLED: 'true'
+      REKLAM_FIXTURE_PASSWORD: isolated-ci-fixture-password-only
+      NEXT_PUBLIC_API_URL: http://127.0.0.1:8059/api
+      NEXT_PUBLIC_SITE_URL: http://localhost:3059
+      NEXT_PUBLIC_INDEXABLE: 'true'
+      NEXT_PUBLIC_LOCAL_TEST_LOGIN: 'true'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: rashad404/reklam-backend
+          path: api-fixture
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: pdo_sqlite, mbstring, gd
+      - run: npm ci --ignore-scripts
+      - run: npx playwright install --with-deps chrome
+      - run: |
+          cd api-fixture
+          composer install --no-interaction --prefer-dist
+          cp .env.example .env
+          php artisan key:generate
+          touch /tmp/reklam-preview.sqlite
+          php artisan migrate --force
+          php artisan product:fixtures
+          php artisan serve --host=127.0.0.1 --port=8059 > /tmp/reklam-api.log 2>&1 &
+      - run: |
+          npm run build
+          cp -r public .next/standalone/public
+          cp -r .next/static .next/standalone/.next/static
+          PORT=3059 HOSTNAME=localhost node .next/standalone/server.js > /tmp/reklam-web.log 2>&1 &
+          python3 -m http.server 8060 --bind 127.0.0.1 --directory api-fixture/tests/fixtures > /tmp/reklam-embed.log 2>&1 &
+          for attempt in $(seq 1 30); do curl --fail --silent http://localhost:3059/en > /dev/null && break; sleep 1; done
+          npx playwright test
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: journey-evidence
+          path: test-results/

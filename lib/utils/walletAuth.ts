@@ -69,6 +69,8 @@ export async function openWalletLogin({
     });
     const url = `${wallet}/${locale}/oauth/authorize?${params}`;
     if (!popup) {
+      // OAuth intentionally leaves this application for the identity provider.
+      // eslint-disable-next-line @next/next/no-location-assign-relative-destination
       window.location.assign(url);
       return;
     }

@@ -532,6 +532,7 @@
     "contactBody": "Email info@reklam.biz with the page URL and a description. Do not include passwords or access tokens.",
     "notFound": "Page not found",
     "returnHome": "Go to homepage",
-    "localLogin": "Local verification login"
+    "localLogin": "Local verification login",
+    "textFormat": "Text ad"
   }
 }

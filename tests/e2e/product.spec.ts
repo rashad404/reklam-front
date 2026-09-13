@@ -33,7 +33,7 @@ test("public pages have correct language, metadata and usable mobile layouts", a
     await expect(page.locator("h1")).toHaveCount(1);
     await expect(page.locator("link[rel=canonical]")).toHaveAttribute(
       "href",
-      lang === "az" ? "http://localhost:3059" : `http://localhost:3059/${lang}`,
+      `${process.env.TEST_BASE_URL || "http://localhost:3059"}${lang === "az" ? "" : `/${lang}`}`,
     );
     for (const width of [320, 390, 1440]) {
       await page.setViewportSize({ width, height: 900 });
