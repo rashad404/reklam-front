@@ -52,28 +52,33 @@ export default async function PublicPage({
           {t("publisherStoryTitle")}
         </StoryHeading>
         <p>{t("publisherStoryBody")}</p>
-        <Link className="btn-primary" href="/publisher/site">
-          {t("joinWebsite")}
-          <ArrowUpRight size={19} />
-        </Link>
+        <div className="publisher-actions">
+          <Link className="btn-primary" href="/publisher/site">
+            {t("joinWebsite")}
+            <ArrowUpRight size={19} />
+          </Link>
+          <Link className="text-link" href="/for-advertisers">
+            {t("navAdvertisers")}
+            <ArrowRight size={18} />
+          </Link>
+        </div>
       </div>
       <div className="publisher-notes">
         <PublisherOffer primary={offerFirst} />
-        <Link className="text-link" href="/ad-formats">
-          {t("viewFormats")}
-          <ArrowRight size={18} />
-        </Link>
       </div>
     </section>
   );
   return (
-    <div className="marketing">
+    <div className="marketing campaign-design">
       <div className="wrap">
         {offerFirst && publisherStory}
         <section
           className={`hero ${kind === "home" ? "hero-home" : "hero-inner"}`}
         >
           <div className="hero-copy">
+            <span className="story-label">
+              {t(publisher ? "formats" : "navAdvertisers")}
+            </span>
             <HeroHeading>
               {kind === "home" ? (
                 <>
@@ -81,11 +86,17 @@ export default async function PublicPage({
                   <span>{t("heroLine2")}</span>
                 </>
               ) : (
-                t(publisher ? "offerHero" : kind)
+                t(publisher ? "formatChoiceTitle" : kind)
               )}
             </HeroHeading>
             <p>
-              {t(kind === "home" ? "heroDescription" : `${kind}Description`)}
+              {t(
+                publisher
+                  ? "formatChoiceBody"
+                  : kind === "home"
+                    ? "heroDescription"
+                    : `${kind}Description`,
+              )}
             </p>
             <div className="hero-actions">
               <Link

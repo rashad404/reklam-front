@@ -29,7 +29,7 @@ export default function PublisherOffer({
     : null;
   return (
     <aside
-      className={`publisher-offer ${compact ? "offer-compact" : ""}`}
+      className={`publisher-offer ${compact ? "offer-compact" : ""} ${primary ? "offer-poster" : ""}`}
       aria-label={t("offerLabel")}
     >
       <div className="offer-rate">
@@ -40,12 +40,20 @@ export default function PublisherOffer({
         <span>{t("offerCommissionLabel")}</span>
       </div>
       <div className="offer-copy">
-        <Heading>
-          {t(
-            ended ? "offerEnded" : compact ? "offerTitle" : "offerPublicTitle",
-          )}
-        </Heading>
-        <p>{t(ended ? "offerStandardBody" : "offerBody")}</p>
+        {!primary && (
+          <>
+            <Heading>
+              {t(
+                ended
+                  ? "offerEnded"
+                  : compact
+                    ? "offerTitle"
+                    : "offerPublicTitle",
+              )}
+            </Heading>
+            <p>{t(ended ? "offerStandardBody" : "offerBody")}</p>
+          </>
+        )}
         {offer?.active && end ? (
           <p className="offer-dates">{t("offerEnds", { date: end })}</p>
         ) : (
