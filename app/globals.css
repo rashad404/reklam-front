@@ -1025,14 +1025,6 @@ body:has(.workspace-nav) .footer-bottom {
   grid-template-columns: 1.6fr 1fr 1fr;
   gap: 60px;
 }
-.footer-wordmark {
-  font-size: 2rem;
-  font-weight: 800;
-  letter-spacing: -0.08em;
-}
-.footer-wordmark > span {
-  color: var(--brand);
-}
 .footer-brand p {
   max-width: 270px;
   line-height: 1.8;

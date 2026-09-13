@@ -1,4 +1,5 @@
 "use client";
+import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { ArrowUpRight } from "lucide-react";
 import { Link } from "@/lib/navigation";
@@ -9,8 +10,23 @@ export default function Footer() {
       <div className="wrap">
         <div className="footer-grid">
           <div className="footer-brand">
-            <Link href="/" className="footer-wordmark">
-              reklam<span>.</span>biz
+            <Link href="/" aria-label="Reklam.biz" className="brand-link">
+              <Image
+                unoptimized
+                className="header-logo dark:hidden"
+                src="/images/logo.svg"
+                alt="Reklam.biz"
+                width={130}
+                height={32}
+              />
+              <Image
+                unoptimized
+                className="header-logo hidden dark:block"
+                src="/images/logo-white.svg"
+                alt="Reklam.biz"
+                width={130}
+                height={32}
+              />
             </Link>
             <p>{t("footerLine")}</p>
           </div>
