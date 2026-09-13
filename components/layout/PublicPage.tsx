@@ -145,10 +145,10 @@ export default async function PublicPage({
               <h2>
                 {t(
                   publisher
-                    ? "verification"
+                    ? "publicPublisherHeading"
                     : kind === "formats"
                       ? "formats"
-                      : "campaignManagement",
+                      : "publicAdvertiserHeading",
                 )}
               </h2>
             </div>
@@ -157,23 +157,27 @@ export default async function PublicPage({
                 <h3>
                   {t(
                     publisher
-                      ? "verification"
+                      ? "publicPublisherTitle"
                       : kind === "formats"
                         ? "content"
-                        : "budget",
+                        : "publicBudgetTitle",
                   )}
                 </h3>
                 <p>
                   {t(
                     publisher
-                      ? "verificationHelp"
+                      ? "publicPublisherBody"
                       : kind === "formats"
                         ? "uploadHint"
-                        : "deliveryHint",
+                        : "publicBudgetBody",
                   )}
                 </p>
-                <h3>{t(publisher ? "embed" : "reports")}</h3>
-                <p>{t(publisher ? "embedHelp" : "metricHelp")}</p>
+                <h3>
+                  {t(publisher ? "publicPlacementTitle" : "publicReportsTitle")}
+                </h3>
+                <p>
+                  {t(publisher ? "publicPlacementBody" : "publicReportsBody")}
+                </p>
               </div>
               <div className="detail-surface">
                 {kind === "formats" ? (
@@ -204,8 +208,20 @@ export default async function PublicPage({
                 ) : (
                   <>
                     <ShieldCheck size={32} />
-                    <h3>{t("reviewStep")}</h3>
-                    <p>{t("reviewHint")}</p>
+                    <h3>
+                      {t(
+                        publisher
+                          ? "publicPublisherCardTitle"
+                          : "publicAdvertiserCardTitle",
+                      )}
+                    </h3>
+                    <p>
+                      {t(
+                        publisher
+                          ? "publicPublisherCardBody"
+                          : "publicAdvertiserCardBody",
+                      )}
+                    </p>
                     <Link className="text-link" href="/help">
                       {t("help")}
                       <ArrowUpRight size={17} />
