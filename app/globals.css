@@ -695,6 +695,11 @@ body:has(.workspace-nav) .footer-bottom {
   width: 100%;
   filter: drop-shadow(0 12px 18px #17191f18);
 }
+.studio-ad > div > div > a:last-child {
+  min-height: 24px;
+  display: flex;
+  align-items: center;
+}
 .studio-bottom {
   display: flex;
   align-items: center;
@@ -1675,6 +1680,11 @@ details p {
   .format-options button {
     font-size: 0.58rem;
     min-height: 57px;
+  }
+  .studio-ad > div > div > a:last-child {
+    min-height: 24px;
+    display: flex;
+    align-items: center;
   }
   .studio-bottom {
     padding-top: 12px;
