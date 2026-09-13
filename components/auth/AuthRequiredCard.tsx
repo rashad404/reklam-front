@@ -1,48 +1,64 @@
-'use client';
-
-import { useTranslations } from 'next-intl';
-import { usePathname } from 'next/navigation';
-import { LogIn } from 'lucide-react';
-import { openWalletLogin, getLocaleFromPathname } from '@/lib/utils/walletAuth';
-
-interface AuthRequiredCardProps {
-  title?: string;
-  message?: string;
-}
-
-export default function AuthRequiredCard({ title, message }: AuthRequiredCardProps) {
-  const t = useTranslations();
-  const pathname = usePathname();
-  const locale = getLocaleFromPathname(pathname);
-
-  const handleLogin = () => {
-    openWalletLogin({
+"use client";
+import { useState } from "react";
+import { useLocale, useTranslations } from "next-intl";
+import { openWalletLogin } from "@/lib/utils/walletAuth";
+import { useAuth } from "@/hooks/useAuth";
+import api from "@/lib/api/client";
+export default function AuthRequiredCard() {
+  const t = useTranslations("product"),
+    locale = useLocale();
+  const [error, setError] = useState(false),
+    [busy, setBusy] = useState(false);
+  const { refresh } = useAuth();
+  async function login() {
+    setBusy(true);
+    setError(false);
+    await openWalletLogin({
       locale,
-      onError: (error) => {
-        if (error === 'popup_blocked') {
-          alert(t('auth.popupBlocked'));
-        }
-      }
+      onError: () => {
+        setError(true);
+        setBusy(false);
+      },
     });
-  };
-
+  }
+  async function localLogin(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const fd = new FormData(e.currentTarget);
+    try {
+      const r = await api.post("/auth/login", {
+        email: fd.get("email"),
+        password: fd.get("password"),
+      });
+      localStorage.setItem("token", r.data.data.token);
+      await refresh();
+    } catch {
+      setError(true);
+    }
+  }
   return (
-    <div className="min-h-[60vh] flex items-center justify-center px-4">
-      <div className="card max-w-md w-full text-center">
-        <div className="w-16 h-16 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center mx-auto mb-4">
-          <LogIn className="w-8 h-8 text-[#FF3131]" />
-        </div>
-        <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
-          {title || t('auth.signIn')}
-        </h2>
-        <p className="text-gray-600 dark:text-gray-400 mb-6">
-          {message || t('auth.walletLoginInfo')}
-        </p>
-        <button onClick={handleLogin} className="btn-primary w-full flex items-center justify-center gap-2">
-          <LogIn className="w-4 h-4" />
-          {t('auth.loginWithWallet')}
+    <div className="wrap page narrow">
+      <section className="card stack">
+        <h1>{t("signIn")}</h1>
+        <p>{t("loginHelp")}</p>
+        {error && <p role="alert">{t("loadError")}</p>}
+        <button className="btn-primary" disabled={busy} onClick={login}>
+          {busy ? t("loading") : t("signIn") + " - Kimlik.az"}
         </button>
-      </div>
+        {process.env.NEXT_PUBLIC_LOCAL_TEST_LOGIN === "true" && (
+          <form className="stack" onSubmit={localLogin}>
+            <h2>{t("localLogin")}</h2>
+            <label className="field">
+              Email
+              <input name="email" type="email" required />
+            </label>
+            <label className="field">
+              Password
+              <input name="password" type="password" required />
+            </label>
+            <button className="btn-secondary">{t("signIn")}</button>
+          </form>
+        )}
+      </section>
     </div>
   );
 }

@@ -1,208 +1,208 @@
-'use client';
-
-import { useState, useEffect } from 'react';
-import { Link } from '@/lib/navigation';
-import { useRouter, usePathname } from 'next/navigation';
-import { Menu, X, User, LogOut, Megaphone, Globe } from 'lucide-react';
-import { ThemeToggle } from '@/components/ui/theme-toggle';
-import { LanguageSwitcher } from '@/components/ui/language-switcher';
-import { useTranslations } from 'next-intl';
-import { openWalletLogin } from '@/lib/utils/walletAuth';
-
+"use client";
+import Image from "next/image";
+import { useState } from "react";
+import { useLocale, useTranslations } from "next-intl";
+import { useTheme } from "next-themes";
+import { Menu, Moon, Sun, X, LogIn } from "lucide-react";
+import { Link, usePathname, useRouter } from "@/lib/navigation";
+import { useAuth } from "@/hooks/useAuth";
+import { openWalletLogin } from "@/lib/utils/walletAuth";
+import api from "@/lib/api/client";
 export default function Header() {
-  const t = useTranslations();
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isMounted, setIsMounted] = useState(false);
-  const router = useRouter();
-  const pathname = usePathname();
-
-  const getLocale = () => {
-    const segments = pathname.split('/');
-    const possibleLocale = segments[1];
-    if (['en', 'ru'].includes(possibleLocale)) {
-      return possibleLocale;
+  const t = useTranslations("product"),
+    locale = useLocale(),
+    path = usePathname(),
+    router = useRouter();
+  const { resolvedTheme, setTheme } = useTheme();
+  const { user, isAuthenticated, refresh } = useAuth();
+  const [menu, setMenu] = useState(false),
+    [error, setError] = useState(false);
+  const links = [
+    ["/for-advertisers", "forAdvertisers"],
+    ["/for-publishers", "forPublishers"],
+    ["/ad-formats", "formats"],
+  ];
+  const workspace = /^\/(advertiser|publisher|settings|admin)(\/|$)/.test(path);
+  const role = path.startsWith("/publisher")
+    ? "publisher"
+    : path.startsWith("/admin")
+      ? "admin"
+      : "advertiser";
+  const tabs =
+    role === "publisher"
+      ? [
+          ["/publisher", "overview"],
+          ["/publisher/site", "site"],
+          ["/publisher/ad-units", "placements"],
+          ["/publisher/stats", "reports"],
+        ]
+      : role === "admin"
+        ? [
+            ["/admin", "overview"],
+            ["/admin/ads", "campaigns"],
+            ["/admin/publishers", "site"],
+          ]
+        : [
+            ["/advertiser", "overview"],
+            ["/advertiser/campaigns", "campaigns"],
+            ["/advertiser/stats", "reports"],
+          ];
+  async function login() {
+    setError(false);
+    await openWalletLogin({ locale, onError: () => setError(true) });
+  }
+  async function logout() {
+    try {
+      await api.post("/auth/logout");
+      localStorage.removeItem("token");
+      await refresh();
+      setMenu(false);
+    } catch {
+      setError(true);
     }
-    return 'az';
-  };
-  const locale = getLocale();
-
-  useEffect(() => {
-    const checkAuth = () => {
-      const token = localStorage.getItem('token');
-      setIsAuthenticated(!!token);
-    };
-
-    checkAuth();
-    setIsMounted(true);
-
-    window.addEventListener('authStateChanged', checkAuth);
-    return () => window.removeEventListener('authStateChanged', checkAuth);
-  }, [pathname]);
-
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    setIsAuthenticated(false);
-    window.dispatchEvent(new Event('authStateChanged'));
-    router.push('/');
-  };
-
-  const handleLoginClick = () => {
-    setIsMenuOpen(false);
-    openWalletLogin({
-      locale,
-      onError: (error) => {
-        if (error === 'popup_blocked') {
-          alert(t('auth.popupBlocked'));
-        }
-      }
-    });
-  };
-
+  }
   return (
-    <header className="sticky top-0 z-50 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800">
-      <nav className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-14">
-          {/* Logo */}
-          <Link href="/" className="flex items-center gap-2 group">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/images/logo.svg" alt="Reklam.biz" width={130} height={32} className="dark:hidden" />
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/images/logo-white.svg" alt="Reklam.biz" width={130} height={32} className="hidden dark:block" />
+    <>
+      <a className="skip" href="#main-content">
+        {t("skip")}
+      </a>
+      <header className="site-header">
+        <div className="wrap header-inner">
+          <Link href="/" aria-label="Reklam.biz">
+            <Image
+              unoptimized
+              className="header-logo dark:hidden"
+              src="/images/logo.svg"
+              alt="Reklam.biz"
+              width={130}
+              height={32}
+            />
+            <Image
+              unoptimized
+              className="header-logo hidden dark:block"
+              src="/images/logo-white.svg"
+              alt="Reklam.biz"
+              width={130}
+              height={32}
+            />
           </Link>
-
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-6">
-            {isAuthenticated && (
-              <>
-                <Link
-                  href="/advertiser"
-                  className={`text-sm font-medium transition-colors ${
-                    pathname.includes('/advertiser')
-                      ? 'text-[#FF3131]'
-                      : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
-                  }`}
-                >
-                  {t('nav.advertiser')}
-                </Link>
-                <Link
-                  href="/publisher"
-                  className={`text-sm font-medium transition-colors ${
-                    pathname.includes('/publisher')
-                      ? 'text-[#FF3131]'
-                      : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
-                  }`}
-                >
-                  {t('nav.publisher')}
-                </Link>
-              </>
-            )}
-
-            <LanguageSwitcher locale={locale} />
-            <ThemeToggle />
-
-            {isAuthenticated ? (
-              <div className="flex items-center gap-3">
-                <Link
-                  href="/settings"
-                  className="w-8 h-8 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
-                >
-                  <User className="w-4 h-4 text-gray-600 dark:text-gray-400" />
-                </Link>
-                <button
-                  onClick={handleLogout}
-                  className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
-                >
-                  <LogOut className="w-4 h-4" />
-                </button>
-              </div>
-            ) : (
-              <div className="flex items-center gap-3">
-                <button
-                  onClick={handleLoginClick}
-                  className="text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
-                >
-                  {t('nav.signIn')}
-                </button>
-                <button
-                  onClick={handleLoginClick}
-                  className="px-4 py-1.5 bg-[#FF3131] text-white text-sm font-medium rounded-lg hover:bg-[#E01B1B] transition-colors"
-                >
-                  {t('nav.getStarted')}
-                </button>
-              </div>
-            )}
-          </div>
-
-          {/* Mobile menu button */}
-          <div className="flex items-center gap-3 md:hidden">
-            <LanguageSwitcher locale={locale} />
-            <ThemeToggle />
-            <button
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+          <nav className="header-nav" aria-label={t("menu")}>
+            {links.map(([href, key]) => (
+              <Link
+                key={href}
+                href={href}
+                aria-current={path === href ? "page" : undefined}
+              >
+                {t(key)}
+              </Link>
+            ))}
+          </nav>
+          <div className="header-actions">
+            <select
+              className="language"
+              aria-label="Language"
+              value={locale}
+              onChange={(e) => router.replace(path, { locale: e.target.value })}
             >
-              {isMenuOpen ? (
-                <X className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-              ) : (
-                <Menu className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-              )}
+              <option value="az">AZ</option>
+              <option value="en">EN</option>
+              <option value="ru">RU</option>
+            </select>
+            <button
+              className="btn-quiet"
+              aria-label={t(resolvedTheme === "dark" ? "light" : "dark")}
+              onClick={() =>
+                setTheme(resolvedTheme === "dark" ? "light" : "dark")
+              }
+            >
+              <Sun size={18} className="hidden dark:block" />
+              <Moon size={18} className="dark:hidden" />
             </button>
+            {isAuthenticated ? (
+              <Link className="btn-secondary" href="/advertiser/campaigns">
+                {t("campaigns")}
+              </Link>
+            ) : (
+              <button
+                className="btn-primary"
+                aria-label={t("signIn")}
+                onClick={login}
+              >
+                <LogIn size={16} />
+                <span className="sign-in-label">{t("signIn")}</span>
+              </button>
+            )}
+            <button
+              className="btn-quiet mobile-toggle"
+              aria-label={t(menu ? "close" : "menu")}
+              aria-expanded={menu}
+              onClick={() => setMenu(!menu)}
+            >
+              {menu ? <X size={21} /> : <Menu size={21} />}
+            </button>
+            {isAuthenticated && (
+              <button
+                className="btn-quiet hidden min-[851px]:inline-flex"
+                aria-label={t("menu")}
+                aria-expanded={menu}
+                onClick={() => setMenu(!menu)}
+              >
+                <Menu size={20} />
+              </button>
+            )}
           </div>
         </div>
-
-        {/* Mobile Navigation */}
-        {isMenuOpen && (
-          <div className="md:hidden py-3 border-t border-gray-200 dark:border-gray-800">
-            {isAuthenticated ? (
-              <div className="space-y-1">
-                <Link
-                  href="/advertiser"
-                  className="block px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  {t('nav.advertiser')}
+        {menu && (
+          <nav className="mobile-nav" aria-label={t("menu")}>
+            {links.map(([href, key]) => (
+              <Link key={href} href={href} onClick={() => setMenu(false)}>
+                {t(key)}
+              </Link>
+            ))}
+            {isAuthenticated && (
+              <>
+                <Link href="/advertiser" onClick={() => setMenu(false)}>
+                  {t("advertiser")}
                 </Link>
-                <Link
-                  href="/publisher"
-                  className="block px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  {t('nav.publisher')}
+                <Link href="/publisher" onClick={() => setMenu(false)}>
+                  {t("publisher")}
                 </Link>
-                <Link
-                  href="/settings"
-                  className="block px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  {t('nav.settings')}
+                <Link href="/settings" onClick={() => setMenu(false)}>
+                  {t("settings")}
                 </Link>
-                <button
-                  onClick={() => { handleLogout(); setIsMenuOpen(false); }}
-                  className="w-full text-left px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg"
-                >
-                  {t('nav.logout')}
+                {user?.is_admin && (
+                  <Link href="/admin" onClick={() => setMenu(false)}>
+                    {t("admin")}
+                  </Link>
+                )}
+                <button className="btn-secondary" onClick={logout}>
+                  {t("signOut")}
                 </button>
-              </div>
-            ) : (
-              <div className="space-y-1">
-                <button
-                  onClick={handleLoginClick}
-                  className="w-full text-left px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg"
-                >
-                  {t('nav.signIn')}
-                </button>
-                <button
-                  onClick={handleLoginClick}
-                  className="w-full text-left px-3 py-2 text-sm font-medium text-white bg-[#FF3131] hover:bg-[#E01B1B] rounded-lg"
-                >
-                  {t('nav.getStarted')}
-                </button>
-              </div>
+              </>
             )}
-          </div>
+          </nav>
         )}
-      </nav>
-    </header>
+      </header>
+      {error && (
+        <div className="wrap notice error" role="alert">
+          {t("loadError")}
+        </div>
+      )}
+      {workspace && isAuthenticated && (
+        <nav className="workspace-nav" aria-label={t(role)}>
+          <div className="wrap row">
+            {tabs.map(([href, key]) => (
+              <Link
+                href={href}
+                key={href}
+                aria-current={path === href ? "page" : undefined}
+              >
+                {t(key)}
+              </Link>
+            ))}
+          </div>
+        </nav>
+      )}
+    </>
   );
 }

@@ -1,17 +1,16 @@
-'use client';
-
-import { useParams } from 'next/navigation';
-import { useAuth } from '@/hooks/useAuth';
-import AuthRequiredCard from '@/components/auth/AuthRequiredCard';
-import LoadingSpinner from '@/components/auth/LoadingSpinner';
-import CampaignForm from '@/components/advertiser/CampaignForm';
-
-export default function EditCampaignPage() {
-  const params = useParams();
-  const { isAuthenticated, isLoading } = useAuth();
-
-  if (isLoading) return <LoadingSpinner />;
-  if (!isAuthenticated) return <AuthRequiredCard />;
-
-  return <CampaignForm campaignId={Number(params.id)} />;
+import { Gate } from "@/components/ui/product";
+import CampaignForm from "@/components/advertiser/CampaignForm";
+export default async function Page({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
+  return (
+    <Gate>
+      <div className="wrap page">
+        <CampaignForm campaignId={Number(id)} />
+      </div>
+    </Gate>
+  );
 }

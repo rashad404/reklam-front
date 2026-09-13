@@ -1,428 +1,423 @@
-'use client';
-
-import { useState, useRef, useEffect } from 'react';
-import { useTranslations } from 'next-intl';
-import { useRouter } from 'next/navigation';
-import { ArrowLeft, ArrowRight, MousePointer, Eye, Check, Upload, Loader2, X } from 'lucide-react';
-import { Link } from '@/lib/navigation';
-import apiClient from '@/lib/api/client';
-
-interface CampaignFormProps {
-  campaignId?: number; // if provided, edit mode
+"use client";
+import { useState, useEffect, useRef } from "react";
+import { useTranslations } from "next-intl";
+import { useRouter } from "@/lib/navigation";
+import { useAuth } from "@/hooks/useAuth";
+import api from "@/lib/api/client";
+import { Notice, Failure } from "@/components/ui/product";
+import AdPreview, { type Creative } from "./AdPreview";
+const sizes = ["300x250", "728x90", "320x50"];
+interface Form {
+  name: string;
+  title: string;
+  description: string;
+  destination: string;
+  images: Record<string, string>;
+  pricing: string;
+  bid: string;
+  budget: string;
+  start: string;
+  end: string;
 }
-
-interface AdRecord { id: number; ad_format: string; title: string; description: string | null; image_url: string | null; destination_url: string; campaign_id: number }
-
-export default function CampaignForm({ campaignId }: CampaignFormProps) {
-  const t = useTranslations();
-  const ta = useTranslations('advertiser');
-  const tc = useTranslations('common');
-  const router = useRouter();
-  const isEdit = !!campaignId;
-
-  const [step, setStep] = useState(1);
-  const [submitting, setSubmitting] = useState(false);
-  const [uploadingSize, setUploadingSize] = useState('');
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
-  const [previewTab, setPreviewTab] = useState('');
-  const [loading, setLoading] = useState(isEdit);
-  const [existingAds, setExistingAds] = useState<AdRecord[]>([]);
-
-  const fileRefs = {
-    '300x250': useRef<HTMLInputElement>(null),
-    '728x90': useRef<HTMLInputElement>(null),
-    '320x50': useRef<HTMLInputElement>(null),
-  };
-
-  const [form, setForm] = useState({
-    pricing: 'cpc' as 'cpc' | 'cpm',
-    budget: '',
-    daily_budget: '',
-    bid: '',
-    start_date: '',
-    end_date: '',
-    ad_title: '',
-    ad_description: '',
-    ad_destination_url: '',
-    images: { '300x250': '', '728x90': '', '320x50': '' } as Record<string, string>,
-  });
-
-  // Load existing campaign data for edit mode
+const initial: Form = {
+  name: "",
+  title: "",
+  description: "",
+  destination: "",
+  images: {},
+  pricing: "cpc",
+  bid: "0.05",
+  budget: "10",
+  start: "",
+  end: "",
+};
+export default function CampaignForm({ campaignId }: { campaignId?: number }) {
+  const t = useTranslations("product"),
+    router = useRouter(),
+    { user, refresh } = useAuth();
+  const [form, setForm] = useState<Form>(initial),
+    [step, setStep] = useState(1),
+    [loading, setLoading] = useState(!!campaignId),
+    [failed, setFailed] = useState(false),
+    [error, setError] = useState(false),
+    [busy, setBusy] = useState(false),
+    [uploading, setUploading] = useState(false),
+    [uploadError, setUploadError] = useState(false),
+    [tab, setTab] = useState("text");
+  const key = useRef("");
+  const hydrated = useRef(false);
+  const draftKey = `reklam-draft:${user?.id}:${campaignId || "new"}`;
   useEffect(() => {
-    if (!isEdit) return;
-
-    Promise.all([
-      apiClient.get(`/campaigns/${campaignId}`),
-      apiClient.get('/ads'),
-    ]).then(([campRes, adsRes]) => {
-      const c = campRes.data.data;
-      const ads: AdRecord[] = (adsRes.data.data?.data || []).filter((a: any) => a.campaign_id === campaignId);
-      setExistingAds(ads);
-
-      const images: Record<string, string> = { '300x250': '', '728x90': '', '320x50': '' };
-      ads.forEach((a: AdRecord) => {
-        const size = a.ad_format.replace('banner_', '');
-        if (size in images) images[size] = a.image_url || '';
-      });
-
-      const firstAd = ads[0];
-      const hasCpc = c.cpc_bid && parseFloat(c.cpc_bid) > 0;
-
-      setForm({
-        pricing: hasCpc ? 'cpc' : 'cpm',
-        budget: c.budget || '',
-        daily_budget: c.daily_budget || '',
-        bid: hasCpc ? c.cpc_bid : (c.cpm_bid || ''),
-        start_date: c.start_date || '',
-        end_date: c.end_date || '',
-        ad_title: firstAd?.title || '',
-        ad_description: firstAd?.description || '',
-        ad_destination_url: firstAd?.destination_url || '',
-        images,
-      });
-    }).catch(() => setError('Campaign not found'))
-    .finally(() => setLoading(false));
-  }, [isEdit, campaignId]);
-
-  if (loading) return <div className="flex justify-center py-20"><Loader2 className="w-8 h-8 text-[#FF3131] animate-spin" /></div>;
-
-  const handleUpload = async (size: string, file: File) => {
-    setUploadingSize(size);
+    let alive = true;
+    key.current = crypto.randomUUID();
+    async function load() {
+      try {
+        if (campaignId) {
+          const r = await api.get(`/campaigns/${campaignId}`);
+          const c = r.data.data,
+            ads = c.ads as Creative[];
+          const text = ads.find((a) => a.ad_format === "text");
+          const first = text || ads[0];
+          if (alive)
+            setForm({
+              name: c.name,
+              title: text?.title || "",
+              description: first?.description || "",
+              destination: first?.destination_url || "",
+              images: Object.fromEntries(
+                ads
+                  .filter((a) => a.image_url)
+                  .map((a) => [
+                    a.ad_format.replace("banner_", ""),
+                    a.image_url!,
+                  ]),
+              ),
+              pricing: c.cpc_bid ? "cpc" : "cpm",
+              bid: String(c.cpc_bid || c.cpm_bid || ""),
+              budget: String(c.budget),
+              start: c.start_date?.slice(0, 10) || "",
+              end: c.end_date?.slice(0, 10) || "",
+            });
+        } else {
+          const saved = sessionStorage.getItem(draftKey);
+          if (saved && alive) {
+            const draft = JSON.parse(saved);
+            setForm(draft.form);
+            key.current = draft.key || key.current;
+          }
+        }
+      } catch {
+        if (alive) setFailed(true);
+      } finally {
+        hydrated.current = true;
+        if (alive) setLoading(false);
+      }
+    }
+    void load();
+    return () => {
+      alive = false;
+    };
+  }, [campaignId, draftKey]);
+  useEffect(() => {
+    if (hydrated.current && !campaignId)
+      sessionStorage.setItem(
+        draftKey,
+        JSON.stringify({ form, key: key.current }),
+      );
+  }, [form, campaignId, draftKey]);
+  function set(field: keyof Form, value: string) {
+    setForm((s) => ({ ...s, [field]: value }));
+  }
+  async function upload(size: string, file: File) {
+    setUploading(true);
+    setUploadError(false);
     try {
       const fd = new FormData();
-      fd.append('image', file);
-      const res = await apiClient.post('/upload/image', fd, { headers: { 'Content-Type': 'multipart/form-data' } });
-      setForm(prev => ({ ...prev, images: { ...prev.images, [size]: res.data.data.url } }));
-      setPreviewTab(size);
+      fd.append("image", file);
+      fd.append("size", size);
+      const r = await api.post("/upload/image", fd, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      setForm((s) => ({
+        ...s,
+        images: { ...s.images, [size]: r.data.data.url },
+      }));
+      setTab(`banner_${size}`);
     } catch {
-      setError('Image upload failed');
+      setUploadError(true);
     } finally {
-      setUploadingSize('');
+      setUploading(false);
     }
-  };
-
-  const hasAnyImage = Object.values(form.images).some(v => v);
-  const hasText = form.ad_title.trim().length > 0;
-  const hasContent = hasAnyImage || hasText;
-  const uploadedSizes = Object.entries(form.images).filter(([, v]) => v);
-
-  const getCampaignName = () => {
-    if (form.ad_title) return form.ad_title;
-    if (form.ad_destination_url) {
-      try { return new URL(form.ad_destination_url).hostname.replace('www.', ''); } catch {}
-    }
-    return 'Campaign';
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
+  }
+  const creatives: Creative[] = [
+    ...Object.entries(form.images)
+      .filter(([, url]) => url)
+      .map(([size, url]) => ({
+        ad_format: `banner_${size}`,
+        title: "",
+        description: "",
+        image_url: url,
+        destination_url: form.destination,
+      })),
+    ...(form.title.trim()
+      ? [
+          {
+            ad_format: "text",
+            title: form.title.trim(),
+            description: form.description,
+            destination_url: form.destination,
+          },
+        ]
+      : []),
+  ];
+  const preview = creatives.find((a) => a.ad_format === tab) ||
+    creatives[0] || {
+      ad_format: "text",
+      title: form.title,
+      description: form.description,
+    };
+  async function submit(e: React.FormEvent) {
     e.preventDefault();
-    setSubmitting(true);
-    setError('');
-    setSuccess('');
-
-    try {
-      const adTitle = form.ad_title || getCampaignName();
-
-      if (isEdit) {
-        // Update campaign
-        await apiClient.put(`/campaigns/${campaignId}`, {
-          name: getCampaignName(),
-          budget: parseFloat(form.budget),
-          daily_budget: form.daily_budget ? parseFloat(form.daily_budget) : null,
-          cpc_bid: form.pricing === 'cpc' ? parseFloat(form.bid) : null,
-          cpm_bid: form.pricing === 'cpm' ? parseFloat(form.bid) : null,
-          start_date: form.start_date || null,
-          end_date: form.end_date || null,
-        });
-
-        // Update/create ads per size
-        for (const [size, imageUrl] of Object.entries(form.images)) {
-          const format = `banner_${size}`;
-          const existing = existingAds.find(a => a.ad_format === format);
-          if (imageUrl && existing) {
-            await apiClient.put(`/ads/${existing.id}`, { title: adTitle, description: form.ad_description || null, image_url: imageUrl, destination_url: form.ad_destination_url });
-          } else if (imageUrl) {
-            await apiClient.post('/ads', { campaign_id: campaignId, title: adTitle, description: form.ad_description || null, image_url: imageUrl, destination_url: form.ad_destination_url, ad_format: format });
-          }
-        }
-
-        // Update/create text ad
-        const existingText = existingAds.find(a => a.ad_format === 'text');
-        if (hasText && existingText) {
-          await apiClient.put(`/ads/${existingText.id}`, { title: adTitle, description: form.ad_description || null, destination_url: form.ad_destination_url });
-        } else if (hasText) {
-          await apiClient.post('/ads', { campaign_id: campaignId, title: adTitle, description: form.ad_description || null, image_url: null, destination_url: form.ad_destination_url, ad_format: 'text' });
-        }
-      } else {
-        // Create new campaign
-        try {
-          const userRes = await apiClient.get('/auth/user');
-          await apiClient.post('/advertiser/register', { company_name: userRes.data.data?.name || 'Advertiser' });
-        } catch {}
-
-        const campaignRes = await apiClient.post('/campaigns', {
-          name: getCampaignName(), type: hasAnyImage ? 'display' : 'text',
-          budget: parseFloat(form.budget),
-          daily_budget: form.daily_budget ? parseFloat(form.daily_budget) : null,
-          cpc_bid: form.pricing === 'cpc' ? parseFloat(form.bid) : null,
-          cpm_bid: form.pricing === 'cpm' ? parseFloat(form.bid) : null,
-          start_date: form.start_date || null, end_date: form.end_date || null,
-        });
-
-        const newId = campaignRes.data.data.id;
-        for (const [size, imageUrl] of Object.entries(form.images)) {
-          if (imageUrl) {
-            await apiClient.post('/ads', { campaign_id: newId, title: adTitle, description: form.ad_description || null, image_url: imageUrl, destination_url: form.ad_destination_url, ad_format: `banner_${size}` });
-          }
-        }
-        if (hasText) {
-          await apiClient.post('/ads', { campaign_id: newId, title: adTitle, description: form.ad_description || null, image_url: null, destination_url: form.ad_destination_url, ad_format: 'text' });
-        }
-      }
-
-      router.push('/advertiser/campaigns');
-    } catch (err: any) {
-      setError(err.response?.data?.message || err.message || 'Error');
-    } finally {
-      setSubmitting(false);
+    if (step < 3) {
+      setStep(step + 1);
+      return;
     }
-  };
-
-  const steps = [
-    { num: 1, label: ta('stepAd') },
-    { num: 2, label: ta('stepBudget') },
-    { num: 3, label: ta('stepSchedule') },
-  ];
-
-  const inputClass = "w-full px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-[#FF3131] focus:border-transparent text-base";
-
-  const adSizes = [
-    { key: '300x250', label: ta('adSize300') },
-    { key: '728x90', label: ta('adSize728') },
-    { key: '320x50', label: ta('adSize320') },
-  ];
-
-  const activePreviewSize = previewTab && form.images[previewTab] ? previewTab : uploadedSizes[0]?.[0] || '';
-  const activePreviewImage = activePreviewSize ? form.images[activePreviewSize] : '';
-
+    setBusy(true);
+    setError(false);
+    try {
+      const payload = {
+        request_key: key.current,
+        name:
+          form.name.trim() ||
+          form.title.trim() ||
+          new URL(form.destination).hostname,
+        type: Object.values(form.images).some(Boolean) ? "display" : "text",
+        budget: Number(form.budget),
+        daily_budget: null,
+        cpc_bid: form.pricing === "cpc" ? Number(form.bid) : null,
+        cpm_bid: form.pricing === "cpm" ? Number(form.bid) : null,
+        start_date: form.start || null,
+        end_date: form.end || null,
+        ads: creatives,
+      };
+      if (campaignId) await api.put(`/campaigns/${campaignId}`, payload);
+      else await api.post("/campaigns", payload);
+      sessionStorage.removeItem(draftKey);
+      await refresh();
+      router.push("/advertiser/campaigns");
+    } catch {
+      setError(true);
+    } finally {
+      setBusy(false);
+    }
+  }
+  if (loading) return <p>{t("loading")}</p>;
+  if (failed) return <Failure retry={() => window.location.reload()} />;
   return (
-    <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 max-w-4xl">
-      <div className="flex items-center gap-3 mb-8">
-        <Link href="/advertiser/campaigns" className="w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center hover:bg-gray-200 dark:hover:bg-gray-700">
-          <ArrowLeft className="w-4 h-4" />
-        </Link>
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-          {isEdit ? ta('editCampaign') : ta('createCampaign')}
-        </h1>
-      </div>
-
-      <div className="flex items-center gap-1 mb-8 max-w-md">
-        {steps.map((s, i) => (
-          <div key={s.num} className="flex items-center gap-1 flex-1">
-            <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${
-              step > s.num ? 'bg-green-500 text-white' : step === s.num ? 'bg-[#FF3131] text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-500'
-            }`}>
-              {step > s.num ? <Check className="w-3.5 h-3.5" /> : s.num}
-            </div>
-            <span className={`text-xs hidden sm:block ${step === s.num ? 'text-gray-900 dark:text-white font-medium' : 'text-gray-500'}`}>{s.label}</span>
-            {i < steps.length - 1 && <div className={`flex-1 h-0.5 ${step > s.num ? 'bg-green-500' : 'bg-gray-200 dark:bg-gray-700'}`} />}
-          </div>
+    <div className="stack">
+      <h1>{t(campaignId ? "edit" : "createCampaign")}</h1>
+      <div className="steps">
+        {["content", "budget", "review"].map((label, i) => (
+          <span
+            className="step"
+            key={label}
+            aria-current={step === i + 1 ? "step" : undefined}
+          >
+            <strong>{i + 1}</strong>
+            {t(label)}
+          </span>
         ))}
       </div>
-
-      {error && <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl text-red-600 text-sm">{error}</div>}
-      {success && <div className="mb-4 p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl text-green-600 text-sm">{success}</div>}
-
-      <form onSubmit={handleSubmit}>
-        {/* Step 1: Ad Creative + Preview */}
-        {step === 1 && (
-          <div className="grid lg:grid-cols-5 gap-6">
-            <div className="lg:col-span-3 card space-y-5">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{ta('adImage')}</label>
-                <p className="text-xs text-gray-500 mb-3">{ta('adImageHint')}</p>
-                <div className="space-y-2">
-                  {adSizes.map(({ key, label }) => (
-                    <div key={key}>
-                      <input ref={fileRefs[key as keyof typeof fileRefs]} type="file" accept="image/jpeg,image/png,image/gif,image/webp" className="hidden"
-                        onChange={(e) => { const f = e.target.files?.[0]; if (f) handleUpload(key, f); }} />
-                      {form.images[key] ? (
-                        <div className="flex items-center gap-3 p-2 border border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-900/20 rounded-xl">
-                          <div className="w-16 h-10 rounded-lg overflow-hidden bg-gray-100 shrink-0">
-                            {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <img src={form.images[key]} alt="" className="w-full h-full object-cover" />
-                          </div>
-                          <span className="text-sm text-green-700 dark:text-green-400 font-medium flex-1">{label}</span>
-                          <button type="button"
-                            onClick={() => { setForm(prev => ({ ...prev, images: { ...prev.images, [key]: '' } })); const ref = fileRefs[key as keyof typeof fileRefs]; if (ref.current) ref.current.value = ''; }}
-                            className="w-6 h-6 bg-red-100 text-red-600 rounded-full flex items-center justify-center hover:bg-red-200 shrink-0">
-                            <X className="w-3 h-3" />
-                          </button>
-                        </div>
-                      ) : (
-                        <button type="button" onClick={() => fileRefs[key as keyof typeof fileRefs].current?.click()} disabled={uploadingSize === key}
-                          className="w-full py-3 border border-dashed border-gray-300 dark:border-gray-700 rounded-xl flex items-center justify-center gap-2 hover:border-[#FF3131] transition-colors">
-                          {uploadingSize === key ? <Loader2 className="w-4 h-4 text-gray-400 animate-spin" /> : <Upload className="w-4 h-4 text-gray-400" />}
-                          <span className="text-sm text-gray-500">{label}</span>
-                        </button>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{ta('adTitle')}</label>
-                <input type="text" value={form.ad_title} onChange={(e) => setForm({ ...form, ad_title: e.target.value })}
-                  placeholder={ta('adTitlePlaceholder')} className={inputClass} />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{ta('adDescription')}</label>
-                <textarea value={form.ad_description} onChange={(e) => setForm({ ...form, ad_description: e.target.value })}
-                  placeholder={ta('adDescriptionPlaceholder')} rows={2} className={inputClass + ' resize-none'} />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{ta('adDestination')}</label>
-                <input type="url" value={form.ad_destination_url} onChange={(e) => setForm({ ...form, ad_destination_url: e.target.value })}
-                  placeholder={ta('adDestinationPlaceholder')} className={inputClass} />
-              </div>
-
-              <button type="button" onClick={() => hasContent && form.ad_destination_url ? setStep(2) : null}
-                disabled={!hasContent || !form.ad_destination_url}
-                className="btn-primary w-full flex items-center justify-center gap-2 disabled:opacity-50">
-                {t('common.next')} <ArrowRight className="w-4 h-4" />
-              </button>
-            </div>
-
-            {/* Preview */}
-            <div className="lg:col-span-2 hidden lg:block">
-              <div className="sticky top-20">
-                <p className="text-xs font-medium text-gray-500 mb-3 uppercase tracking-wider">{tc('preview')}</p>
-                {(uploadedSizes.length > 1 || (uploadedSizes.length >= 1 && hasText)) && (
-                  <div className="flex gap-1 mb-3 bg-gray-100 dark:bg-gray-800 rounded-lg p-1">
-                    {uploadedSizes.map(([size]) => (
-                      <button key={size} type="button" onClick={() => setPreviewTab(size)}
-                        className={`flex-1 px-2 py-1 text-[10px] font-medium rounded-md transition-colors ${
-                          activePreviewSize === size && previewTab !== 'text' ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm' : 'text-gray-500'
-                        }`}>
-                        {adSizes.find(s => s.key === size)?.label || size}
-                      </button>
-                    ))}
-                    {hasText && (
-                      <button type="button" onClick={() => setPreviewTab('text')}
-                        className={`flex-1 px-2 py-1 text-[10px] font-medium rounded-md transition-colors ${
-                          previewTab === 'text' ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm' : 'text-gray-500'
-                        }`}>
-                        {ta('formatText')}
-                      </button>
-                    )}
-                  </div>
-                )}
-
-                {previewTab === 'text' || (!hasAnyImage && hasText) ? (
-                  <div className="bg-white dark:bg-gray-900 rounded-xl shadow-md p-3 border border-gray-100 dark:border-gray-800">
-                    <div className="font-bold text-sm text-gray-900 dark:text-white mb-1">{form.ad_title || '...'}</div>
-                    {form.ad_description && <div className="text-xs text-gray-500">{form.ad_description}</div>}
-                  </div>
-                ) : activePreviewImage ? (
-                  <div className="bg-white dark:bg-gray-900 rounded-xl shadow-md overflow-hidden border border-gray-100 dark:border-gray-800">
-                    <div style={{ aspectRatio: activePreviewSize === '728x90' ? '728/90' : activePreviewSize === '320x50' ? '320/50' : '300/250' }} className="overflow-hidden bg-gray-100 dark:bg-gray-800">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={activePreviewImage} alt="" className="w-full h-full object-cover" />
-                    </div>
-                    {(form.ad_title || form.ad_description) && (
-                      <div className="p-3">
-                        {form.ad_title && <div className="font-bold text-sm text-gray-900 dark:text-white mb-1">{form.ad_title}</div>}
-                        {form.ad_description && <div className="text-xs text-gray-500">{form.ad_description}</div>}
-                      </div>
-                    )}
-                  </div>
-                ) : (
-                  <div className="rounded-xl bg-gray-50 dark:bg-gray-800/50 p-10 text-center">
-                    <Eye className="w-8 h-8 text-gray-300 dark:text-gray-600 mx-auto mb-2" />
-                    <p className="text-sm text-gray-400">{tc('preview')}</p>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Step 2: Budget */}
-        {step === 2 && (
-          <div className="max-w-xl">
-            <div className="card space-y-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{ta('pricingModel')}</label>
-                <div className="grid grid-cols-2 gap-3">
-                  {[
-                    { val: 'cpc', icon: MousePointer, label: ta('pricingCpc'), desc: ta('pricingCpcDesc') },
-                    { val: 'cpm', icon: Eye, label: ta('pricingCpm'), desc: ta('pricingCpmDesc') },
-                  ].map((opt) => (
-                    <button key={opt.val} type="button" onClick={() => setForm({ ...form, pricing: opt.val as 'cpc' | 'cpm' })}
-                      className={`p-4 rounded-xl border text-left transition-all ${form.pricing === opt.val ? 'border-[#FF3131] bg-red-50 dark:bg-red-900/20' : 'border-gray-300 dark:border-gray-700 hover:border-gray-400'}`}>
-                      <opt.icon className={`w-5 h-5 mb-2 ${form.pricing === opt.val ? 'text-[#FF3131]' : 'text-gray-400'}`} />
-                      <p className={`font-medium text-sm ${form.pricing === opt.val ? 'text-[#FF3131]' : 'text-gray-900 dark:text-white'}`}>{opt.label}</p>
-                      <p className="text-xs text-gray-500 mt-1">{opt.desc}</p>
+      <div className="editor">
+        <form className="card stack" onSubmit={submit}>
+          {error && <Notice error>{t("saveError")}</Notice>}
+          {step === 1 && (
+            <>
+              <label className="field">
+                {t("name")}
+                <input
+                  value={form.name}
+                  maxLength={120}
+                  onChange={(e) => set("name", e.target.value)}
+                />
+              </label>
+              <label className="field">
+                {t("destination")}
+                <input
+                  type="url"
+                  required
+                  pattern="https?://.*"
+                  value={form.destination}
+                  onChange={(e) => set("destination", e.target.value)}
+                  placeholder="https://example.com"
+                />
+              </label>
+              <label className="field">
+                {t("adTitle")}
+                <input
+                  maxLength={120}
+                  value={form.title}
+                  onChange={(e) => set("title", e.target.value)}
+                />
+              </label>
+              <label className="field">
+                {t("adText")}
+                <textarea
+                  maxLength={240}
+                  value={form.description}
+                  onChange={(e) => set("description", e.target.value)}
+                />
+              </label>
+              <p className="text-sm">{t("uploadHint")}</p>
+              {uploadError && <Notice error>{t("uploadError")}</Notice>}
+              {sizes.map((size) => (
+                <div className="stack" key={size}>
+                  <label className="field">
+                    {t("image")} {size}
+                    <input
+                      type="file"
+                      accept="image/png,image/jpeg,image/webp"
+                      disabled={uploading}
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) void upload(size, file);
+                        e.target.value = "";
+                      }}
+                    />
+                  </label>
+                  {form.images[size] && (
+                    <button
+                      type="button"
+                      className="btn-secondary"
+                      onClick={() =>
+                        setForm((s) => ({
+                          ...s,
+                          images: { ...s.images, [size]: "" },
+                        }))
+                      }
+                    >
+                      {t("remove")} {size}
                     </button>
-                  ))}
+                  )}
                 </div>
+              ))}
+            </>
+          )}
+          {step === 2 && (
+            <>
+              <label className="field">
+                {t("pricing")}
+                <select
+                  value={form.pricing}
+                  onChange={(e) => set("pricing", e.target.value)}
+                >
+                  <option value="cpc">{t("cpc")}</option>
+                  <option value="cpm">{t("cpm")}</option>
+                </select>
+              </label>
+              <div className="two-col">
+                <label className="field">
+                  {t("bid")}
+                  <input
+                    type="number"
+                    min="0.01"
+                    max="1000"
+                    step="0.01"
+                    required
+                    value={form.bid}
+                    onChange={(e) => set("bid", e.target.value)}
+                  />
+                </label>
+                <label className="field">
+                  {t("totalBudget")}
+                  <input
+                    type="number"
+                    min="1"
+                    max="1000000"
+                    step="0.01"
+                    required
+                    value={form.budget}
+                    onChange={(e) => set("budget", e.target.value)}
+                  />
+                </label>
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{form.pricing === 'cpc' ? ta('pricePerClick') : ta('pricePer1000Views')} (AZN)</label>
-                <input type="number" step="0.01" min="0.01" value={form.bid} onChange={(e) => setForm({ ...form, bid: e.target.value })} placeholder="0.10" className={inputClass} />
+              <div className="two-col">
+                <label className="field">
+                  {t("startDate")}
+                  <input
+                    type="date"
+                    value={form.start}
+                    onChange={(e) => set("start", e.target.value)}
+                  />
+                </label>
+                <label className="field">
+                  {t("endDate")}
+                  <input
+                    type="date"
+                    min={form.start || undefined}
+                    value={form.end}
+                    onChange={(e) => set("end", e.target.value)}
+                  />
+                </label>
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{ta('budget')} (AZN)</label>
-                <input type="number" step="1" min="1" value={form.budget} onChange={(e) => setForm({ ...form, budget: e.target.value })} placeholder="100" className={inputClass} />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{ta('dailyBudget')} (AZN)</label>
-                <input type="number" step="1" min="1" value={form.daily_budget} onChange={(e) => setForm({ ...form, daily_budget: e.target.value })} className={inputClass} />
-                <p className="text-xs text-gray-500 mt-1">{ta('dailyBudgetHint')}</p>
-              </div>
-              <div className="flex gap-3">
-                <button type="button" onClick={() => setStep(1)} className="btn-secondary flex-1 flex items-center justify-center gap-2"><ArrowLeft className="w-4 h-4" /> {t('common.back')}</button>
-                <button type="button" onClick={() => form.bid && form.budget ? setStep(3) : null} disabled={!form.bid || !form.budget}
-                  className="btn-primary flex-1 flex items-center justify-center gap-2 disabled:opacity-50">{t('common.next')} <ArrowRight className="w-4 h-4" /></button>
-              </div>
-            </div>
+              <p className="text-sm">{t("timezone")}</p>
+            </>
+          )}
+          {step === 3 && (
+            <>
+              <h2>{form.name || form.title || form.destination}</h2>
+              <p className="break-all">{form.destination}</p>
+              <dl className="stack">
+                <div>
+                  {t(form.pricing)}: {form.bid} AZN
+                </div>
+                <div>
+                  {t("totalBudget")}: {form.budget}
+                </div>
+                <div>
+                  {t("format")}:{" "}
+                  {creatives
+                    .map((a) => a.ad_format.replace("banner_", ""))
+                    .join(", ")}
+                </div>
+                {form.start && (
+                  <div>
+                    {t("startDate")}: {form.start}
+                  </div>
+                )}
+                {form.end && (
+                  <div>
+                    {t("endDate")}: {form.end}
+                  </div>
+                )}
+              </dl>
+              <Notice>{t("reviewHint")}</Notice>
+            </>
+          )}
+          <div className="row between">
+            {step > 1 && (
+              <button
+                type="button"
+                className="btn-secondary"
+                onClick={() => setStep(step - 1)}
+                disabled={busy}
+              >
+                {t("back")}
+              </button>
+            )}
+            <button
+              className="btn-primary"
+              disabled={busy || uploading || !creatives.length}
+            >
+              {busy
+                ? t("loading")
+                : step === 3
+                  ? t(campaignId ? "save" : "submitReview")
+                  : t("next")}
+            </button>
           </div>
-        )}
-
-        {/* Step 3: Schedule + Summary */}
-        {step === 3 && (
-          <div className="max-w-xl">
-            <div className="card space-y-6">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{ta('startDate')}</label>
-                  <input type="date" value={form.start_date} onChange={(e) => setForm({ ...form, start_date: e.target.value })} className={inputClass} />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{ta('endDate')}</label>
-                  <input type="date" value={form.end_date} onChange={(e) => setForm({ ...form, end_date: e.target.value })} className={inputClass} />
-                </div>
-              </div>
-              <div className="bg-gray-50 dark:bg-gray-800/50 rounded-xl p-4 space-y-2 text-sm">
-                {form.ad_title && <div className="flex justify-between"><span className="text-gray-500">{ta('adTitle')}</span><span className="font-medium text-gray-900 dark:text-white">{form.ad_title}</span></div>}
-                <div className="flex justify-between"><span className="text-gray-500">{ta('pricingModel')}</span><span className="font-medium text-gray-900 dark:text-white">{form.pricing === 'cpc' ? ta('pricingCpc') : ta('pricingCpm')}</span></div>
-                <div className="flex justify-between"><span className="text-gray-500">{form.pricing === 'cpc' ? ta('pricePerClick') : ta('pricePer1000Views')}</span><span className="font-medium text-gray-900 dark:text-white">{form.bid} AZN</span></div>
-                <div className="flex justify-between"><span className="text-gray-500">{ta('budget')}</span><span className="font-medium text-gray-900 dark:text-white">{form.budget} AZN</span></div>
-                {hasAnyImage && <div className="flex justify-between"><span className="text-gray-500">{ta('adImage')}</span><span className="font-medium text-gray-900 dark:text-white">{uploadedSizes.map(([k]) => k).join(', ')}</span></div>}
-                {hasText && <div className="flex justify-between"><span className="text-gray-500">{ta('formatText')}</span><span className="font-medium text-green-600">+</span></div>}
-              </div>
-              <div className="flex gap-3">
-                <button type="button" onClick={() => setStep(2)} className="btn-secondary flex-1 flex items-center justify-center gap-2"><ArrowLeft className="w-4 h-4" /> {t('common.back')}</button>
-                <button type="submit" disabled={submitting} className="btn-primary flex-1 flex items-center justify-center gap-2 disabled:opacity-50">
-                  {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <><Check className="w-4 h-4" /> {isEdit ? t('common.save') : t('common.create')}</>}
+        </form>
+        <aside className="preview-panel stack">
+          <h2>{t("preview")}</h2>
+          <div className="demo-stage">
+            <AdPreview ad={preview} />
+            <div className="demo-tabs">
+              {creatives.map((a) => (
+                <button
+                  type="button"
+                  aria-pressed={preview.ad_format === a.ad_format}
+                  key={a.ad_format}
+                  onClick={() => setTab(a.ad_format)}
+                >
+                  {a.ad_format.replace("banner_", "")}
                 </button>
-              </div>
+              ))}
             </div>
           </div>
-        )}
-      </form>
+          <p className="text-sm">{t("previewHint")}</p>
+          <Notice>{t("deliveryHint")}</Notice>
+        </aside>
+      </div>
     </div>
   );
 }

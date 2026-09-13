@@ -1,107 +1,96 @@
-'use client';
-
-import { useEffect, useState, Suspense } from 'react';
-import { useSearchParams } from 'next/navigation';
-
-function CallbackContent() {
-  const searchParams = useSearchParams();
-  const [status, setStatus] = useState('loading');
-  const [message, setMessage] = useState('');
-
-  useEffect(() => {
-    const handleCallback = async () => {
-      const code = searchParams.get('code');
-      const state = searchParams.get('state');
-      const error = searchParams.get('error');
-
-      if (error) {
-        setStatus('error');
-        setMessage(error);
-        if (window.opener) {
-          window.opener.postMessage({ type: 'oauth_error', message: error }, '*');
-        }
-        return;
-      }
-
-      if (!code) {
-        setStatus('error');
-        setMessage('No code');
-        return;
-      }
-
-      const savedState = localStorage.getItem('wallet_oauth_state');
-      if (state !== savedState) {
-        setStatus('error');
-        setMessage(`State mismatch: got=${state} saved=${savedState}`);
-        return;
-      }
-
-      try {
-        const codeVerifier = localStorage.getItem('wallet_code_verifier');
-        const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.reklam.biz/api';
-
-        const response = await fetch(`${API_URL}/auth/wallet/callback`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-          },
-          body: JSON.stringify({
-            code,
-            code_verifier: codeVerifier,
-            redirect_uri: `${window.location.origin}/auth/wallet/callback`,
-          }),
-        });
-
-        const data = await response.json();
-
-        if (!response.ok || data.status === 'error') {
-          throw new Error(data.message || 'Auth failed');
-        }
-
-        localStorage.removeItem('wallet_oauth_state');
-        localStorage.removeItem('wallet_code_verifier');
-
-        if (data.data?.token) {
-          localStorage.setItem('token', data.data.token);
-          setStatus('success');
-
-          if (window.opener) {
-            window.opener.postMessage({ type: 'oauth_success' }, '*');
-            setTimeout(() => window.close(), 1000);
-          } else {
-            window.location.href = '/advertiser';
-          }
-        } else {
-          throw new Error('No token');
-        }
-      } catch (err: any) {
-        setStatus('error');
-        setMessage(err.message || 'Failed');
-        if (window.opener) {
-          window.opener.postMessage({ type: 'oauth_error', message: err.message }, '*');
-        }
-      }
-    };
-
-    handleCallback();
-  }, [searchParams]);
-
-  return (
-    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', fontFamily: 'sans-serif' }}>
-      <div style={{ textAlign: 'center', padding: '40px' }}>
-        {status === 'loading' && <p>Loading...</p>}
-        {status === 'success' && <p style={{ color: 'green' }}>Success! Redirecting...</p>}
-        {status === 'error' && <p style={{ color: 'red' }}>{message}</p>}
-      </div>
-    </div>
+"use client";
+import { useEffect, useState } from "react";
+import { safeReturnPath } from "@/lib/utils/walletAuth";
+const messages = {
+  az: ["Daxil olunur...", "Giriş alınmadı. Yenidən cəhd edin.", "Ana səhifə"],
+  en: ["Signing in...", "Sign-in failed. Please try again.", "Homepage"],
+  ru: [
+    "Выполняется вход...",
+    "Не удалось войти. Попробуйте еще раз.",
+    "Главная",
+  ],
+};
+let exchange: Promise<void> | null = null;
+async function complete() {
+  const p = new URLSearchParams(window.location.search),
+    state = p.get("state"),
+    saved = localStorage.getItem("wallet_oauth_state"),
+    verifier = localStorage.getItem("wallet_code_verifier");
+  if (
+    p.get("error") ||
+    !p.get("code") ||
+    !state ||
+    !saved ||
+    state !== saved ||
+    !verifier ||
+    Date.now() - Number(localStorage.getItem("wallet_oauth_time")) > 600000
+  )
+    throw Error("invalid_session");
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL || "https://api.reklam.biz/api"}/auth/wallet/callback`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      body: JSON.stringify({
+        code: p.get("code"),
+        code_verifier: verifier,
+        redirect_uri: `${window.location.origin}/auth/wallet/callback`,
+      }),
+    },
   );
+  const data = await response.json();
+  if (!response.ok || !data.data?.token) throw Error("login_failed");
+  localStorage.setItem("token", data.data.token);
+  const destination = safeReturnPath(
+    localStorage.getItem("wallet_return_path"),
+  );
+  [
+    "wallet_code_verifier",
+    "wallet_oauth_state",
+    "wallet_oauth_time",
+    "wallet_return_path",
+  ].forEach((key) => localStorage.removeItem(key));
+  window.history.replaceState({}, "", window.location.pathname);
+  if (window.opener) {
+    window.opener.postMessage(
+      { type: "oauth_success", state },
+      window.location.origin,
+    );
+    window.close();
+  } else window.location.replace(destination);
 }
-
-export default function WalletCallbackPage() {
+export default function Callback() {
+  const [failed, setFailed] = useState(false);
+  const [locale, setLocale] = useState<keyof typeof messages>("az");
+  useEffect(() => {
+    const value = localStorage.getItem("wallet_locale");
+    queueMicrotask(() =>
+      setLocale(value === "en" || value === "ru" ? value : "az"),
+    );
+    exchange ||= complete();
+    exchange.catch(() => {
+      setFailed(true);
+      if (window.opener)
+        window.opener.postMessage(
+          {
+            type: "oauth_error",
+            state: new URLSearchParams(window.location.search).get("state"),
+          },
+          window.location.origin,
+        );
+    });
+  }, []);
   return (
-    <Suspense fallback={<div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}>Loading...</div>}>
-      <CallbackContent />
-    </Suspense>
+    <main className="wrap page narrow stack">
+      <h1>{messages[locale][failed ? 1 : 0]}</h1>
+      {failed && (
+        <a className="btn-primary" href={locale === "az" ? "/" : `/${locale}`}>
+          {messages[locale][2]}
+        </a>
+      )}
+    </main>
   );
 }
