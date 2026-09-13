@@ -11,6 +11,7 @@ import {
   PanelsTopLeft,
   ShieldCheck,
 } from "lucide-react";
+import PublisherOffer from "@/components/publisher/PublisherOffer";
 import { Link } from "@/lib/navigation";
 import { Gate, Failure } from "@/components/ui/product";
 import { useResource } from "@/hooks/useResource";
@@ -107,6 +108,9 @@ function Content({ role }: { role: "advertiser" | "publisher" }) {
           ))}
         </div>
       ) : null}
+      {publisher && (
+        <PublisherOffer compact offer={user?.publisher?.commission_offer} />
+      )}
       <div className="two-col">
         {cards.map(({ href, title, body, icon: Icon }) => (
           <Link href={href} className="card action-card" key={href}>

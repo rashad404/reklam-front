@@ -2,6 +2,7 @@ import { getTranslations } from "next-intl/server";
 import { ArrowRight, ArrowUpRight, Plus } from "lucide-react";
 import { Link } from "@/lib/navigation";
 import FormatDemo from "@/components/advertiser/FormatDemo";
+import PublisherOffer from "@/components/publisher/PublisherOffer";
 import { site } from "@/lib/seo";
 
 export default async function PublicPage({
@@ -52,13 +53,7 @@ export default async function PublicPage({
         </Link>
       </div>
       <div className="publisher-notes">
-        <p>{t("publisherPlacementNote")}</p>
-        <div className="publisher-format-list" aria-label={t("formats")}>
-          <span>300x250</span>
-          <span>728x90</span>
-          <span>320x50</span>
-          <span>{t("textFormat")}</span>
-        </div>
+        <PublisherOffer />
         <Link className="text-link" href="/ad-formats">
           {t("viewFormats")}
           <ArrowRight size={18} />
@@ -80,7 +75,7 @@ export default async function PublicPage({
                   <span>{t("heroLine2")}</span>
                 </>
               ) : (
-                t(kind)
+                t(publisher ? "offerHero" : kind)
               )}
             </h1>
             <p>
@@ -104,7 +99,15 @@ export default async function PublicPage({
                 <ArrowRight size={18} />
               </Link>
             </div>
-            <p className="hero-footnote">{t("heroFootnote")}</p>
+            {kind === "home" && (
+              <Link className="offer-teaser" href="/for-publishers">
+                {t("offerTeaser")}
+                <ArrowRight size={16} />
+              </Link>
+            )}
+            <p className="hero-footnote">
+              {t(publisher ? "offerFees" : "heroFootnote")}
+            </p>
           </div>
           <div className="hero-visual">
             <FormatDemo />
@@ -161,10 +164,10 @@ export default async function PublicPage({
           </div>
           <div className="market-questions">
             {(publisher
-              ? [3, 4]
+              ? [5, 6, 3, 4]
               : kind === "forAdvertisers" || kind === "formats"
                 ? [1, 2]
-                : [1, 2, 3]
+                : [5, 1, 3]
             ).map((n) => (
               <details key={n}>
                 <summary>

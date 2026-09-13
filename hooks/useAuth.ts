@@ -24,6 +24,7 @@ export interface User {
     status: string;
     website_url: string;
     website_name: string;
+    commission_offer?: import("@/components/publisher/PublisherOffer").CommissionOffer;
   };
 }
 interface AuthState {

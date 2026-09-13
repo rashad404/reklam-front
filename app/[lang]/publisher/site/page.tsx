@@ -5,8 +5,11 @@ import { Gate, Status, Notice, Failure } from "@/components/ui/product";
 import { useResource } from "@/hooks/useResource";
 import { useAuth } from "@/hooks/useAuth";
 import { Link } from "@/lib/navigation";
+import PublisherOffer from "@/components/publisher/PublisherOffer";
+import type { CommissionOffer } from "@/components/publisher/PublisherOffer";
 import api from "@/lib/api/client";
 interface Site {
+  commission_offer?: CommissionOffer;
   website_name: string;
   website_url: string;
   status: string;
@@ -44,6 +47,9 @@ function Content() {
   return (
     <div className="wrap page narrow stack">
       <h1>{t("site")}</h1>
+      {!site.loading && !site.error && (
+        <PublisherOffer compact offer={site.data?.commission_offer} />
+      )}
       {error && <Notice error>{t("saveError")}</Notice>}
       {site.error ? (
         <Failure retry={site.retry} />

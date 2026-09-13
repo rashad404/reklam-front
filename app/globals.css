@@ -2227,3 +2227,116 @@ details p {
     font-size: 2.3rem;
   }
 }
+
+.publisher-offer {
+  display: grid;
+  gap: 18px;
+}
+.offer-rate {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+.offer-rate > strong {
+  font-size: 5.5rem;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.07em;
+  color: #ff9ca6;
+}
+.offer-rate > strong > span {
+  font-size: 0.52em;
+  letter-spacing: -0.03em;
+}
+.offer-rate > span {
+  font-size: 0.79rem;
+  max-width: 130px;
+  line-height: 1.6;
+}
+.offer-copy h2,
+.offer-copy h3 {
+  font-size: 1.12rem;
+  line-height: 1.4;
+  letter-spacing: -0.025em;
+}
+.offer-copy > p {
+  font-size: 0.83rem;
+  line-height: 1.8;
+  margin-top: 12px;
+}
+.offer-copy > .offer-dates {
+  font-weight: 600;
+}
+.offer-copy > .offer-fees {
+  font-size: 0.76rem;
+}
+.offer-copy > a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  margin-top: 4px;
+  font-size: 0.78rem;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.publisher-notes > .publisher-offer + .text-link {
+  margin-top: 15px;
+}
+.offer-compact {
+  grid-template-columns: auto 1fr;
+  align-items: start;
+  gap: 28px;
+  padding: 25px 28px;
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--brand);
+  border-radius: 10px;
+  background: var(--surface);
+}
+.offer-compact .offer-rate {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+}
+.offer-compact .offer-rate > strong {
+  color: var(--brand);
+  font-size: 3.4rem;
+}
+.offer-compact .offer-rate > span {
+  color: var(--muted);
+}
+.offer-compact .offer-copy > a {
+  color: var(--brand);
+}
+#publisher-offer {
+  scroll-margin-top: 110px;
+}
+@media (max-width: 600px) {
+  .offer-rate > strong {
+    font-size: 4.7rem;
+  }
+  .offer-compact {
+    grid-template-columns: 1fr;
+    gap: 20px;
+    padding: 22px;
+  }
+  .offer-compact .offer-rate {
+    flex-direction: row;
+    align-items: center;
+    gap: 16px;
+  }
+}
+.offer-teaser {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 44px;
+  margin-top: 14px;
+  font-size: 0.77rem;
+  font-weight: 650;
+  color: var(--brand);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.offer-teaser svg {
+  flex-shrink: 0;
+}

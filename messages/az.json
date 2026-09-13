@@ -366,7 +366,12 @@
     "publisher4": "Saxtakarlıq aşkar edilərsə hesab dayandırılacaq.",
     "fraudTitle": "Saxtakarlıq",
     "fraudDesc": "Süni klik və baxış yaratmaq, bot istifadəsi və hər hansı manipulyasiya ciddi şəkildə qadağandır. Belə hallar aşkar edildikdə hesab dərhal bağlanacaq.",
-    "contact": "Hesabınız, məxfilik və ya bu şərtlər haqqında sualınız varsa, hesabınızdan dəstək müraciəti göndərin."
+    "contact": "Hesabınız, məxfilik və ya bu şərtlər haqqında sualınız varsa, hesabınızdan dəstək müraciəti göndərin.",
+    "offerTitle": "Sayt sahibləri üçün 0% komissiya təklifi",
+    "offer1": "Sayt ilk dəfə yayım üçün təsdiqləndikdən sonra altı təqvim ayı ərzində Reklam.biz platforma komissiyası 0% təşkil edir. Təklif başladıqda artıq təsdiqlənmiş saytlar üçün müddət təklifin istifadəyə verildiyi tarixdən hesablanır. Hesabınızdakı bitmə tarixi əsas götürülür.",
+    "offer2": "Təklif yalnız həmin saytın etibarlı reklam fəaliyyətindən yaranan gəlirə aiddir. Reklam.biz bu gəlirdən platforma payı götürmür. Ödəniş xidməti haqları və tətbiq olunan vergi tutulmaları təklifə daxil deyil; bu tutulmalardan sonra qalan məbləğ sayt sahibinə çatır.",
+    "offer3": "Müddət bitdikdən sonra standart platforma komissiyası tətbiq edilir. Cari standart komissiya 30%-dir. Saytın dayandırılması, yenidən yoxlanması və ya təkrar təsdiqi altı aylıq müddəti yeniləmir.",
+    "offer4": "Təklif minimum gəlir, reklam həcmi və ya müəyyən ödəniş xidməti haqqı vəd etmir. Saxta və etibarsız trafikdən gəlir hesablanmır. Ödəniş zamanı tətbiq olunan xidmət haqları və vergi tutulmaları yekun hesablamada ayrıca göstərilməlidir."
   },
   "settings": {
     "title": "Parametrlər",
@@ -399,7 +404,7 @@
     "forAdvertisers": "Biznesinizi reklam edin",
     "forAdvertisersDescription": "Mağazanız, xidmətiniz və ya yeni kampaniyanız üçün onlayn reklam. Təklifinizi saytlarda göstərin, maraqlananları öz ünvanınıza yönləndirin.",
     "forPublishers": "Saytınıza reklam əlavə edin",
-    "forPublishersDescription": "Saytınızdakı reklam yerlərini gəlir mənbəyinə çevirin. Formatı və yerləşməni siz seçirsiniz.",
+    "forPublishersDescription": "Saytınızı Reklam.biz-ə qoşun. İlk 6 ay platforma komissiyası ödəmədən reklam gəliri qazanın.",
     "formats": "Reklam formatları",
     "formatsDescription": "Təklifinizi diqqətçəkən bannerlə göstərin və ya qısa mətnlə çatdırın. Mesajınıza uyğun reklam formatını seçin.",
     "help": "Kömək və quraşdırma",
@@ -589,8 +594,8 @@
     "heroFootnote": "Banner və mətn reklamı. Kompüter və mobil ekranlar üçün.",
     "advertiserStoryTitle": "Təklif sizdən, reklam yeri bizdən.",
     "advertiserStoryBody": "Yeni kolleksiya, endirim və ya xidmət. Nəyi tanıtmaq istədiyinizi seçin, banner və ya mətn reklamı ilə saytların ziyarətçilərinə göstərin.",
-    "publisherStoryTitle": "Oxucularınız var. Reklam üçün də yeriniz olsun.",
-    "publisherStoryBody": "Saytınızda dərc etdiyiniz məzmun insanları bir araya gətirir. Reklam.biz həmin auditoriyaya çatmaq istəyən bizneslərin reklamlarını saytınızda yayımlayır.",
+    "publisherStoryTitle": "İlk 6 ay reklam gəlirinizdən pay götürmürük.",
+    "publisherStoryBody": "Reklam.biz-ə qoşulan saytlar üçün 6 ay platforma komissiyası yoxdur. Reklam yerlərinizi əlavə edin və reklamverənlərin büdcəsindən saytınıza çatan payı artırın.",
     "publisherPlacementNote": "Məqalənin yanında, səhifənin yuxarısında və ya mobil görünüşdə. Reklam yerini saytınızın quruluşuna uyğun seçin.",
     "viewFormats": "Formatlara baxın",
     "formatChoiceTitle": "Şəkillə göstərin, mətnlə izah edin.",
@@ -605,6 +610,23 @@
     "marketQuestion4": "Saytıma hansı reklam formatları uyğundur?",
     "marketAnswer4": "300x250 banner məqalə yanında, 728x90 banner geniş sahələrdə, 320x50 isə mobil görünüşdə yerləşdirilə bilər. Mətn reklamı da seçə bilərsiniz.",
     "advertiserSignoff": "Tanıtmaq istədiyiniz bir təklif var?",
-    "publisherSignoff": "Saytınızda reklama yer ayırın."
+    "publisherSignoff": "6 ay 0% komissiya ilə qoşulun.",
+    "offerLabel": "Sayt sahibləri üçün 6 aylıq təklif",
+    "offerHero": "İlk 6 ay komissiyasız qazanın.",
+    "offerTitle": "İlk 6 ay gəlirinizdən pay götürmürük.",
+    "offerBody": "Reklamverənlərin saytınızdakı reklamlara xərclədiyi məbləğdən platforma komissiyası tutmuruq.",
+    "offerCommissionLabel": "Reklam.biz komissiyası",
+    "offerFees": "Ödəniş xidməti haqları və tətbiq olunan vergilər ayrıca tutulur.",
+    "offerStart": "6 ay saytınız ilk dəfə yayım üçün təsdiqləndiyi gündən hesablanır.",
+    "offerEnds": "0% komissiya {date} tarixinədək qüvvədədir.",
+    "offerTerms": "Təklifin şərtləri",
+    "offerEnded": "6 aylıq komissiyasız dövr başa çatıb.",
+    "offerStandardBody": "Hazırda saytınız üçün göstərilən standart platforma komissiyası tətbiq olunur.",
+    "marketQuestion5": "İlk 6 ay bütün gəlir mənə qalır?",
+    "marketAnswer5": "Reklam.biz bu müddətdə platforma komissiyası tutmur. Saytınızın qazandığı reklam gəlirindən ödəniş xidməti haqları və tətbiq olunan vergilər çıxıldıqdan sonra qalan məbləğ sizə çatır.",
+    "marketQuestion6": "6 ay nə vaxt başlayır və sonra nə olur?",
+    "marketAnswer6": "Müddət saytınız ilk dəfə yayım üçün təsdiqlənəndə başlayır. Saytı müvəqqəti dayandırmaq və ya yenidən təsdiqlətmək müddəti uzatmır. Altı aydan sonra standart platforma komissiyası tətbiq edilir; cari tarif 30%-dir.",
+    "offerTeaser": "Sayt sahiblərinə: ilk 6 ay 0% komissiya",
+    "offerPublicTitle": "Daha çox gəlir sizə qalsın."
   }
 }

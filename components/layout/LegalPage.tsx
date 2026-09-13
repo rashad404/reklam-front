@@ -25,6 +25,7 @@ export default async function LegalPage({
             "publisher3",
             "publisher4",
           ],
+          ["offerTitle", "offer1", "offer2", "offer3", "offer4"],
           ["fraudTitle", "fraudDesc"],
         ];
   return (
@@ -32,7 +33,11 @@ export default async function LegalPage({
       <h1>{t("title")}</h1>
       <p>{t("intro")}</p>
       {groups.map(([heading, ...body]) => (
-        <section className="card stack" key={heading}>
+        <section
+          className="card stack"
+          key={heading}
+          id={heading === "offerTitle" ? "publisher-offer" : undefined}
+        >
           <h2>{t(heading)}</h2>
           {body.map((key) => (
             <p key={key}>{t(key)}</p>
