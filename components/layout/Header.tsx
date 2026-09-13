@@ -3,7 +3,7 @@ import Image from "next/image";
 import { useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { useTheme } from "next-themes";
-import { Menu, Moon, Sun, X, LogIn } from "lucide-react";
+import { Menu, Moon, Sun, X, UserRound } from "lucide-react";
 import { Link, usePathname, useRouter } from "@/lib/navigation";
 import { useAuth } from "@/hooks/useAuth";
 import { openWalletLogin } from "@/lib/utils/walletAuth";
@@ -129,7 +129,7 @@ export default function Header() {
                 aria-label={t("signIn")}
                 onClick={login}
               >
-                <LogIn size={16} />
+                <UserRound size={18} aria-hidden="true" />
                 <span className="sign-in-label">{t("signIn")}</span>
               </button>
             )}
