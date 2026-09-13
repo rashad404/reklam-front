@@ -53,7 +53,7 @@ test("public pages have correct language, metadata and usable mobile layouts", a
   expect(accessibility.violations).toEqual([]);
   await page.getByRole("button", { name: "Text ad", exact: true }).click();
   await expect(
-    page.getByText("Make room for something new", { exact: true }),
+    page.getByText("Advertise your business online.", { exact: true }),
   ).toBeVisible();
   expect(errors).toEqual([]);
 });
@@ -249,10 +249,13 @@ test("support requests are saved and administrator replies reach the requester",
   await expect(ticket).toHaveCount(0);
   await page.reload();
   await expect(
-    page.getByText(
-      "Open your placements list to see the last installation request.",
-      { exact: true },
-    ),
+    page
+      .locator("article")
+      .filter({ hasText: subject })
+      .getByText(
+        "Open your placements list to see the last installation request.",
+        { exact: true },
+      ),
   ).toBeVisible();
   await admin.close();
 });

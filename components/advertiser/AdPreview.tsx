@@ -16,14 +16,20 @@ declare global {
     ReklamRenderer?: {
       render: (
         container: HTMLElement,
-        ad: Creative,
+        ad: Creative & { click_url?: string },
         options: { preview: boolean; label: string },
       ) => void;
     };
   }
 }
 let rendererReady: Promise<void> | undefined;
-export default function AdPreview({ ad }: { ad: Creative }) {
+export default function AdPreview({
+  ad,
+  href,
+}: {
+  ad: Creative;
+  href?: string;
+}) {
   const ref = useRef<HTMLDivElement>(null);
   const t = useTranslations("product");
   const [failed, setFailed] = useState(false);
@@ -44,10 +50,14 @@ export default function AdPreview({ ad }: { ad: Creative }) {
     rendererReady
       .then(() => {
         if (alive && ref.current)
-          window.ReklamRenderer?.render(ref.current, ad, {
-            preview: true,
-            label: t("adLabel"),
-          });
+          window.ReklamRenderer?.render(
+            ref.current,
+            { ...ad, click_url: href },
+            {
+              preview: !href,
+              label: t("adLabel"),
+            },
+          );
       })
       .catch(() => {
         if (alive) setFailed(true);
@@ -55,7 +65,7 @@ export default function AdPreview({ ad }: { ad: Creative }) {
     return () => {
       alive = false;
     };
-  }, [ad, t]);
+  }, [ad, href, t]);
   return failed ? (
     <p role="alert">{t("loadError")}</p>
   ) : (

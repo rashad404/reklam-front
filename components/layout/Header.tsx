@@ -3,7 +3,23 @@ import Image from "next/image";
 import { useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { useTheme } from "next-themes";
-import { Menu, Moon, Sun, X, UserRound } from "lucide-react";
+import {
+  Menu,
+  Moon,
+  Sun,
+  X,
+  UserRound,
+  ChevronDown,
+  Megaphone,
+  PanelsTopLeft,
+  LayoutDashboard,
+  BarChart3,
+  Globe2,
+  Settings2,
+  LifeBuoy,
+  Layers3,
+  ShieldCheck,
+} from "lucide-react";
 import { Link, usePathname, useRouter } from "@/lib/navigation";
 import { useAuth } from "@/hooks/useAuth";
 import { openWalletLogin } from "@/lib/utils/walletAuth";
@@ -17,36 +33,46 @@ export default function Header() {
   const { user, isAuthenticated, refresh } = useAuth();
   const [menu, setMenu] = useState(false),
     [error, setError] = useState(false);
-  const links = [
-    ["/for-advertisers", "forAdvertisers"],
-    ["/for-publishers", "forPublishers"],
-    ["/ad-formats", "formats"],
-  ];
-  const workspace = /^\/(advertiser|publisher|settings|admin)(\/|$)/.test(path);
+  const workspace =
+    !!isAuthenticated &&
+    /^\/(advertiser|publisher|settings|admin)(\/|$)/.test(path);
   const role = path.startsWith("/publisher")
     ? "publisher"
     : path.startsWith("/admin")
       ? "admin"
       : "advertiser";
+  const links = [
+    ["/for-advertisers", "navAdvertisers"],
+    ["/for-publishers", "navPublishers"],
+    ["/ad-formats", "formats"],
+  ];
   const tabs =
     role === "publisher"
       ? [
-          ["/publisher", "overview"],
-          ["/publisher/site", "site"],
-          ["/publisher/ad-units", "placements"],
-          ["/publisher/stats", "reports"],
+          { href: "/publisher", label: "overview", icon: LayoutDashboard },
+          { href: "/publisher/site", label: "site", icon: Globe2 },
+          {
+            href: "/publisher/ad-units",
+            label: "placements",
+            icon: PanelsTopLeft,
+          },
+          { href: "/publisher/stats", label: "reports", icon: BarChart3 },
         ]
       : role === "admin"
         ? [
-            ["/admin", "overview"],
-            ["/admin/ads", "campaigns"],
-            ["/admin/publishers", "site"],
-            ["/admin/support", "support"],
+            { href: "/admin", label: "overview", icon: LayoutDashboard },
+            { href: "/admin/ads", label: "campaigns", icon: Megaphone },
+            { href: "/admin/publishers", label: "site", icon: ShieldCheck },
+            { href: "/admin/support", label: "support", icon: LifeBuoy },
           ]
         : [
-            ["/advertiser", "overview"],
-            ["/advertiser/campaigns", "campaigns"],
-            ["/advertiser/stats", "reports"],
+            { href: "/advertiser", label: "overview", icon: LayoutDashboard },
+            {
+              href: "/advertiser/campaigns",
+              label: "campaigns",
+              icon: Megaphone,
+            },
+            { href: "/advertiser/stats", label: "reports", icon: BarChart3 },
           ];
   async function login() {
     setError(false);
@@ -67,9 +93,9 @@ export default function Header() {
       <a className="skip" href="#main-content">
         {t("skip")}
       </a>
-      <header className="site-header">
+      <header className={`site-header ${workspace ? "workspace-header" : ""}`}>
         <div className="wrap header-inner">
-          <Link href="/" aria-label="Reklam.biz">
+          <Link href="/" aria-label="Reklam.biz" className="brand-link">
             <Image
               unoptimized
               className="header-logo dark:hidden"
@@ -87,17 +113,24 @@ export default function Header() {
               height={32}
             />
           </Link>
-          <nav className="header-nav" aria-label={t("menu")}>
-            {links.map(([href, key]) => (
-              <Link
-                key={href}
-                href={href}
-                aria-current={path === href ? "page" : undefined}
-              >
-                {t(key)}
-              </Link>
-            ))}
-          </nav>
+          {workspace ? (
+            <div className="workspace-breadcrumb">
+              <span className="breadcrumb-slash">/</span>
+              {t(role)}
+            </div>
+          ) : (
+            <nav className="header-nav" aria-label={t("menu")}>
+              {links.map(([href, key]) => (
+                <Link
+                  href={href}
+                  key={href}
+                  aria-current={path === href ? "page" : undefined}
+                >
+                  {t(key)}
+                </Link>
+              ))}
+            </nav>
+          )}
           <div className="header-actions">
             <select
               className="language"
@@ -110,7 +143,7 @@ export default function Header() {
               <option value="ru">RU</option>
             </select>
             <button
-              className="btn-quiet"
+              className="btn-quiet theme-toggle"
               aria-label={t(resolvedTheme === "dark" ? "light" : "dark")}
               onClick={() =>
                 setTheme(resolvedTheme === "dark" ? "light" : "dark")
@@ -120,59 +153,67 @@ export default function Header() {
               <Moon size={18} className="dark:hidden" />
             </button>
             {isAuthenticated ? (
-              <Link className="btn-secondary" href="/advertiser/campaigns">
-                {t("campaigns")}
-              </Link>
-            ) : (
               <button
-                className="btn-primary"
-                aria-label={t("signIn")}
-                onClick={login}
-              >
-                <UserRound size={18} aria-hidden="true" />
-                <span className="sign-in-label">{t("signIn")}</span>
-              </button>
-            )}
-            <button
-              className="btn-quiet mobile-toggle"
-              aria-label={t(menu ? "close" : "menu")}
-              aria-expanded={menu}
-              onClick={() => setMenu(!menu)}
-            >
-              {menu ? <X size={21} /> : <Menu size={21} />}
-            </button>
-            {isAuthenticated && (
-              <button
-                className="btn-quiet hidden min-[851px]:inline-flex"
+                className="profile-trigger"
                 aria-label={t("menu")}
                 aria-expanded={menu}
                 onClick={() => setMenu(!menu)}
               >
-                <Menu size={20} />
+                <span className="avatar">
+                  {user?.name?.slice(0, 1).toLocaleUpperCase(locale) || (
+                    <UserRound size={18} />
+                  )}
+                </span>
+                <span className="profile-name">{user?.name}</span>
+                <ChevronDown size={14} />
               </button>
+            ) : (
+              <>
+                <button
+                  className="btn-primary sign-in-button"
+                  aria-label={t("signIn")}
+                  onClick={login}
+                >
+                  <UserRound size={18} aria-hidden="true" />
+                  <span className="sign-in-label">{t("signIn")}</span>
+                </button>
+                <button
+                  className="btn-quiet mobile-toggle"
+                  aria-label={t(menu ? "close" : "menu")}
+                  aria-expanded={menu}
+                  onClick={() => setMenu(!menu)}
+                >
+                  {menu ? <X size={21} /> : <Menu size={21} />}
+                </button>
+              </>
             )}
           </div>
         </div>
         {menu && (
-          <nav className="mobile-nav" aria-label={t("menu")}>
+          <nav className="account-menu" aria-label={t("menu")}>
             {links.map(([href, key]) => (
-              <Link key={href} href={href} onClick={() => setMenu(false)}>
+              <Link href={href} key={href} onClick={() => setMenu(false)}>
                 {t(key)}
               </Link>
             ))}
             {isAuthenticated && (
               <>
+                <div className="menu-divider" />
                 <Link href="/advertiser" onClick={() => setMenu(false)}>
+                  <Megaphone size={17} />
                   {t("advertiser")}
                 </Link>
                 <Link href="/publisher" onClick={() => setMenu(false)}>
+                  <PanelsTopLeft size={17} />
                   {t("publisher")}
                 </Link>
                 <Link href="/settings" onClick={() => setMenu(false)}>
+                  <Settings2 size={17} />
                   {t("settings")}
                 </Link>
                 {user?.is_admin && (
                   <Link href="/admin" onClick={() => setMenu(false)}>
+                    <ShieldCheck size={17} />
                     {t("admin")}
                   </Link>
                 )}
@@ -189,20 +230,57 @@ export default function Header() {
           {t("loadError")}
         </div>
       )}
-      {workspace && isAuthenticated && (
-        <nav className="workspace-nav" aria-label={t(role)}>
-          <div className="wrap row">
-            {tabs.map(([href, key]) => (
+      {workspace && (
+        <aside className="workspace-nav" aria-label={t(role)}>
+          <div className="workspace-switch">
+            <Link
+              href="/advertiser"
+              aria-current={role === "advertiser" ? "page" : undefined}
+            >
+              <Megaphone size={17} />
+              {t("navAdvertisers")}
+            </Link>
+            <Link
+              href="/publisher"
+              aria-current={role === "publisher" ? "page" : undefined}
+            >
+              <PanelsTopLeft size={17} />
+              {t("navPublishers")}
+            </Link>
+          </div>
+          <div className="sidebar-label">{t(role)}</div>
+          <nav className="workspace-tabs" aria-label={t("menu")}>
+            {tabs.map(({ href, label, icon: Icon }) => (
               <Link
-                href={href}
                 key={href}
-                aria-current={path === href ? "page" : undefined}
+                href={href}
+                aria-current={
+                  path === href ||
+                  (href !== `/${role}` && path.startsWith(href + "/"))
+                    ? "page"
+                    : undefined
+                }
               >
-                {t(key)}
+                <Icon size={19} />
+                <span>{t(label)}</span>
               </Link>
             ))}
-          </div>
-        </nav>
+          </nav>
+          <nav className="workspace-bottom" aria-label={t("help")}>
+            <Link href="/settings">
+              <Settings2 size={19} />
+              {t("settings")}
+            </Link>
+            <Link href="/settings/support">
+              <LifeBuoy size={19} />
+              {t("support")}
+            </Link>
+            <Link href="/ad-formats">
+              <Layers3 size={19} />
+              {t("formats")}
+            </Link>
+          </nav>
+        </aside>
       )}
     </>
   );

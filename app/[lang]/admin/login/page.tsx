@@ -33,7 +33,7 @@ export default function AdminLogin() {
     }
   }
   return (
-    <div className="wrap page narrow stack">
+    <div className="wrap page narrow stack auth-page">
       <h1>{t("admin")}</h1>
       <form className="card stack" onSubmit={submit}>
         {error && <Notice error>{t("loadError")}</Notice>}

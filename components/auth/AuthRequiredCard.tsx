@@ -1,4 +1,5 @@
 "use client";
+import { UserRound } from "lucide-react";
 import { useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { openWalletLogin } from "@/lib/utils/walletAuth";
@@ -36,8 +37,11 @@ export default function AuthRequiredCard() {
     }
   }
   return (
-    <div className="wrap page narrow">
+    <div className="wrap page narrow auth-page">
       <section className="card stack">
+        <span className="auth-mark">
+          <UserRound size={25} />
+        </span>
         <h1>{t("signIn")}</h1>
         <p>{t("loginHelp")}</p>
         {error && <p role="alert">{t("loadError")}</p>}

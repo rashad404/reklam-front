@@ -28,7 +28,7 @@ export default async function LegalPage({
           ["fraudTitle", "fraudDesc"],
         ];
   return (
-    <div className="wrap page narrow stack">
+    <div className="wrap page narrow stack legal-page">
       <h1>{t("title")}</h1>
       <p>{t("intro")}</p>
       {groups.map(([heading, ...body]) => (

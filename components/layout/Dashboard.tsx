@@ -1,7 +1,18 @@
 "use client";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
+import {
+  ArrowUpRight,
+  Eye,
+  MousePointer2,
+  Layers3,
+  Megaphone,
+  BarChart3,
+  Globe2,
+  PanelsTopLeft,
+  ShieldCheck,
+} from "lucide-react";
 import { Link } from "@/lib/navigation";
-import { Gate, Notice, Failure } from "@/components/ui/product";
+import { Gate, Failure } from "@/components/ui/product";
 import { useResource } from "@/hooks/useResource";
 import { useAuth } from "@/hooks/useAuth";
 interface Overview {
@@ -11,61 +22,109 @@ interface Overview {
   active_ad_units?: number;
 }
 function Content({ role }: { role: "advertiser" | "publisher" }) {
-  const t = useTranslations("product");
+  const t = useTranslations("product"),
+    locale = useLocale();
   const { user } = useAuth();
   const registered = !!user?.[role];
   const resource = useResource<Overview>(
     registered ? `/${role}/dashboard` : null,
   );
+  const publisher = role === "publisher";
+  const cards = publisher
+    ? [
+        {
+          href: "/publisher/site",
+          title: "site",
+          body: "siteManagementBody",
+          icon: Globe2,
+        },
+        {
+          href: "/publisher/ad-units",
+          title: "placements",
+          body: "placementManagementBody",
+          icon: PanelsTopLeft,
+        },
+      ]
+    : [
+        {
+          href: "/advertiser/campaigns",
+          title: "campaigns",
+          body: "campaignManagementBody",
+          icon: Megaphone,
+        },
+        {
+          href: "/advertiser/stats",
+          title: "reports",
+          body: "reportManagementBody",
+          icon: BarChart3,
+        },
+      ];
   return (
     <div className="wrap page stack">
-      <div>
-        <span className="eyebrow">{user?.name}</span>
-        <h1>{t(role)}</h1>
+      <div className="dashboard-lead">
+        <div>
+          <span className="eyebrow">{user?.name}</span>
+          <h1>{t("overview")}</h1>
+          <p>{t(`${role}Description`)}</p>
+        </div>
+        <Link
+          className="btn-primary"
+          href={
+            publisher
+              ? "/publisher/ad-units/create"
+              : "/advertiser/campaigns/create"
+          }
+        >
+          {t(publisher ? "createPlacement" : "createCampaign")}
+          <ArrowUpRight size={18} />
+        </Link>
       </div>
-      <p>{t(`${role}Description`)}</p>
       {registered && resource.error ? (
         <Failure retry={resource.retry} />
       ) : registered && resource.loading ? (
-        <p>{t("loading")}</p>
+        <p role="status">{t("loading")}</p>
       ) : registered && resource.data ? (
         <div className="metrics">
           {[
-            ["impressions", resource.data.impressions],
-            ["clicks", resource.data.clicks],
-            [
-              "active",
-              resource.data.active_campaigns ??
+            { key: "impressions", n: resource.data.impressions, icon: Eye },
+            { key: "clicks", n: resource.data.clicks, icon: MousePointer2 },
+            {
+              key: "active",
+              n:
+                resource.data.active_campaigns ??
                 resource.data.active_ad_units ??
                 0,
-            ],
-          ].map(([key, n]) => (
+              icon: Layers3,
+            },
+          ].map(({ key, n, icon: Icon }) => (
             <div className="metric" key={key}>
-              <span>{t(String(key))}</span>
-              <strong>{Number(n).toLocaleString()}</strong>
+              <div className="metric-top">
+                <span>{t(key)}</span>
+                <Icon size={21} />
+              </div>
+              <strong>{Number(n).toLocaleString(locale)}</strong>
             </div>
           ))}
         </div>
       ) : null}
       <div className="two-col">
-        {(role === "advertiser"
-          ? [
-              ["/advertiser/campaigns", "campaigns", "noCampaigns"],
-              ["/advertiser/stats", "reports", "metricHelp"],
-            ]
-          : [
-              ["/publisher/site", "site", "verificationHelp"],
-              ["/publisher/ad-units", "placements", "noPlacements"],
-            ]
-        ).map(([href, title, body]) => (
-          <Link href={href} className="card stack" key={href}>
-            <h2>{t(title)}</h2>
-            <p>{t(body)}</p>
-            <span className="eyebrow">{t("next")} &rarr;</span>
+        {cards.map(({ href, title, body, icon: Icon }) => (
+          <Link href={href} className="card action-card" key={href}>
+            <span className="action-icon">
+              <Icon size={21} />
+            </span>
+            <div>
+              <h2>{t(title)}</h2>
+              <p>{t(body)}</p>
+            </div>
+            <ArrowUpRight size={18} />
           </Link>
         ))}
       </div>
-      <Notice>{t("deliveryHint")}</Notice>
+      <p className="dashboard-note">
+        <ShieldCheck size={17} />
+        {t("deliveryHint")}
+      </p>
     </div>
   );
 }
