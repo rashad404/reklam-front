@@ -120,7 +120,6 @@ export default async function PublicPage({
         ))}
       </section>
       <section className="section stack">
-        <div className="notice">{t("paymentDescription")}</div>
         <h2>{t("contact")}</h2>
         <p>{t("contactBody")}</p>
         <div>
