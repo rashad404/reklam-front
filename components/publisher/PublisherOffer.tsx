@@ -10,14 +10,16 @@ export interface CommissionOffer {
 }
 export default function PublisherOffer({
   compact = false,
+  primary = false,
   offer,
 }: {
   compact?: boolean;
+  primary?: boolean;
   offer?: CommissionOffer | null;
 }) {
   const t = useTranslations("product");
   const locale = useLocale();
-  const Heading = compact ? "h2" : "h3";
+  const Heading = compact || primary ? "h2" : "h3";
   const ended = !!offer?.ends_at && !offer.active;
   const end = offer?.ends_at
     ? new Intl.DateTimeFormat(locale, {

@@ -12,6 +12,9 @@ export default async function PublicPage({
 }) {
   const t = await getTranslations("product");
   const publisher = kind === "forPublishers";
+  const offerFirst = kind === "home" || publisher;
+  const StoryHeading = offerFirst ? "h1" : "h2";
+  const HeroHeading = offerFirst ? "h2" : "h1";
   const advertiserStory = (
     <section
       className="audience-story"
@@ -40,12 +43,14 @@ export default async function PublicPage({
   );
   const publisherStory = (
     <section
-      className="publisher-story"
+      className={`publisher-story ${offerFirst ? "publisher-hero" : ""}`}
       aria-labelledby="publisher-story-title"
     >
       <div className="story-intro">
         <span className="story-label">{t("navPublishers")}</span>
-        <h2 id="publisher-story-title">{t("publisherStoryTitle")}</h2>
+        <StoryHeading id="publisher-story-title">
+          {t("publisherStoryTitle")}
+        </StoryHeading>
         <p>{t("publisherStoryBody")}</p>
         <Link className="btn-primary" href="/publisher/site">
           {t("joinWebsite")}
@@ -53,7 +58,7 @@ export default async function PublicPage({
         </Link>
       </div>
       <div className="publisher-notes">
-        <PublisherOffer />
+        <PublisherOffer primary={offerFirst} />
         <Link className="text-link" href="/ad-formats">
           {t("viewFormats")}
           <ArrowRight size={18} />
@@ -64,11 +69,12 @@ export default async function PublicPage({
   return (
     <div className="marketing">
       <div className="wrap">
+        {offerFirst && publisherStory}
         <section
           className={`hero ${kind === "home" ? "hero-home" : "hero-inner"}`}
         >
           <div className="hero-copy">
-            <h1>
+            <HeroHeading>
               {kind === "home" ? (
                 <>
                   {t("heroLine1")}
@@ -77,7 +83,7 @@ export default async function PublicPage({
               ) : (
                 t(publisher ? "offerHero" : kind)
               )}
-            </h1>
+            </HeroHeading>
             <p>
               {t(kind === "home" ? "heroDescription" : `${kind}Description`)}
             </p>
@@ -99,12 +105,6 @@ export default async function PublicPage({
                 <ArrowRight size={18} />
               </Link>
             </div>
-            {kind === "home" && (
-              <Link className="offer-teaser" href="/for-publishers">
-                {t("offerTeaser")}
-                <ArrowRight size={16} />
-              </Link>
-            )}
             <p className="hero-footnote">
               {t(publisher ? "offerFees" : "heroFootnote")}
             </p>
@@ -113,14 +113,8 @@ export default async function PublicPage({
             <FormatDemo />
           </div>
         </section>
-        {kind === "home" && (
-          <>
-            {advertiserStory}
-            {publisherStory}
-          </>
-        )}
+        {kind === "home" && advertiserStory}
         {kind === "forAdvertisers" && advertiserStory}
-        {kind === "forPublishers" && publisherStory}
         {kind === "formats" && (
           <section className="format-specifications">
             <div className="story-intro">

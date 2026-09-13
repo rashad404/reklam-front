@@ -583,14 +583,14 @@ body:has(.workspace-nav) .footer-bottom {
   border-radius: 50%;
   box-shadow: 0 0 0 4px var(--soft);
 }
-.hero h1 {
+.hero :is(h1, h2) {
   font-size: clamp(2.8rem, 4.9vw, 4.4rem);
   line-height: 1.08;
   letter-spacing: -0.063em;
   font-weight: 800;
   margin: 24px 0;
 }
-.hero h1 > span {
+.hero :is(h1, h2) > span {
   display: block;
   color: var(--brand);
 }
@@ -1432,7 +1432,7 @@ details p {
   .hero {
     gap: 32px;
   }
-  .hero h1 {
+  .hero :is(h1, h2) {
     font-size: 3.5rem;
   }
   .hero-actions {
@@ -1493,7 +1493,7 @@ details p {
   .hero-copy {
     max-width: 680px;
   }
-  .hero h1 {
+  .hero :is(h1, h2) {
     font-size: clamp(2.8rem, 6.9vw, 4.1rem);
   }
   .hero-copy > p {
@@ -1643,7 +1643,7 @@ details p {
     padding-block: 39px 44px;
     gap: 34px;
   }
-  .hero h1 {
+  .hero :is(h1, h2) {
     font-size: clamp(2.65rem, 9.2vw, 3.4rem);
     margin-block: 20px;
     letter-spacing: -0.06em;
@@ -1893,7 +1893,7 @@ details p {
   .sign-in-button {
     padding-inline: 10px;
   }
-  .hero h1 {
+  .hero :is(h1, h2) {
     font-size: 2.6rem;
   }
   .hero-caption {
@@ -1949,11 +1949,11 @@ details p {
 .marketing .hero {
   padding-block: 84px 76px;
 }
-.marketing .hero-home h1 {
+.marketing .hero-home :is(h1, h2) {
   font-size: clamp(2.6rem, 4.6vw, 4.25rem);
   letter-spacing: -0.055em;
 }
-.marketing .hero-home h1 span {
+.marketing .hero-home :is(h1, h2) span {
   max-width: 560px;
 }
 .hero-copy .hero-footnote {
@@ -2169,7 +2169,7 @@ details p {
     padding-block: 43px 47px;
     gap: 39px;
   }
-  .marketing .hero-home h1 {
+  .marketing .hero-home :is(h1, h2) {
     font-size: 2.75rem;
     max-width: 400px;
   }
@@ -2223,7 +2223,7 @@ details p {
   }
 }
 @media (max-width: 360px) {
-  .marketing .hero-home h1 {
+  .marketing .hero-home :is(h1, h2) {
     font-size: 2.3rem;
   }
 }
@@ -2339,4 +2339,34 @@ details p {
 }
 .offer-teaser svg {
   flex-shrink: 0;
+}
+
+/* Put the publisher launch offer in the first viewport. */
+.publisher-hero {
+  margin-top: 24px;
+  padding-block: 44px;
+  align-items: center;
+}
+.publisher-hero h1 {
+  font-size: clamp(2rem, 3.5vw, 3.2rem);
+  line-height: 1.12;
+  letter-spacing: -0.045em;
+  max-width: 560px;
+}
+@media (max-width: 600px) {
+  .publisher-hero {
+    margin-top: 16px;
+    padding: 26px 22px;
+    gap: 24px;
+  }
+  .publisher-hero h1 {
+    font-size: clamp(1.8rem, 7.7vw, 2.5rem);
+  }
+  .publisher-hero .story-intro > p {
+    margin-block: 16px;
+    line-height: 1.65;
+  }
+  .publisher-hero .publisher-notes {
+    padding-top: 20px;
+  }
 }
