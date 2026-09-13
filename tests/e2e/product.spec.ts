@@ -49,7 +49,10 @@ test("public pages have correct language, metadata and usable mobile layouts", a
     }
   }
   await page.goto("/en");
-  const accessibility = await new AxeBuilder({ page }).analyze();
+  await expect(page.locator(".studio-ad img")).toBeVisible();
+  const accessibility = await new AxeBuilder({ page })
+    .withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa", "best-practice"])
+    .analyze();
   expect(accessibility.violations).toEqual([]);
   await page.getByRole("button", { name: "Text ad", exact: true }).click();
   await expect(
@@ -220,7 +223,10 @@ test("public secondary pages and dark theme pass accessibility checks", async ({
   await page.goto("/en");
   await page.getByRole("button", { name: "Dark theme", exact: true }).click();
   await expect(page.locator("html")).toHaveClass(/dark/);
-  const result = await new AxeBuilder({ page }).analyze();
+  await expect(page.locator(".studio-ad img")).toBeVisible();
+  const result = await new AxeBuilder({ page })
+    .withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa", "best-practice"])
+    .analyze();
   expect(result.violations).toEqual([]);
   await page.screenshot({ path: "test-results/home-dark.png", fullPage: true });
 });
