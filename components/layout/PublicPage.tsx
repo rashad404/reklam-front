@@ -124,8 +124,8 @@ export default async function PublicPage({
         <h2>{t("contact")}</h2>
         <p>{t("contactBody")}</p>
         <div>
-          <Link className="btn-secondary" href="/help">
-            {t("help")}
+          <Link className="btn-secondary" href="/settings/support">
+            {t("support")}
           </Link>
         </div>
       </section>

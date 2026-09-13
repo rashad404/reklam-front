@@ -1,10 +1,12 @@
 import { getTranslations } from "next-intl/server";
+import { Link } from "@/lib/navigation";
 export default async function LegalPage({
   kind,
 }: {
   kind: "privacy" | "terms";
 }) {
   const t = await getTranslations(kind);
+  const product = await getTranslations("product");
   const groups =
     kind === "privacy"
       ? [
@@ -38,6 +40,9 @@ export default async function LegalPage({
         </section>
       ))}
       <p>{t("contact")}</p>
+      <Link className="btn-secondary" href="/settings/support">
+        {product("support")}
+      </Link>
     </div>
   );
 }

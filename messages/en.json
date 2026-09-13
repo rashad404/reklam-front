@@ -339,14 +339,14 @@
     "title": "Privacy Policy",
     "intro": "This privacy policy explains how Reklam.biz collects, uses, and protects user data.",
     "dataCollection": "Data We Collect",
-    "dataCollectionDesc": "We collect: name, email, phone number (via Kimlik.az), IP address, device type, browser information, and site visit statistics.",
+    "dataCollectionDesc": "We collect: name, email, phone number (via Kimlik.az), IP address, device type, browser information, and site visit statistics. We also store support requests and administrator replies.",
     "dataUsage": "How We Use Data",
     "dataUsageDesc": "Collected data is used for account management, ad serving, statistics calculation, fraud prevention, and service improvement.",
     "cookies": "Cookies",
     "cookiesDesc": "The login token and theme preference are stored in localStorage. A new campaign draft stays in sessionStorage until submission or the tab is closed.",
     "thirdParty": "Third Parties",
     "thirdPartyDesc": "Sign-in uses Kimlik.az. The browser contacts the image host when an ad loads and the advertiser website on a click. Hosting infrastructure processes network requests.",
-    "contact": "For questions about this policy, email info@reklam.biz."
+    "contact": "For questions about your account, privacy or these terms, send a support request from your account."
   },
   "terms": {
     "title": "Terms of Service",
@@ -366,7 +366,7 @@
     "publisher4": "If fraud is detected, the account will be suspended.",
     "fraudTitle": "Fraud Policy",
     "fraudDesc": "Generating artificial clicks/impressions, using bots, and any manipulation is strictly prohibited. Detected cases result in immediate account termination.",
-    "contact": "For questions, email info@reklam.biz."
+    "contact": "For questions about your account, privacy or these terms, send a support request from your account."
   },
   "settings": {
     "title": "Settings",
@@ -529,10 +529,24 @@
     "process3": "Follow the traffic",
     "process3Body": "See impressions, clicks and CTR by date. Pause a campaign or placement whenever needed.",
     "contact": "Questions or an unsuitable ad?",
-    "contactBody": "Email info@reklam.biz with the page URL and a description. Do not include passwords or access tokens.",
+    "contactBody": "Send a support request from your account. Include the page address and describe the issue. Do not include passwords or access tokens.",
     "notFound": "Page not found",
     "returnHome": "Go to homepage",
     "localLogin": "Local verification login",
-    "textFormat": "Text ad"
+    "textFormat": "Text ad",
+    "support": "Support requests",
+    "supportHelp": "Describe the issue and include the page address. Replies appear here in your account. Do not include passwords or access tokens.",
+    "supportAdminHelp": "Read requests and reply directly to the account holder. Replies are visible in their support history.",
+    "supportSubject": "Subject",
+    "supportMessage": "Message",
+    "supportSend": "Send request",
+    "supportHistory": "Your requests",
+    "supportReply": "Reply from support",
+    "supportSaveReply": "Save reply",
+    "supportSaved": "Saved. You can follow the request below.",
+    "open": "Open",
+    "answered": "Answered",
+    "closed": "Closed",
+    "status": "Status"
   }
 }

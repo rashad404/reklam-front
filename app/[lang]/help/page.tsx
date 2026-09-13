@@ -31,9 +31,9 @@ export default async function Help() {
       <section className="card stack">
         <h2>{t("contact")}</h2>
         <p>{t("contactBody")}</p>
-        <a className="btn-primary" href="mailto:info@reklam.biz">
-          info@reklam.biz
-        </a>
+        <Link className="btn-primary" href="/settings/support">
+          {t("support")}
+        </Link>
       </section>
     </div>
   );

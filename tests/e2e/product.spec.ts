@@ -224,3 +224,35 @@ test("public secondary pages and dark theme pass accessibility checks", async ({
   expect(result.violations).toEqual([]);
   await page.screenshot({ path: "test-results/home-dark.png", fullPage: true });
 });
+
+test("support requests are saved and administrator replies reach the requester", async ({
+  page,
+  browser,
+}) => {
+  const subject = `Placement help ${Date.now()}`;
+  await login(page, "advertiser", "/en/settings/support");
+  await page.getByLabel("Subject", { exact: true }).fill(subject);
+  await page
+    .getByLabel("Message", { exact: true })
+    .fill("Please explain where to check the placement installation status.");
+  await page.getByRole("button", { name: "Send request", exact: true }).click();
+  await expect(
+    page.getByRole("heading", { name: new RegExp(subject) }),
+  ).toBeVisible();
+  const admin = await browser.newPage();
+  await login(admin, "admin", "http://localhost:3059/en/admin/support");
+  const ticket = admin.locator("article").filter({ hasText: subject });
+  await ticket
+    .getByLabel("Reply from support", { exact: true })
+    .fill("Open your placements list to see the last installation request.");
+  await ticket.getByRole("button", { name: "Save reply", exact: true }).click();
+  await expect(ticket).toHaveCount(0);
+  await page.reload();
+  await expect(
+    page.getByText(
+      "Open your placements list to see the last installation request.",
+      { exact: true },
+    ),
+  ).toBeVisible();
+  await admin.close();
+});

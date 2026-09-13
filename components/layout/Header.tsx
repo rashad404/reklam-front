@@ -41,6 +41,7 @@ export default function Header() {
             ["/admin", "overview"],
             ["/admin/ads", "campaigns"],
             ["/admin/publishers", "site"],
+            ["/admin/support", "support"],
           ]
         : [
             ["/advertiser", "overview"],

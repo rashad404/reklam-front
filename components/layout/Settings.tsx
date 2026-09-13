@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { useAuth } from "@/hooks/useAuth";
 import { Gate, Notice } from "@/components/ui/product";
+import { Link } from "@/lib/navigation";
 import api from "@/lib/api/client";
 function Content() {
   const t = useTranslations("product");
@@ -36,6 +37,9 @@ function Content() {
   return (
     <div className="wrap page narrow stack">
       <h1>{t("settings")}</h1>
+      <Link href="/settings/support" className="btn-secondary">
+        {t("support")}
+      </Link>
       {error && <Notice error>{t("loadError")}</Notice>}
       <section className="card stack">
         <h2>{user?.name}</h2>

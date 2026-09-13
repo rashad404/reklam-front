@@ -17,7 +17,7 @@ export default function Footer() {
               {t(key)}
             </Link>
           ))}
-          <a href="mailto:info@reklam.biz">info@reklam.biz</a>
+          <Link href="/settings/support">{t("support")}</Link>
         </nav>
       </div>
     </footer>

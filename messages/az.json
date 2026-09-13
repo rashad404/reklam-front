@@ -339,14 +339,14 @@
     "title": "Məxfilik Siyasəti",
     "intro": "Bu məxfilik siyasəti Reklam.biz platformasının istifadəçilərinin məlumatlarının necə toplandığını, istifadə edildiyini və qorunduğunu izah edir.",
     "dataCollection": "Toplanan Məlumatlar",
-    "dataCollectionDesc": "Biz aşağıdakı məlumatları toplayırıq: ad, e-poçt ünvanı, telefon nömrəsi (Kimlik.az vasitəsilə), IP ünvanı, cihaz növü, brauzer məlumatları və sayt ziyarət statistikası.",
+    "dataCollectionDesc": "Biz aşağıdakı məlumatları toplayırıq: ad, e-poçt ünvanı, telefon nömrəsi (Kimlik.az vasitəsilə), IP ünvanı, cihaz növü, brauzer məlumatları və sayt ziyarət statistikası. Dəstək müraciətlərini və administrator cavablarını da saxlayırıq.",
     "dataUsage": "Məlumatların İstifadəsi",
     "dataUsageDesc": "Topladığımız məlumatlar hesab idarəçiliyi, reklam baxışi, statistika hesablanması, saxtakarlığın qarşısının alınması və xidmətin yaxşılaşdırılması üçün istifadə olunur.",
     "cookies": "Kukilər",
     "cookiesDesc": "Giriş tokeni və görünüş seçimi localStorage-da saxlanılır. Yeni kampaniyanın qaralaması göndərilənədək və ya vərəq bağlananadək sessionStorage-da qalır.",
     "thirdParty": "Üçüncü Tərəflər",
     "thirdPartyDesc": "Giriş üçün Kimlik.az istifadə olunur. Reklam açıldıqda brauzer şəkil serverinə, keçid zamanı isə reklamçının saytına sorğu göndərir. Hostinq infrastrukturu şəbəkə sorğularını emal edir.",
-    "contact": "Bu siyasət haqqında suallarınız üçün info@reklam.biz ünvanına yazın."
+    "contact": "Hesabınız, məxfilik və ya bu şərtlər haqqında sualınız varsa, hesabınızdan dəstək müraciəti göndərin."
   },
   "terms": {
     "title": "İstifadə Şərtləri",
@@ -366,7 +366,7 @@
     "publisher4": "Saxtakarlıq aşkar edilərsə hesab dayandırılacaq.",
     "fraudTitle": "Saxtakarlıq",
     "fraudDesc": "Süni klik və baxış yaratmaq, bot istifadəsi və hər hansı manipulyasiya ciddi şəkildə qadağandır. Belə hallar aşkar edildikdə hesab dərhal bağlanacaq.",
-    "contact": "Suallarınız üçün info@reklam.biz ünvanına yazın."
+    "contact": "Hesabınız, məxfilik və ya bu şərtlər haqqında sualınız varsa, hesabınızdan dəstək müraciəti göndərin."
   },
   "settings": {
     "title": "Parametrlər",
@@ -529,10 +529,24 @@
     "process3": "Trafiki izləyin",
     "process3Body": "Göstərim, klik və CTR göstəricilərinə tarix üzrə baxın. Lazım olduqda kampaniyanı və ya reklam sahəsini dayandırın.",
     "contact": "Sualınız var, yaxud uyğun olmayan reklam gördünüz?",
-    "contactBody": "Səhifənin ünvanını və məsələni info@reklam.biz ünvanına göndərin. Şifrə və giriş tokeni göndərməyin.",
+    "contactBody": "Hesabınızdan dəstək müraciəti göndərin. Səhifənin ünvanını qeyd edin və problemi təsvir edin. Şifrə və giriş tokeni göndərməyin.",
     "notFound": "Səhifə tapılmadı",
     "returnHome": "Ana səhifəyə keç",
     "localLogin": "Yerli yoxlama girişi",
-    "textFormat": "Mətn reklamı"
+    "textFormat": "Mətn reklamı",
+    "support": "Dəstək müraciətləri",
+    "supportHelp": "Problemi təsvir edin və səhifənin ünvanını qeyd edin. Cavabı hesabınızda, bu səhifədə görə bilərsiniz. Şifrə və giriş tokeni göndərməyin.",
+    "supportAdminHelp": "Müraciətləri oxuyun və istifadəçiyə cavab yazın. Cavab istifadəçinin müraciətlər tarixçəsində görünür.",
+    "supportSubject": "Mövzu",
+    "supportMessage": "Müraciətiniz",
+    "supportSend": "Müraciət göndər",
+    "supportHistory": "Müraciətləriniz",
+    "supportReply": "Dəstək komandasının cavabı",
+    "supportSaveReply": "Cavabı yadda saxla",
+    "supportSaved": "Yadda saxlanıldı. Müraciəti aşağıda izləyə bilərsiniz.",
+    "open": "Açıq",
+    "answered": "Cavablandırılıb",
+    "closed": "Bağlanıb",
+    "status": "Status"
   }
 }
