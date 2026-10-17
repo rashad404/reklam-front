@@ -39,17 +39,21 @@ export async function openWalletLogin({
       ? window.open("about:blank", "reklam-login", "width=460,height=640")
       : null;
   try {
-    if (!crypto.subtle) throw Error("secure_context_required");
     const verifier = base64(crypto.getRandomValues(new Uint8Array(32))),
       state = base64(crypto.getRandomValues(new Uint8Array(24)));
-    const challenge = base64(
-      new Uint8Array(
-        await crypto.subtle.digest(
-          "SHA-256",
-          new TextEncoder().encode(verifier),
-        ),
-      ),
-    );
+    // crypto.subtle exists only in secure contexts (HTTPS or localhost).
+    // Plain HTTP development hosts such as a Tailscale IP fall back to plain PKCE.
+    const method = crypto.subtle ? "S256" : "plain";
+    const challenge = crypto.subtle
+      ? base64(
+          new Uint8Array(
+            await crypto.subtle.digest(
+              "SHA-256",
+              new TextEncoder().encode(verifier),
+            ),
+          ),
+        )
+      : verifier;
     localStorage.setItem("wallet_code_verifier", verifier);
     localStorage.setItem("wallet_oauth_state", state);
     localStorage.setItem("wallet_oauth_time", String(Date.now()));
@@ -64,7 +68,7 @@ export async function openWalletLogin({
       scope: "profile:name profile:email profile:phone verification:read",
       state,
       code_challenge: challenge,
-      code_challenge_method: "S256",
+      code_challenge_method: method,
       response_type: "code",
     });
     const url = `${wallet}/${locale}/oauth/authorize?${params}`;

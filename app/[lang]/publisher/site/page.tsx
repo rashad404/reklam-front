@@ -76,27 +76,23 @@ function Content() {
               </button>
             )}
           </section>
-          <section className="card stack">
-            <h2>{t("verification")}</h2>
-            {site.data.verified_at ? (
-              <Notice>{t("verified")}</Notice>
-            ) : (
-              <>
-                <p>{t("verificationHelp")}</p>
-                <pre>
-                  TXT _reklam.{new URL(site.data.website_url).hostname}
-                  {"\n"}reklam-verification={site.data.verification_token}
-                </pre>
-                <button
-                  className="btn-primary"
-                  disabled={busy}
-                  onClick={() => action("/publisher/verify")}
-                >
-                  {busy ? t("loading") : t("verify")}
-                </button>
-              </>
-            )}
-          </section>
+          {!site.data.verified_at && (
+            <section className="card stack">
+              <h2>{t("verification")}</h2>
+              <p>{t("verificationHelp")}</p>
+              <pre>
+                TXT _reklam.{new URL(site.data.website_url).hostname}
+                {"\n"}reklam-verification={site.data.verification_token}
+              </pre>
+              <button
+                className="btn-primary"
+                disabled={busy}
+                onClick={() => action("/publisher/verify")}
+              >
+                {busy ? t("loading") : t("verify")}
+              </button>
+            </section>
+          )}
           <Link className="btn-secondary" href="/publisher/ad-units/create">
             {t("createPlacement")}
           </Link>

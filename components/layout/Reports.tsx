@@ -157,7 +157,10 @@ function Content({ endpoint }: { endpoint: string }) {
           </>
         )
       )}
-      <Notice>{t("metricHelp")}</Notice>
+      <details className="muted text-sm">
+        <summary>{t("metricHelpTitle")}</summary>
+        <p>{t("metricHelp")}</p>
+      </details>
     </div>
   );
 }

@@ -156,15 +156,20 @@ function Campaigns() {
                 {t("archive")}
               </button>
             </div>
+            {c.status !== "active" &&
+              !c.ads.some((a) => a.status === "approved") && (
+                <p className="muted text-sm">
+                  {t(
+                    c.ads.length ? "activateNeedsApproval" : "activateNeedsAd",
+                  )}
+                </p>
+              )}
           </article>
         ))
       )}
       {data.data && (
         <Pager page={page} total={data.data.last_page} onChange={setPage} />
       )}
-      <Notice>
-        {t("reviewHint")} {t("deliveryHint")}
-      </Notice>
     </div>
   );
 }

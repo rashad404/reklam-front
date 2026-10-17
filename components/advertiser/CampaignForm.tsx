@@ -415,7 +415,6 @@ export default function CampaignForm({ campaignId }: { campaignId?: number }) {
             </div>
           </div>
           <p className="text-sm">{t("previewHint")}</p>
-          <Notice>{t("deliveryHint")}</Notice>
         </aside>
       </div>
     </div>
