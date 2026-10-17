@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/product";
 import { useResource } from "@/hooks/useResource";
 import { useAuth } from "@/hooks/useAuth";
+import type { Site } from "@/components/publisher/site";
 interface Overview {
   impressions: number;
   clicks: number;
@@ -32,6 +33,8 @@ interface Item {
   ad_format?: string;
   last_seen_at?: string | null;
   ads?: { id: number; ad_format: string; status?: string }[];
+  host?: string;
+  ad_units_count?: number;
   impressions_count?: number;
   clicks_count?: number;
 }
@@ -44,36 +47,47 @@ function Content({ role }: { role: "advertiser" | "publisher" }) {
   const overview = useResource<Overview>(
     registered ? `/${role}/dashboard` : null,
   );
-  const items = useResource<{ data: Item[]; total: number }>(
-    registered ? (publisher ? "/ad-units?page=1" : "/campaigns?page=1") : null,
+  const campaigns = useResource<{ data: Item[]; total: number }>(
+    registered && !publisher ? "/campaigns?page=1" : null,
   );
+  // Publishers work site by site; the list endpoint is empty before the first site.
+  const sites = useResource<Site[]>(publisher ? "/sites" : null);
+  const items = publisher ? sites : campaigns;
   const numbers = new Intl.NumberFormat(locale, { maximumFractionDigits: 2 });
-  const list = items.data?.data ?? [],
-    total = items.data?.total ?? 0,
+  const siteList = sites.data ?? [],
+    list: Item[] = publisher ? siteList : (campaigns.data?.data ?? []),
+    total = publisher ? siteList.length : (campaigns.data?.total ?? 0),
     stats = overview.data;
-  const site = user?.publisher;
+  const firstSite = siteList[0],
+    sitePath = firstSite
+      ? `/publisher/sites/${firstSite.id}`
+      : "/publisher/sites";
   const steps = publisher
     ? [
-        { done: !!site, label: "stepRegisterSite", href: "/publisher/site" },
-        {
-          done: site?.status === "approved",
-          label: "stepSiteApproved",
-          href: "/publisher/site",
-        },
-        {
-          done: !!site?.verified_at,
-          label: "stepVerifySite",
-          href: "/publisher/site",
-        },
         {
           done: total > 0,
-          label: "stepCreatePlacement",
-          href: "/publisher/ad-units/create",
+          label: "stepRegisterSite",
+          href: "/publisher/sites",
         },
         {
-          done: list.some((u) => u.last_seen_at),
+          done: siteList.some((s) => !!s.verified_at),
+          label: "stepVerifySite",
+          href: sitePath,
+        },
+        {
+          done: siteList.some((s) => s.status === "approved"),
+          label: "stepSiteApproved",
+          href: sitePath,
+        },
+        {
+          done: siteList.some((s) => (s.ad_units_count ?? 0) > 0),
+          label: "stepCreatePlacement",
+          href: `/publisher/ad-units/create${firstSite ? `?site=${firstSite.id}` : ""}`,
+        },
+        {
+          done: siteList.some((s) => !!s.last_seen_at),
           label: "stepInstallCode",
-          href: "/publisher/ad-units",
+          href: sitePath,
         },
       ]
     : [
@@ -150,15 +164,13 @@ function Content({ role }: { role: "advertiser" | "publisher" }) {
         <section className="list" aria-labelledby="recent-heading">
           <div className="list-toolbar">
             <h2 id="recent-heading">
-              {t(publisher ? "placements" : "campaigns")}
+              {t(publisher ? "sites" : "campaigns")}
               {total > 0 && <span className="count">{total}</span>}
             </h2>
             {total > 0 && (
               <Link
                 className="text-link"
-                href={
-                  publisher ? "/publisher/ad-units" : "/advertiser/campaigns"
-                }
+                href={publisher ? "/publisher/sites" : "/advertiser/campaigns"}
               >
                 {t("viewAll")}
                 <ArrowRight size={16} />
@@ -175,25 +187,17 @@ function Content({ role }: { role: "advertiser" | "publisher" }) {
             </p>
           ) : !list.length ? (
             <div className="list-empty">
-              <p>{t(publisher ? "noPlacementsBody" : "noCampaignsShort")}</p>
+              <p>{t(publisher ? "noSitesBody" : "noCampaignsShort")}</p>
               <Link
                 className="btn-secondary btn-sm"
                 href={
                   publisher
-                    ? site
-                      ? "/publisher/ad-units/create"
-                      : "/publisher/site"
+                    ? "/publisher/sites"
                     : "/advertiser/campaigns/create"
                 }
               >
                 <Plus size={16} />
-                {t(
-                  publisher
-                    ? site
-                      ? "createPlacement"
-                      : "registerSite"
-                    : "createCampaign",
-                )}
+                {t(publisher ? "addSite" : "createCampaign")}
               </Link>
             </div>
           ) : (
@@ -203,15 +207,20 @@ function Content({ role }: { role: "advertiser" | "publisher" }) {
                 key={item.id}
                 href={
                   publisher
-                    ? `/publisher/stats?unit=${item.id}`
+                    ? `/publisher/sites/${item.id}`
                     : `/advertiser/stats/${item.id}`
                 }
               >
                 <span className="list-main">
                   <span className="list-title">{item.name}</span>
                   <span className="recent-formats">
-                    {publisher && item.ad_format ? (
-                      <FormatGlyph format={item.ad_format} />
+                    {publisher ? (
+                      <span className="list-sub">
+                        {item.host} ·{" "}
+                        {t("placementCount", {
+                          count: item.ad_units_count ?? 0,
+                        })}
+                      </span>
                     ) : (
                       [...new Set(item.ads?.map((a) => a.ad_format))].map(
                         (f) => <FormatGlyph format={f} key={f} />,
@@ -291,7 +300,7 @@ function Content({ role }: { role: "advertiser" | "publisher" }) {
             </nav>
           ) : null}
           {publisher && (
-            <PublisherOffer compact offer={site?.commission_offer} />
+            <PublisherOffer compact offer={user?.publisher?.commission_offer} />
           )}
         </aside>
       </div>

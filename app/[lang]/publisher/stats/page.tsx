@@ -2,8 +2,13 @@ import Reports from "@/components/layout/Reports";
 export default async function Page({
   searchParams,
 }: {
-  searchParams: Promise<{ unit?: string }>;
+  searchParams: Promise<{ site?: string; unit?: string }>;
 }) {
-  const { unit } = await searchParams;
-  return <Reports scope="publisher" selected={Number(unit) || null} />;
+  const { site, unit } = await searchParams;
+  const selected = Number(unit)
+    ? `unit:${Number(unit)}`
+    : Number(site)
+      ? `site:${Number(site)}`
+      : "";
+  return <Reports scope="publisher" selected={selected} />;
 }

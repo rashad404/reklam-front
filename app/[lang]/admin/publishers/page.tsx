@@ -1,4 +1,4 @@
 import Admin from "@/components/layout/Admin";
 export default function Page() {
-  return <Admin kind="publishers" />;
+  return <Admin kind="sites" />;
 }

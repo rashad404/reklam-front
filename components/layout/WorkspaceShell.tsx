@@ -26,17 +26,27 @@ import { Link, usePathname, useRouter } from "@/lib/navigation";
 import { useAuth } from "@/hooks/useAuth";
 import api from "@/lib/api/client";
 export type WorkspaceRole = "advertiser" | "publisher" | "admin";
-const tabs = {
+type Tab = {
+  href: string;
+  label: string;
+  icon: typeof Globe2;
+  also?: string;
+};
+const tabs: Record<WorkspaceRole, Tab[]> = {
   publisher: [
     { href: "/publisher", label: "overview", icon: LayoutDashboard },
-    { href: "/publisher/site", label: "site", icon: Globe2 },
-    { href: "/publisher/ad-units", label: "placements", icon: PanelsTopLeft },
+    {
+      href: "/publisher/sites",
+      label: "sites",
+      icon: Globe2,
+      also: "/publisher/ad-units",
+    },
     { href: "/publisher/stats", label: "reports", icon: BarChart3 },
   ],
   admin: [
     { href: "/admin", label: "overview", icon: LayoutDashboard },
     { href: "/admin/ads", label: "campaigns", icon: Megaphone },
-    { href: "/admin/publishers", label: "site", icon: ShieldCheck },
+    { href: "/admin/publishers", label: "sites", icon: ShieldCheck },
     { href: "/admin/support", label: "support", icon: LifeBuoy },
   ],
   advertiser: [
@@ -172,14 +182,15 @@ export default function WorkspaceShell({ role }: { role: WorkspaceRole }) {
           </div>
         )}
         <nav className="ws-nav" aria-label={t("menu")}>
-          {tabs[role].map(({ href, label, icon: Icon }) => (
+          {tabs[role].map(({ href, label, icon: Icon, ...tab }) => (
             <Link
               key={href}
               href={href}
               onClick={close}
               aria-current={
                 path === href ||
-                (href !== `/${role}` && path.startsWith(href + "/"))
+                (href !== `/${role}` && path.startsWith(href + "/")) ||
+                (!!tab.also && path.startsWith(tab.also))
                   ? "page"
                   : undefined
               }

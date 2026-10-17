@@ -8,8 +8,9 @@ import AdPreview, { type Creative } from "@/components/advertiser/AdPreview";
 import { Link } from "@/lib/navigation";
 interface Entry extends Creative {
   id: number;
-  website_name?: string;
-  website_url?: string;
+  name?: string;
+  url?: string;
+  publisher?: { user?: { name: string; email: string } };
   verified_at?: string;
   status: string;
   user?: { name: string; email: string };
@@ -18,7 +19,7 @@ interface Entry extends Creative {
     advertiser?: { user?: { name: string; email: string } };
   };
 }
-function Queue({ kind }: { kind: "ads" | "publishers" }) {
+function Queue({ kind }: { kind: "ads" | "sites" }) {
   const t = useTranslations("product");
   const [status, setStatus] = useState("pending"),
     [page, setPage] = useState(1),
@@ -46,14 +47,14 @@ function Queue({ kind }: { kind: "ads" | "publishers" }) {
   return (
     <div className="wrap page stack">
       <h1>
-        {t("admin")}: {t(kind === "ads" ? "campaigns" : "site")}
+        {t("admin")}: {t(kind === "ads" ? "campaigns" : "sites")}
       </h1>
       <div className="row">
         {[
           "pending",
           "approved",
           "rejected",
-          ...(kind === "publishers" ? ["suspended"] : []),
+          ...(kind === "sites" ? ["suspended"] : []),
         ].map((s) => (
           <button
             className={status === s ? "btn-primary" : "btn-secondary"}
@@ -79,9 +80,7 @@ function Queue({ kind }: { kind: "ads" | "publishers" }) {
         data.data.data.map((entry) => (
           <article className="card stack" key={entry.id}>
             <div className="row between">
-              <h2>
-                {entry.website_name || entry.campaign?.name || entry.title}
-              </h2>
+              <h2>{entry.name || entry.campaign?.name || entry.title}</h2>
               <Status value={entry.status} />
             </div>
             {kind === "ads" ? (
@@ -94,8 +93,8 @@ function Queue({ kind }: { kind: "ads" | "publishers" }) {
               </div>
             ) : (
               <>
-                <p>{entry.website_url}</p>
-                <p>{entry.user?.email}</p>
+                <p className="break-all">{entry.url}</p>
+                <p>{entry.publisher?.user?.email}</p>
                 <Notice>
                   {t(entry.verified_at ? "verified" : "verification")}
                 </Notice>
@@ -116,8 +115,7 @@ function Queue({ kind }: { kind: "ads" | "publishers" }) {
               <button
                 className="btn-primary"
                 disabled={
-                  busy === entry.id ||
-                  (kind === "publishers" && !entry.verified_at)
+                  busy === entry.id || (kind === "sites" && !entry.verified_at)
                 }
                 onClick={() => decide(entry.id, "approved")}
               >
@@ -133,7 +131,7 @@ function Queue({ kind }: { kind: "ads" | "publishers" }) {
               >
                 {t("reject")}
               </button>
-              {kind === "publishers" && (
+              {kind === "sites" && (
                 <button
                   className="btn-secondary"
                   disabled={
@@ -168,7 +166,7 @@ function Overview() {
       ) : (
         <div className="metrics">
           {[
-            ["site", "total_publishers"],
+            ["sites", "total_sites"],
             ["advertiser", "total_advertisers"],
             ["impressions", "total_impressions"],
             ["clicks", "total_clicks"],
@@ -188,15 +186,15 @@ function Overview() {
           </p>
         </Link>
         <Link className="card stack" href="/admin/publishers">
-          <h2>{t("site")}</h2>
+          <h2>{t("sites")}</h2>
           <p>
-            {t("pending")}: {data.data?.pending_publishers ?? "-"}
+            {t("pending")}: {data.data?.pending_sites ?? "-"}
           </p>
         </Link>
       </div>
     </div>
   );
 }
-export default function Admin({ kind }: { kind?: "ads" | "publishers" }) {
+export default function Admin({ kind }: { kind?: "ads" | "sites" }) {
   return <Gate admin>{kind ? <Queue kind={kind} /> : <Overview />}</Gate>;
 }

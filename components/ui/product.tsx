@@ -20,12 +20,12 @@ export function Notice({
     </div>
   );
 }
-export function Status({ value }: { value: string }) {
+export function Status({ value, label }: { value: string; label?: string }) {
   const t = useTranslations("product");
   return (
     <span className={`badge badge-${value}`}>
       <span className="badge-dot" aria-hidden="true" />
-      {t.has(value) ? t(value) : value}
+      {label ?? (t.has(value) ? t(value) : value)}
     </span>
   );
 }

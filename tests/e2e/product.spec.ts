@@ -133,6 +133,7 @@ test("publisher creates placement and reads installation code", async ({
     .getByRole("combobox", { name: "Format", exact: true })
     .selectOption("text");
   await page.getByRole("button", { name: "Save changes", exact: true }).click();
+  await expect(page).toHaveURL(/\/publisher\/sites\/\d+$/);
   const record = page
     .getByRole("article")
     .filter({

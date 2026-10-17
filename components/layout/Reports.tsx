@@ -34,6 +34,7 @@ function bakuDate(daysAgo: number) {
 interface Option {
   id: number;
   name: string;
+  site_id?: number | null;
 }
 // The list endpoints paginate by 20; the selector needs every item.
 function useAllItems(url: string) {
@@ -61,7 +62,7 @@ function Content({
   initial,
 }: {
   scope: "advertiser" | "publisher";
-  initial: number | null;
+  initial: string;
 }) {
   const t = useTranslations("product"),
     locale = useLocale();
@@ -80,27 +81,36 @@ function Content({
     setSelected(initial);
   }
   const options = useAllItems(publisher ? "/ad-units" : "/campaigns");
-  const endpoint = selected
-    ? publisher
-      ? `/stats/ad-unit/${selected}`
-      : `/stats/campaign/${selected}`
-    : `/stats/${scope}`;
+  const sites = useResource<Option[]>(publisher ? "/sites" : null);
+  // A selection is "", "campaign:ID", "site:ID" or "unit:ID".
+  const [kind, rawId] = selected.split(":");
+  const id = Number(rawId) || null;
+  const endpoint = !id
+    ? `/stats/${scope}`
+    : kind === "site"
+      ? `/stats/site/${id}`
+      : kind === "unit"
+        ? `/stats/ad-unit/${id}`
+        : `/stats/campaign/${id}`;
   const data = useResource<Report>(
     `${endpoint}?from=${range.from}&to=${range.to}`,
   );
-  const subject = options.find((o) => o.id === selected);
+  const subject = (kind === "site" ? (sites.data ?? []) : options).find(
+    (o) => o.id === id,
+  );
   function select(value: string) {
-    const id = value ? Number(value) : null;
-    setSelected(id);
+    setSelected(value);
+    const [nextKind, nextId] = value.split(":");
     // Keep the address shareable without remounting the report.
     const url = new URL(window.location.href);
     if (publisher) {
-      if (id) url.searchParams.set("unit", String(id));
-      else url.searchParams.delete("unit");
+      url.searchParams.delete("site");
+      url.searchParams.delete("unit");
+      if (nextId) url.searchParams.set(nextKind, nextId);
     } else {
       url.pathname = url.pathname.replace(
         /\/stats(\/\d+)?$/,
-        id ? `/stats/${id}` : "/stats",
+        nextId ? `/stats/${nextId}` : "/stats",
       );
     }
     window.history.replaceState(null, "", url);
@@ -133,30 +143,40 @@ function Content({
     <div className="wrap page stack">
       <header className="report-head">
         <div>
-          {selected && <p className="eyebrow">{t("reports")}</p>}
-          <h1>{(selected && subject?.name) || t("reports")}</h1>
+          {id && <p className="eyebrow">{t("reports")}</p>}
+          <h1>{(id && subject?.name) || t("reports")}</h1>
           <p className="text-sm">{period}</p>
         </div>
         <div className="report-controls">
           <label className="select-field report-filter">
             <span className="sr-only">
-              {t(publisher ? "placementColumn" : "campaignColumn")}
+              {t(publisher ? "siteColumn" : "campaignColumn")}
             </span>
-            <select
-              value={selected ?? ""}
-              onChange={(e) => select(e.target.value)}
-            >
+            <select value={selected} onChange={(e) => select(e.target.value)}>
               <option value="">
-                {t(publisher ? "allPlacements" : "allCampaigns")}
+                {t(publisher ? "allSites" : "allCampaigns")}
               </option>
-              {selected && !subject && (
-                <option value={selected}>#{selected}</option>
-              )}
-              {options.map((o) => (
-                <option key={o.id} value={o.id}>
-                  {o.name}
-                </option>
-              ))}
+              {id && !subject && <option value={selected}>#{id}</option>}
+              {publisher
+                ? (sites.data ?? []).map((site) => (
+                    <optgroup label={site.name} key={site.id}>
+                      <option value={`site:${site.id}`}>
+                        {t("wholeSite", { name: site.name })}
+                      </option>
+                      {options
+                        .filter((o) => o.site_id === site.id)
+                        .map((o) => (
+                          <option key={o.id} value={`unit:${o.id}`}>
+                            {o.name}
+                          </option>
+                        ))}
+                    </optgroup>
+                  ))
+                : options.map((o) => (
+                    <option key={o.id} value={`campaign:${o.id}`}>
+                      {o.name}
+                    </option>
+                  ))}
             </select>
           </label>
           <div className="range-picker" role="group" aria-label={t("period")}>
@@ -375,10 +395,10 @@ function Content({
 }
 export default function Reports({
   scope,
-  selected = null,
+  selected = "",
 }: {
   scope: "advertiser" | "publisher";
-  selected?: number | null;
+  selected?: string;
 }) {
   return (
     <Gate>
