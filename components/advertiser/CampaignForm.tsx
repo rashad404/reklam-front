@@ -6,6 +6,7 @@ import { useAuth } from "@/hooks/useAuth";
 import api from "@/lib/api/client";
 import { Notice, Failure } from "@/components/ui/product";
 import AdPreview, { type Creative } from "./AdPreview";
+import { uuid } from "@/lib/utils/id";
 const sizes = ["300x250", "728x90", "320x50"];
 interface Form {
   name: string;
@@ -49,7 +50,7 @@ export default function CampaignForm({ campaignId }: { campaignId?: number }) {
   const draftKey = `reklam-draft:${user?.id}:${campaignId || "new"}`;
   useEffect(() => {
     let alive = true;
-    key.current = crypto.randomUUID();
+    key.current = uuid();
     async function load() {
       try {
         if (campaignId) {

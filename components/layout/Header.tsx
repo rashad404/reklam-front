@@ -12,18 +12,15 @@ import {
   ChevronDown,
   Megaphone,
   PanelsTopLeft,
-  LayoutDashboard,
-  BarChart3,
-  Globe2,
   Settings2,
-  LifeBuoy,
-  Layers3,
   ShieldCheck,
 } from "lucide-react";
 import { Link, usePathname, useRouter } from "@/lib/navigation";
 import { useAuth } from "@/hooks/useAuth";
 import { openWalletLogin } from "@/lib/utils/walletAuth";
 import api from "@/lib/api/client";
+import WorkspaceShell from "@/components/layout/WorkspaceShell";
+import type { WorkspaceRole } from "@/components/layout/WorkspaceShell";
 export default function Header() {
   const t = useTranslations("product"),
     locale = useLocale(),
@@ -36,7 +33,7 @@ export default function Header() {
   const workspace =
     !!isAuthenticated &&
     /^\/(advertiser|publisher|settings|admin)(\/|$)/.test(path);
-  const role = path.startsWith("/publisher")
+  const role: WorkspaceRole = path.startsWith("/publisher")
     ? "publisher"
     : path.startsWith("/admin")
       ? "admin"
@@ -46,34 +43,6 @@ export default function Header() {
     ["/for-publishers", "navPublishers"],
     ["/ad-formats", "formats"],
   ];
-  const tabs =
-    role === "publisher"
-      ? [
-          { href: "/publisher", label: "overview", icon: LayoutDashboard },
-          { href: "/publisher/site", label: "site", icon: Globe2 },
-          {
-            href: "/publisher/ad-units",
-            label: "placements",
-            icon: PanelsTopLeft,
-          },
-          { href: "/publisher/stats", label: "reports", icon: BarChart3 },
-        ]
-      : role === "admin"
-        ? [
-            { href: "/admin", label: "overview", icon: LayoutDashboard },
-            { href: "/admin/ads", label: "campaigns", icon: Megaphone },
-            { href: "/admin/publishers", label: "site", icon: ShieldCheck },
-            { href: "/admin/support", label: "support", icon: LifeBuoy },
-          ]
-        : [
-            { href: "/advertiser", label: "overview", icon: LayoutDashboard },
-            {
-              href: "/advertiser/campaigns",
-              label: "campaigns",
-              icon: Megaphone,
-            },
-            { href: "/advertiser/stats", label: "reports", icon: BarChart3 },
-          ];
   async function login() {
     setError(false);
     await openWalletLogin({ locale, onError: () => setError(true) });
@@ -88,12 +57,13 @@ export default function Header() {
       setError(true);
     }
   }
+  if (workspace) return <WorkspaceShell role={role} />;
   return (
     <>
       <a className="skip" href="#main-content">
         {t("skip")}
       </a>
-      <header className={`site-header ${workspace ? "workspace-header" : ""}`}>
+      <header className="site-header">
         <div className="wrap header-inner">
           <Link href="/" aria-label="Reklam.biz" className="brand-link">
             <Image
@@ -113,24 +83,17 @@ export default function Header() {
               height={32}
             />
           </Link>
-          {workspace ? (
-            <div className="workspace-breadcrumb">
-              <span className="breadcrumb-slash">/</span>
-              {t(role)}
-            </div>
-          ) : (
-            <nav className="header-nav" aria-label={t("menu")}>
-              {links.map(([href, key]) => (
-                <Link
-                  href={href}
-                  key={href}
-                  aria-current={path === href ? "page" : undefined}
-                >
-                  {t(key)}
-                </Link>
-              ))}
-            </nav>
-          )}
+          <nav className="header-nav" aria-label={t("menu")}>
+            {links.map(([href, key]) => (
+              <Link
+                href={href}
+                key={href}
+                aria-current={path === href ? "page" : undefined}
+              >
+                {t(key)}
+              </Link>
+            ))}
+          </nav>
           <div className="header-actions">
             <select
               className="language"
@@ -229,58 +192,6 @@ export default function Header() {
         <div className="wrap notice error" role="alert">
           {t("loadError")}
         </div>
-      )}
-      {workspace && (
-        <aside className="workspace-nav" aria-label={t(role)}>
-          <div className="workspace-switch">
-            <Link
-              href="/advertiser"
-              aria-current={role === "advertiser" ? "page" : undefined}
-            >
-              <Megaphone size={17} />
-              {t("navAdvertisers")}
-            </Link>
-            <Link
-              href="/publisher"
-              aria-current={role === "publisher" ? "page" : undefined}
-            >
-              <PanelsTopLeft size={17} />
-              {t("navPublishers")}
-            </Link>
-          </div>
-          <div className="sidebar-label">{t(role)}</div>
-          <nav className="workspace-tabs" aria-label={t("menu")}>
-            {tabs.map(({ href, label, icon: Icon }) => (
-              <Link
-                key={href}
-                href={href}
-                aria-current={
-                  path === href ||
-                  (href !== `/${role}` && path.startsWith(href + "/"))
-                    ? "page"
-                    : undefined
-                }
-              >
-                <Icon size={19} />
-                <span>{t(label)}</span>
-              </Link>
-            ))}
-          </nav>
-          <nav className="workspace-bottom" aria-label={t("help")}>
-            <Link href="/settings">
-              <Settings2 size={19} />
-              {t("settings")}
-            </Link>
-            <Link href="/settings/support">
-              <LifeBuoy size={19} />
-              {t("support")}
-            </Link>
-            <Link href="/ad-formats">
-              <Layers3 size={19} />
-              {t("formats")}
-            </Link>
-          </nav>
-        </aside>
       )}
     </>
   );

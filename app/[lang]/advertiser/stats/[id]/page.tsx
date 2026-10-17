@@ -5,5 +5,5 @@ export default async function Page({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  return <Reports endpoint={`/stats/campaign/${Number(id)}`} />;
+  return <Reports scope="advertiser" selected={Number(id) || null} />;
 }

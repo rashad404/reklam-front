@@ -1,10 +1,21 @@
 "use client";
 import { useState } from "react";
-import { useTranslations } from "next-intl";
-import { Gate, Notice, Failure, Pager, Status } from "@/components/ui/product";
+import { useLocale, useTranslations } from "next-intl";
+import { Code2, Copy, Check, Plus } from "lucide-react";
+import {
+  Gate,
+  Notice,
+  Failure,
+  Pager,
+  Status,
+  PageHead,
+  FormatGlyph,
+  RowMenu,
+} from "@/components/ui/product";
 import { useResource } from "@/hooks/useResource";
 import { useAuth } from "@/hooks/useAuth";
-import { Link } from "@/lib/navigation";
+import { Link, useRouter } from "@/lib/navigation";
+import { formatDate } from "@/lib/utils/date";
 import api from "@/lib/api/client";
 interface Unit {
   id: number;
@@ -13,9 +24,20 @@ interface Unit {
   status: string;
   website_url: string;
   last_seen_at: string | null;
+  impressions_count?: number;
+  clicks_count?: number;
+}
+function host(url: string) {
+  try {
+    return new URL(url).hostname.replace(/^www\./, "");
+  } catch {
+    return url;
+  }
 }
 function Content() {
   const t = useTranslations("product"),
+    locale = useLocale(),
+    router = useRouter(),
     { user } = useAuth();
   const [page, setPage] = useState(1),
     [error, setError] = useState(false),
@@ -24,15 +46,22 @@ function Content() {
     [copied, setCopied] = useState(false),
     [copyError, setCopyError] = useState(false),
     [editing, setEditing] = useState<number | null>(null);
-  const data = useResource<{ data: Unit[]; last_page: number }>(
-    user?.publisher ? `/ad-units?page=${page}` : null,
-  );
+  const data = useResource<{
+    data: Unit[];
+    last_page: number;
+    total: number;
+  }>(user?.publisher ? `/ad-units?page=${page}` : null);
+  const numbers = new Intl.NumberFormat(locale);
   async function action(u: Unit, kind: string, name?: string) {
     if (kind === "archive" && !confirm(t("archiveConfirm"))) return;
     setBusy(u.id);
     setError(false);
     try {
       if (kind === "code") {
+        if (code?.id === u.id) {
+          setCode(null);
+          return;
+        }
         const r = await api.get(`/ad-units/${u.id}/code`);
         setCode({ id: u.id, text: r.data.data.embed_code });
         setCopied(false);
@@ -61,118 +90,183 @@ function Content() {
   }
   return (
     <div className="wrap page stack">
-      <div className="row between">
-        <h1>{t("placements")}</h1>
+      <PageHead
+        eyebrow={t("rolePublisher")}
+        title={t("placements")}
+        description={t("placementsIntro")}
+      >
         <Link className="btn-primary" href="/publisher/ad-units/create">
+          <Plus size={17} />
           {t("createPlacement")}
         </Link>
-      </div>
+      </PageHead>
       {error && <Notice error>{t("saveError")}</Notice>}
       {!user?.publisher ? (
-        <div className="card empty">
+        <div className="empty-state">
+          <div className="empty-formats" aria-hidden="true">
+            <span className="f300" />
+            <span className="f728" />
+            <span className="f320" />
+          </div>
+          <h2>{t("noSiteTitle")}</h2>
           <p>{t("noPlacements")}</p>
           <Link href="/publisher/site" className="btn-primary">
-            {t("site")}
+            {t("registerSite")}
           </Link>
         </div>
       ) : data.error ? (
         <Failure retry={data.retry} />
       ) : data.loading ? (
-        <p>{t("loading")}</p>
+        <p role="status">{t("loading")}</p>
       ) : !data.data?.data.length ? (
-        <div className="card empty">
+        <div className="empty-state">
+          <div className="empty-formats" aria-hidden="true">
+            <span className="f300" />
+            <span className="f728" />
+            <span className="f320" />
+          </div>
+          <h2>{t("noPlacementsTitle")}</h2>
           <p>{t("noPlacements")}</p>
+          <Link href="/publisher/ad-units/create" className="btn-primary">
+            <Plus size={17} />
+            {t("createPlacement")}
+          </Link>
         </div>
       ) : (
-        data.data.data.map((u) => (
-          <article className="record" key={u.id}>
-            <div className="row between">
-              <h2>{u.name}</h2>
-              <Status value={u.status} />
-            </div>
-            <p>
-              {u.ad_format.replace("banner_", "")} - {u.website_url}
-            </p>
-            <p className="text-sm">
-              {t(u.last_seen_at ? "installed" : "notInstalled")}
-            </p>
-            <div className="row">
-              <button
-                className="btn-primary"
-                disabled={busy === u.id}
-                onClick={() => action(u, "code")}
-              >
-                {t("embed")}
-              </button>
-              <button
-                className="btn-secondary"
-                disabled={busy === u.id}
-                onClick={() =>
-                  action(u, u.status === "active" ? "paused" : "active")
-                }
-              >
-                {t(u.status === "active" ? "pause" : "activate")}
-              </button>
-              <button
-                className="btn-secondary"
-                onClick={() => setEditing(editing === u.id ? null : u.id)}
-              >
-                {t("edit")}
-              </button>
-              <Link
-                className="btn-secondary"
-                href={`/publisher/stats?unit=${u.id}`}
-              >
-                {t("reports")}
-              </Link>
-              <button
-                className="btn-quiet"
-                disabled={busy === u.id}
-                onClick={() => action(u, "archive")}
-              >
-                {t("archive")}
-              </button>
-            </div>
-            {editing === u.id && (
-              <form
-                className="row"
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  const fd = new FormData(e.currentTarget);
-                  void action(u, "edit", String(fd.get("name")));
-                }}
-              >
-                <label className="field grow">
-                  {t("name")}
-                  <input
-                    name="name"
-                    required
-                    maxLength={120}
-                    defaultValue={u.name}
-                  />
-                </label>
-                <button className="btn-primary" disabled={busy === u.id}>
-                  {t("save")}
-                </button>
-              </form>
-            )}
-            {code?.id === u.id && (
-              <section className="stack">
-                <h3>{t("embed")}</h3>
-                <p>{t("embedHelp")}</p>
-                <pre>{code.text}</pre>
-                {copyError && <Notice error>{t("copyFailed")}</Notice>}
-                <div>
-                  <button className="btn-secondary" onClick={copy}>
-                    {t(copied ? "copied" : "copy")}
-                  </button>
+        <section className="list" aria-label={t("placements")}>
+          <div className="list-head units-grid" aria-hidden="true">
+            <span>{t("placementColumn")}</span>
+            <span>{t("format")}</span>
+            <span>{t("status")}</span>
+            <span className="num">{t("trafficTotal")}</span>
+            <span />
+          </div>
+          {data.data.data.map((u) => (
+            <article className="list-row" key={u.id}>
+              <div className="units-grid">
+                <div className="list-main">
+                  <h2 className="list-title">{u.name}</h2>
+                  <span className="list-sub">{host(u.website_url)}</span>
                 </div>
-              </section>
-            )}
-          </article>
-        ))
+                <div className="list-cell">
+                  <FormatGlyph format={u.ad_format} />
+                </div>
+                <div className="list-cell list-status">
+                  <Status value={u.status} />
+                  <span className={`signal ${u.last_seen_at ? "on" : ""}`}>
+                    {u.last_seen_at
+                      ? t("lastSignal", {
+                          date: formatDate(u.last_seen_at, locale, "short"),
+                        })
+                      : t("notInstalled")}
+                  </span>
+                </div>
+                <div className="list-cell num list-traffic">
+                  <span>
+                    <strong>{numbers.format(u.impressions_count ?? 0)}</strong>{" "}
+                    {t("impressions")}
+                  </span>
+                  <span>
+                    <strong>{numbers.format(u.clicks_count ?? 0)}</strong>{" "}
+                    {t("clicks")}
+                  </span>
+                </div>
+                <div className="list-actions">
+                  <button
+                    className="btn-secondary btn-sm"
+                    aria-expanded={code?.id === u.id}
+                    disabled={busy === u.id}
+                    onClick={() => action(u, "code")}
+                  >
+                    <Code2 size={16} />
+                    {t("embed")}
+                  </button>
+                  <RowMenu
+                    items={[
+                      {
+                        label: t(u.status === "active" ? "pause" : "activate"),
+                        disabled: busy === u.id,
+                        onSelect: () =>
+                          action(
+                            u,
+                            u.status === "active" ? "paused" : "active",
+                          ),
+                      },
+                      {
+                        label: t("rename"),
+                        onSelect: () => setEditing(u.id),
+                      },
+                      {
+                        label: t("reports"),
+                        onSelect: () =>
+                          router.push(`/publisher/stats?unit=${u.id}`),
+                      },
+                      {
+                        label: t("archive"),
+                        danger: true,
+                        disabled: busy === u.id,
+                        onSelect: () => action(u, "archive"),
+                      },
+                    ]}
+                  />
+                </div>
+              </div>
+              {editing === u.id && (
+                <form
+                  className="list-panel row"
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    const fd = new FormData(e.currentTarget);
+                    void action(u, "edit", String(fd.get("name")));
+                  }}
+                >
+                  <label className="field grow">
+                    {t("name")}
+                    <input
+                      name="name"
+                      required
+                      maxLength={120}
+                      defaultValue={u.name}
+                      autoFocus
+                    />
+                  </label>
+                  <div className="row self-end">
+                    <button
+                      type="button"
+                      className="btn-quiet"
+                      onClick={() => setEditing(null)}
+                    >
+                      {t("cancel")}
+                    </button>
+                    <button className="btn-primary" disabled={busy === u.id}>
+                      {t("save")}
+                    </button>
+                  </div>
+                </form>
+              )}
+              {code?.id === u.id && (
+                <section className="list-panel install-panel">
+                  <ol className="install-steps">
+                    <li>{t("installStep1")}</li>
+                    <li>{t("installStep2")}</li>
+                    <li>{t("installStep3")}</li>
+                  </ol>
+                  <div className="code-block">
+                    <pre>{code.text}</pre>
+                    <button className="btn-secondary btn-sm" onClick={copy}>
+                      {copied ? <Check size={16} /> : <Copy size={16} />}
+                      {t(copied ? "copied" : "copy")}
+                    </button>
+                  </div>
+                  {copyError && <Notice error>{t("copyFailed")}</Notice>}
+                  <p className="text-sm">{t("embedHelp")}</p>
+                </section>
+              )}
+            </article>
+          ))}
+        </section>
       )}
-      {data.data && (
+      {data.data && data.data.last_page > 1 && (
         <Pager page={page} total={data.data.last_page} onChange={setPage} />
       )}
     </div>

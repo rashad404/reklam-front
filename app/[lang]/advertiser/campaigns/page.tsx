@@ -1,8 +1,18 @@
 "use client";
 import { useState } from "react";
-import { useTranslations } from "next-intl";
-import { Link } from "@/lib/navigation";
-import { Gate, Pager, Failure, Notice, Status } from "@/components/ui/product";
+import { useLocale, useTranslations } from "next-intl";
+import { Plus, Search, Pencil } from "lucide-react";
+import { Link, useRouter } from "@/lib/navigation";
+import {
+  Gate,
+  Pager,
+  Failure,
+  Notice,
+  Status,
+  PageHead,
+  FormatGlyph,
+  RowMenu,
+} from "@/components/ui/product";
 import { useResource } from "@/hooks/useResource";
 import api from "@/lib/api/client";
 import type { Creative } from "@/components/advertiser/AdPreview";
@@ -15,7 +25,9 @@ interface Campaign {
   clicks_count: number;
 }
 function Campaigns() {
-  const t = useTranslations("product");
+  const t = useTranslations("product"),
+    locale = useLocale(),
+    router = useRouter();
   const [page, setPage] = useState(1),
     [status, setStatus] = useState(""),
     [search, setSearch] = useState(""),
@@ -25,6 +37,7 @@ function Campaigns() {
   const data = useResource<{ data: Campaign[]; last_page: number }>(
     `/campaigns?page=${page}&status=${status}&search=${encodeURIComponent(query)}`,
   );
+  const numbers = new Intl.NumberFormat(locale);
   async function change(c: Campaign, action: string) {
     if (action === "archive" && !confirm(t("archiveConfirm"))) return;
     setBusy(c.id);
@@ -39,135 +52,191 @@ function Campaigns() {
       setBusy(null);
     }
   }
+  const filtered = !!query || !!status;
   return (
     <div className="wrap page stack">
-      <div className="row between">
-        <h1>{t("campaigns")}</h1>
+      <PageHead
+        eyebrow={t("roleAdvertiser")}
+        title={t("campaigns")}
+        description={t("campaignsIntro")}
+      >
         <Link className="btn-primary" href="/advertiser/campaigns/create">
+          <Plus size={17} />
           {t("createCampaign")}
         </Link>
-      </div>
-      <form
-        className="row"
-        onSubmit={(e) => {
-          e.preventDefault();
-          setPage(1);
-          setQuery(search);
-        }}
-      >
-        <label className="field grow">
-          {t("search")}
-          <input
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            maxLength={100}
-          />
-        </label>
-        <label className="field">
-          {t("all")}
-          <select
-            value={status}
-            onChange={(e) => {
-              setStatus(e.target.value);
-              setPage(1);
-            }}
-          >
-            <option value="">{t("all")}</option>
-            {["draft", "active", "paused", "completed"].map((s) => (
-              <option key={s} value={s}>
-                {t(s)}
-              </option>
-            ))}
-          </select>
-        </label>
-        <button className="btn-secondary self-end">{t("search")}</button>
-      </form>
+      </PageHead>
       {error && <Notice error>{t("saveError")}</Notice>}
-      {data.error ? (
-        <Failure retry={data.retry} />
-      ) : data.loading ? (
-        <p>{t("loading")}</p>
-      ) : !data.data?.data.length ? (
-        <div className="card empty">
-          <h2>{t("empty")}</h2>
-          <p>{t("noCampaigns")}</p>
-        </div>
-      ) : (
-        data.data.data.map((c) => (
-          <article className="record" key={c.id}>
-            <div className="row between">
-              <h2>{c.name}</h2>
-              <Status value={c.status} />
-            </div>
-            <div className="row muted text-sm">
-              <span>
-                {t("impressions")}: {c.impressions_count}
-              </span>
-              <span>
-                {t("clicks")}: {c.clicks_count}
-              </span>
-            </div>
-            <div className="row">
-              {c.ads.map((a) => (
-                <span className="row text-sm" key={a.id}>
-                  {a.ad_format.replace("banner_", "")}{" "}
-                  <Status value={a.status || "pending"} />
-                  {a.review_reason && <span>{a.review_reason}</span>}
-                </span>
+      <section className="list" aria-label={t("campaigns")}>
+        <form
+          className="list-toolbar list-filters"
+          role="search"
+          onSubmit={(e) => {
+            e.preventDefault();
+            setPage(1);
+            setQuery(search);
+          }}
+        >
+          <label className="search-field">
+            <Search size={16} aria-hidden="true" />
+            <span className="sr-only">{t("search")}</span>
+            <input
+              type="search"
+              value={search}
+              placeholder={t("search")}
+              onChange={(e) => setSearch(e.target.value)}
+              maxLength={100}
+            />
+          </label>
+          <label className="select-field">
+            <span className="sr-only">{t("status")}</span>
+            <select
+              value={status}
+              onChange={(e) => {
+                setStatus(e.target.value);
+                setPage(1);
+              }}
+            >
+              <option value="">{t("all")}</option>
+              {["draft", "active", "paused", "completed"].map((s) => (
+                <option key={s} value={s}>
+                  {t(s)}
+                </option>
               ))}
-            </div>
-            <div className="row">
+            </select>
+          </label>
+        </form>
+        {data.error ? (
+          <div className="list-panel">
+            <Failure retry={data.retry} />
+          </div>
+        ) : data.loading ? (
+          <p className="list-panel" role="status">
+            {t("loading")}
+          </p>
+        ) : !data.data?.data.length ? (
+          <div className="list-empty">
+            <p>{t(filtered ? "noMatches" : "noCampaigns")}</p>
+            {!filtered && (
               <Link
-                className="btn-secondary"
-                href={`/advertiser/campaigns/${c.id}/edit`}
+                className="btn-secondary btn-sm"
+                href="/advertiser/campaigns/create"
               >
-                {t("edit")}
+                <Plus size={16} />
+                {t("createCampaign")}
               </Link>
-              <Link
-                className="btn-secondary"
-                href={`/advertiser/stats/${c.id}`}
-              >
-                {t("reports")}
-              </Link>
-              {c.status === "active" ? (
-                <button
-                  className="btn-secondary"
-                  disabled={busy === c.id}
-                  onClick={() => change(c, "paused")}
-                >
-                  {t("pause")}
-                </button>
-              ) : (
-                <button
-                  className="btn-secondary"
-                  disabled={
-                    busy === c.id || !c.ads.some((a) => a.status === "approved")
-                  }
-                  onClick={() => change(c, "active")}
-                >
-                  {t("activate")}
-                </button>
-              )}
-              <button
-                className="btn-quiet"
-                disabled={busy === c.id}
-                onClick={() => change(c, "archive")}
-              >
-                {t("archive")}
-              </button>
+            )}
+          </div>
+        ) : (
+          <>
+            <div className="list-head campaigns-grid" aria-hidden="true">
+              <span>{t("campaignColumn")}</span>
+              <span>{t("status")}</span>
+              <span className="num">{t("trafficTotal")}</span>
+              <span />
             </div>
-            {c.status !== "active" &&
-              !c.ads.some((a) => a.status === "approved") && (
-                <p className="muted text-sm">
-                  {t(
-                    c.ads.length ? "activateNeedsApproval" : "activateNeedsAd",
-                  )}
-                </p>
-              )}
-          </article>
-        ))
-      )}
-      {data.data && (
+            {data.data.data.map((c) => {
+              const approved = c.ads.some((a) => a.status === "approved");
+              return (
+                <article className="list-row" key={c.id}>
+                  <div className="campaigns-grid">
+                    <div className="list-main">
+                      <h2 className="list-title">
+                        <Link href={`/advertiser/stats/${c.id}`}>{c.name}</Link>
+                      </h2>
+                      <span className="recent-formats">
+                        {[...new Set(c.ads.map((a) => a.ad_format))].map(
+                          (format) => {
+                            const ads = c.ads.filter(
+                              (a) => a.ad_format === format,
+                            );
+                            const open = ads.find(
+                              (a) => a.status && a.status !== "approved",
+                            );
+                            return (
+                              <span className="creative" key={format}>
+                                <FormatGlyph format={format} />
+                                {ads.length > 1 && (
+                                  <span className="muted text-sm">
+                                    ×{ads.length}
+                                  </span>
+                                )}
+                                {open?.status && <Status value={open.status} />}
+                              </span>
+                            );
+                          },
+                        )}
+                      </span>
+                      {c.ads.some((a) => a.review_reason) && (
+                        <span className="list-reason">
+                          {c.ads.find((a) => a.review_reason)?.review_reason}
+                        </span>
+                      )}
+                    </div>
+                    <div className="list-cell list-status">
+                      <Status value={c.status} />
+                      {c.status !== "active" && !approved && (
+                        <span className="signal">
+                          {t(
+                            c.ads.length
+                              ? "activateNeedsApproval"
+                              : "activateNeedsAd",
+                          )}
+                        </span>
+                      )}
+                    </div>
+                    <div className="list-cell num list-traffic">
+                      <span>
+                        <strong>{numbers.format(c.impressions_count)}</strong>{" "}
+                        {t("impressions")}
+                      </span>
+                      <span>
+                        <strong>{numbers.format(c.clicks_count)}</strong>{" "}
+                        {t("clicks")}
+                      </span>
+                    </div>
+                    <div className="list-actions">
+                      <Link
+                        className="btn-secondary btn-sm"
+                        href={`/advertiser/campaigns/${c.id}/edit`}
+                      >
+                        <Pencil size={15} />
+                        {t("edit")}
+                      </Link>
+                      <RowMenu
+                        items={[
+                          c.status === "active"
+                            ? {
+                                label: t("pause"),
+                                disabled: busy === c.id,
+                                onSelect: () => change(c, "paused"),
+                              }
+                            : {
+                                label: t("activate"),
+                                disabled: busy === c.id || !approved,
+                                onSelect: () => change(c, "active"),
+                              },
+                          {
+                            label: t("reports"),
+                            onSelect: () =>
+                              router.push(`/advertiser/stats/${c.id}`),
+                          },
+                          {
+                            label: t("archive"),
+                            danger: true,
+                            disabled: busy === c.id,
+                            onSelect: () => change(c, "archive"),
+                          },
+                        ]}
+                      />
+                    </div>
+                  </div>
+                </article>
+              );
+            })}
+          </>
+        )}
+      </section>
+      {data.data && data.data.last_page > 1 && (
         <Pager page={page} total={data.data.last_page} onChange={setPage} />
       )}
     </div>

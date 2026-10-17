@@ -1,19 +1,22 @@
 "use client";
 import { useTranslations, useLocale } from "next-intl";
 import {
-  ArrowUpRight,
-  Eye,
-  MousePointer2,
-  Layers3,
-  Megaphone,
+  ArrowRight,
+  Check,
+  Plus,
   BarChart3,
-  Globe2,
-  PanelsTopLeft,
-  ShieldCheck,
+  Layers3,
+  CircleHelp,
 } from "lucide-react";
 import PublisherOffer from "@/components/publisher/PublisherOffer";
 import { Link } from "@/lib/navigation";
-import { Gate, Failure } from "@/components/ui/product";
+import {
+  Gate,
+  Failure,
+  PageHead,
+  Status,
+  FormatGlyph,
+} from "@/components/ui/product";
 import { useResource } from "@/hooks/useResource";
 import { useAuth } from "@/hooks/useAuth";
 interface Overview {
@@ -22,52 +25,90 @@ interface Overview {
   active_campaigns?: number;
   active_ad_units?: number;
 }
+interface Item {
+  id: number;
+  name: string;
+  status: string;
+  ad_format?: string;
+  last_seen_at?: string | null;
+  ads?: { id: number; ad_format: string; status?: string }[];
+  impressions_count?: number;
+  clicks_count?: number;
+}
 function Content({ role }: { role: "advertiser" | "publisher" }) {
   const t = useTranslations("product"),
     locale = useLocale();
   const { user } = useAuth();
+  const publisher = role === "publisher";
   const registered = !!user?.[role];
-  const resource = useResource<Overview>(
+  const overview = useResource<Overview>(
     registered ? `/${role}/dashboard` : null,
   );
-  const publisher = role === "publisher";
-  const cards = publisher
+  const items = useResource<{ data: Item[]; total: number }>(
+    registered ? (publisher ? "/ad-units?page=1" : "/campaigns?page=1") : null,
+  );
+  const numbers = new Intl.NumberFormat(locale, { maximumFractionDigits: 2 });
+  const list = items.data?.data ?? [],
+    total = items.data?.total ?? 0,
+    stats = overview.data;
+  const site = user?.publisher;
+  const steps = publisher
     ? [
+        { done: !!site, label: "stepRegisterSite", href: "/publisher/site" },
         {
+          done: site?.status === "approved",
+          label: "stepSiteApproved",
           href: "/publisher/site",
-          title: "site",
-          body: "siteManagementBody",
-          icon: Globe2,
         },
         {
+          done: !!site?.verified_at,
+          label: "stepVerifySite",
+          href: "/publisher/site",
+        },
+        {
+          done: total > 0,
+          label: "stepCreatePlacement",
+          href: "/publisher/ad-units/create",
+        },
+        {
+          done: list.some((u) => u.last_seen_at),
+          label: "stepInstallCode",
           href: "/publisher/ad-units",
-          title: "placements",
-          body: "placementManagementBody",
-          icon: PanelsTopLeft,
         },
       ]
     : [
         {
-          href: "/advertiser/campaigns",
-          title: "campaigns",
-          body: "campaignManagementBody",
-          icon: Megaphone,
+          done: total > 0,
+          label: "stepCreateCampaign",
+          href: "/advertiser/campaigns/create",
         },
         {
-          href: "/advertiser/stats",
-          title: "reports",
-          body: "reportManagementBody",
-          icon: BarChart3,
+          done: list.some((c) => c.ads?.some((a) => a.status === "approved")),
+          label: "stepAdApproved",
+          href: "/advertiser/campaigns",
+        },
+        {
+          done: (stats?.active_campaigns ?? 0) > 0,
+          label: "stepActivateCampaign",
+          href: "/advertiser/campaigns",
         },
       ];
+  const doneCount = steps.filter((s) => s.done).length,
+    nextStep = steps.find((s) => !s.done);
+  const ready = !registered || (!overview.loading && !items.loading);
+  const ctr =
+    stats && stats.impressions ? (stats.clicks / stats.impressions) * 100 : 0;
   return (
     <div className="wrap page stack">
-      <div className="dashboard-lead">
-        <div>
-          <span className="eyebrow">{user?.name}</span>
-          <h1>{t("overview")}</h1>
-          <p>{t(`${role}Description`)}</p>
-        </div>
+      <PageHead
+        eyebrow={t(publisher ? "rolePublisher" : "roleAdvertiser")}
+        title={
+          user?.name
+            ? t("greeting", { name: user.name.split(" ")[0] })
+            : t("overview")
+        }
+        description={t(`${role}Description`)}
+      >
         <Link
           className="btn-primary"
           href={
@@ -76,59 +117,184 @@ function Content({ role }: { role: "advertiser" | "publisher" }) {
               : "/advertiser/campaigns/create"
           }
         >
+          <Plus size={17} />
           {t(publisher ? "createPlacement" : "createCampaign")}
-          <ArrowUpRight size={18} />
         </Link>
-      </div>
-      {registered && resource.error ? (
-        <Failure retry={resource.retry} />
-      ) : registered && resource.loading ? (
+      </PageHead>
+      {registered && overview.error ? (
+        <Failure retry={overview.retry} />
+      ) : registered && !stats ? (
         <p role="status">{t("loading")}</p>
-      ) : registered && resource.data ? (
-        <div className="metrics">
+      ) : stats ? (
+        <div className="kpi-row">
           {[
-            { key: "impressions", n: resource.data.impressions, icon: Eye },
-            { key: "clicks", n: resource.data.clicks, icon: MousePointer2 },
-            {
-              key: "active",
-              n:
-                resource.data.active_campaigns ??
-                resource.data.active_ad_units ??
-                0,
-              icon: Layers3,
-            },
-          ].map(({ key, n, icon: Icon }) => (
-            <div className="metric" key={key}>
-              <div className="metric-top">
-                <span>{t(key)}</span>
-                <Icon size={21} />
-              </div>
-              <strong>{Number(n).toLocaleString(locale)}</strong>
+            ["impressions", numbers.format(stats.impressions)],
+            ["clicks", numbers.format(stats.clicks)],
+            ["ctr", `${numbers.format(ctr)}%`],
+            [
+              publisher ? "activePlacements" : "activeCampaigns",
+              numbers.format(
+                stats.active_campaigns ?? stats.active_ad_units ?? 0,
+              ),
+            ],
+          ].map(([key, value]) => (
+            <div className="kpi" key={key}>
+              <span>{t(key)}</span>
+              <strong>{value}</strong>
             </div>
           ))}
+          <p className="kpi-note text-sm">{t("allTimeNote")}</p>
         </div>
       ) : null}
-      {publisher && (
-        <PublisherOffer compact offer={user?.publisher?.commission_offer} />
-      )}
-      <div className="two-col">
-        {cards.map(({ href, title, body, icon: Icon }) => (
-          <Link href={href} className="card action-card" key={href}>
-            <span className="action-icon">
-              <Icon size={21} />
-            </span>
-            <div>
-              <h2>{t(title)}</h2>
-              <p>{t(body)}</p>
+      <div className="overview-grid">
+        <section className="list" aria-labelledby="recent-heading">
+          <div className="list-toolbar">
+            <h2 id="recent-heading">
+              {t(publisher ? "placements" : "campaigns")}
+              {total > 0 && <span className="count">{total}</span>}
+            </h2>
+            {total > 0 && (
+              <Link
+                className="text-link"
+                href={
+                  publisher ? "/publisher/ad-units" : "/advertiser/campaigns"
+                }
+              >
+                {t("viewAll")}
+                <ArrowRight size={16} />
+              </Link>
+            )}
+          </div>
+          {items.error ? (
+            <div className="list-panel">
+              <Failure retry={items.retry} />
             </div>
-            <ArrowUpRight size={18} />
-          </Link>
-        ))}
+          ) : registered && items.loading ? (
+            <p className="list-panel" role="status">
+              {t("loading")}
+            </p>
+          ) : !list.length ? (
+            <div className="list-empty">
+              <p>{t(publisher ? "noPlacementsBody" : "noCampaignsShort")}</p>
+              <Link
+                className="btn-secondary btn-sm"
+                href={
+                  publisher
+                    ? site
+                      ? "/publisher/ad-units/create"
+                      : "/publisher/site"
+                    : "/advertiser/campaigns/create"
+                }
+              >
+                <Plus size={16} />
+                {t(
+                  publisher
+                    ? site
+                      ? "createPlacement"
+                      : "registerSite"
+                    : "createCampaign",
+                )}
+              </Link>
+            </div>
+          ) : (
+            list.slice(0, 5).map((item) => (
+              <Link
+                className="list-row recent-row"
+                key={item.id}
+                href={
+                  publisher
+                    ? `/publisher/stats?unit=${item.id}`
+                    : `/advertiser/stats/${item.id}`
+                }
+              >
+                <span className="list-main">
+                  <span className="list-title">{item.name}</span>
+                  <span className="recent-formats">
+                    {publisher && item.ad_format ? (
+                      <FormatGlyph format={item.ad_format} />
+                    ) : (
+                      [...new Set(item.ads?.map((a) => a.ad_format))].map(
+                        (f) => <FormatGlyph format={f} key={f} />,
+                      )
+                    )}
+                  </span>
+                </span>
+                <Status value={item.status} />
+                <span className="num recent-traffic">
+                  <strong>{numbers.format(item.impressions_count ?? 0)}</strong>
+                  <span>{t("impressions")}</span>
+                </span>
+                <ArrowRight size={16} className="recent-arrow" />
+              </Link>
+            ))
+          )}
+        </section>
+        <aside className="stack overview-side">
+          {ready && nextStep ? (
+            <section className="card setup">
+              <div className="row between">
+                <h2>{t("nextSteps")}</h2>
+                <span className="text-sm muted">
+                  {doneCount}/{steps.length}
+                </span>
+              </div>
+              <div
+                className="setup-progress"
+                role="progressbar"
+                aria-valuemin={0}
+                aria-valuemax={steps.length}
+                aria-valuenow={doneCount}
+                aria-label={t("nextSteps")}
+              >
+                <span
+                  style={{ width: `${(doneCount / steps.length) * 100}%` }}
+                />
+              </div>
+              <ol className="setup-list">
+                {steps.map((s) => (
+                  <li
+                    key={s.label}
+                    className={
+                      s.done ? "done" : s === nextStep ? "current" : undefined
+                    }
+                  >
+                    <span className="setup-mark" aria-hidden="true">
+                      {s.done && <Check size={13} strokeWidth={3} />}
+                    </span>
+                    {s === nextStep ? (
+                      <Link href={s.href}>{t(s.label)}</Link>
+                    ) : (
+                      <span>{t(s.label)}</span>
+                    )}
+                    <span className="sr-only">
+                      {t(s.done ? "stepDone" : "stepTodo")}
+                    </span>
+                  </li>
+                ))}
+              </ol>
+            </section>
+          ) : ready ? (
+            <nav className="card shortcuts" aria-label={t("shortcuts")}>
+              <h2>{t("shortcuts")}</h2>
+              <Link href={publisher ? "/publisher/stats" : "/advertiser/stats"}>
+                <BarChart3 size={18} />
+                {t("reports")}
+              </Link>
+              <Link href="/ad-formats">
+                <Layers3 size={18} />
+                {t("formats")}
+              </Link>
+              <Link href="/help">
+                <CircleHelp size={18} />
+                {t("helpShort")}
+              </Link>
+            </nav>
+          ) : null}
+          {publisher && (
+            <PublisherOffer compact offer={site?.commission_offer} />
+          )}
+        </aside>
       </div>
-      <p className="dashboard-note">
-        <ShieldCheck size={17} />
-        {t("deliveryHint")}
-      </p>
     </div>
   );
 }

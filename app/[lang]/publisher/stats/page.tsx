@@ -5,9 +5,5 @@ export default async function Page({
   searchParams: Promise<{ unit?: string }>;
 }) {
   const { unit } = await searchParams;
-  return (
-    <Reports
-      endpoint={unit ? `/stats/ad-unit/${Number(unit)}` : "/stats/publisher"}
-    />
-  );
+  return <Reports scope="publisher" selected={Number(unit) || null} />;
 }

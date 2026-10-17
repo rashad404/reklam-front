@@ -4,6 +4,7 @@ import { useTranslations } from "next-intl";
 import { Gate, Notice, Failure, Pager, Status } from "@/components/ui/product";
 import { useResource } from "@/hooks/useResource";
 import api from "@/lib/api/client";
+import { uuid } from "@/lib/utils/id";
 interface Ticket {
   id: number;
   subject: string;
@@ -39,7 +40,7 @@ function Inbox({ admin }: { admin: boolean }) {
           status: data.get("status"),
         });
       else {
-        const key = requestKey || crypto.randomUUID();
+        const key = requestKey || uuid();
         setRequestKey(key);
         await api.post("/support", {
           subject: data.get("subject"),

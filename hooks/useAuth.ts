@@ -24,6 +24,7 @@ export interface User {
     status: string;
     website_url: string;
     website_name: string;
+    verified_at?: string | null;
     commission_offer?: import("@/components/publisher/PublisherOffer").CommissionOffer;
   };
 }

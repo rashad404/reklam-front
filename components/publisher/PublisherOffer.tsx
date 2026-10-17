@@ -1,49 +1,13 @@
 "use client";
 import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/lib/navigation";
+import { formatDate } from "@/lib/utils/date";
 export interface CommissionOffer {
   active: boolean;
   starts_at: string | null;
   ends_at: string | null;
   platform_percent: number;
   standard_platform_percent: number;
-}
-// Browsers lack Azerbaijani month names and print "2027 M03 13" for az.
-// Russian long dates end with "г.", which doubles the sentence's final period.
-const azMonths = [
-  "yanvar",
-  "fevral",
-  "mart",
-  "aprel",
-  "may",
-  "iyun",
-  "iyul",
-  "avqust",
-  "sentyabr",
-  "oktyabr",
-  "noyabr",
-  "dekabr",
-];
-function formatDate(value: string, locale: string) {
-  const date = new Date(value);
-  if (locale !== "az")
-    return new Intl.DateTimeFormat(locale, {
-      dateStyle: "long",
-      timeZone: "Asia/Baku",
-    })
-      .format(date)
-      .replace(/\s*г\.$/, "");
-  const parts = Object.fromEntries(
-    new Intl.DateTimeFormat("en", {
-      day: "numeric",
-      month: "numeric",
-      year: "numeric",
-      timeZone: "Asia/Baku",
-    })
-      .formatToParts(date)
-      .map((p) => [p.type, p.value]),
-  );
-  return `${parts.day} ${azMonths[Number(parts.month) - 1]} ${parts.year}`;
 }
 export default function PublisherOffer({
   compact = false,
