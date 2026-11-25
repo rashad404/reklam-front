@@ -1,3 +1,14 @@
+# Retention policy, 2026-11-24
+
+Historical retained-release rollback instructions below are superseded. Keep
+only the live application release; rollback means rebuilding earlier GitHub
+commits. Fetch source from GitHub, never upload local source archives. After
+successful API/frontend checks, update scheduler and monitor paths to the live
+backend and run frontend/deploy/finalize-release.sh from fetched operational
+scripts. Hold /home/ugn/reklam-releases/deploy.lock as fd 9 during build/switch/
+cleanup. The finalizer refuses split API/frontend releases and old cron paths.
+Shared storage, secrets and database backups are never cleanup candidates.
+
 # Reklam.biz operations
 
 ## Scope and source

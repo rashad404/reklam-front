@@ -1,9 +1,12 @@
 #!/usr/bin/env python3
 """Prune verified inactive releases under the deployment lock, never shared data."""
 import argparse
+from contextlib import ExitStack
 import fcntl
 import json
 import os
+import pwd
+import signal
 from pathlib import Path
 import re
 import shutil
@@ -41,6 +44,11 @@ def main():
     p.add_argument('--health-url', required=True)
     p.add_argument('--apply', action='store_true')
     a = p.parse_args()
+    with ExitStack() as stack:
+        cleanup(a, stack)
+
+
+def cleanup(a, stack):
     base = Path(a.base)
     if not re.fullmatch(r'/home/[a-z0-9-]+/[a-z0-9-]+', str(base)):
         raise RuntimeError('Invalid deployment base')
@@ -51,7 +59,7 @@ def main():
         inherited = False
     lock = None
     if not inherited:
-        lock = open(base / 'deploy.lock', 'a')
+        lock = stack.enter_context(open(base / 'deploy.lock', 'a'))
         fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
     env = dict(os.environ, PATH='/opt/cpanel/ea-nodejs22/bin:' + os.environ['PATH'])
     if a.pm2_home:
@@ -109,12 +117,14 @@ def main():
         blockers = []
         for proc in Path('/proc').glob('[0-9]*'):
             try:
-                refs = [os.readlink(str(proc / 'exe'))]
+                executable = os.readlink(str(proc / 'exe'))
+                cwd = os.readlink(str(proc / 'cwd'))
+                refs = [executable]
                 command = (proc / 'cmdline').read_bytes().replace(b'\0', b' ').decode(errors='replace')
                 # PM2 daemon's inherited cwd is not an app dependency. Its live
                 # workers, descriptors and mappings are checked independently.
                 if not (command.startswith('PM2 ') and 'God Daemon (' in command):
-                    refs.append(os.readlink(str(proc / 'cwd')))
+                    refs.append(cwd)
                 for fd in (proc / 'fd').iterdir():
                     try:
                         refs.append(os.readlink(str(fd)))
@@ -123,6 +133,15 @@ def main():
                 refs.append((proc / 'maps').read_text())
                 if any(str(path) + '/' in ref or ref == str(path) for ref in refs for path in old):
                     blockers.append(proc.name)
+                    # Old Next child workers can outlive their PM2 parent.
+                    # Stop only known runtime titles with exact owner and cwd.
+                    title = (proc / 'comm').read_text().strip()
+                    if (title in ('next-server', 'next-router-wor', 'next-render-wor')
+                            and Path(executable).name == 'node'
+                            and proc.stat().st_uid == pwd.getpwnam(a.user).pw_uid
+                            and any(cwd == str(path) or cwd.startswith(str(path) + '/') for path in old)):
+                        if os.readlink(str(proc / 'cwd')) == cwd:
+                            os.kill(int(proc.name), signal.SIGTERM)
             except (FileNotFoundError, ProcessLookupError):
                 pass
         if not blockers:
