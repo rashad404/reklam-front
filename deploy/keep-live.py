@@ -37,6 +37,7 @@ def main():
     p.add_argument('--source')
     p.add_argument('--live-process')
     p.add_argument('--pm2-home')
+    p.add_argument('--public-root')
     p.add_argument('--health-url', required=True)
     p.add_argument('--apply', action='store_true')
     a = p.parse_args()
@@ -57,7 +58,12 @@ def main():
         env['PM2_HOME'] = a.pm2_home
     prefix = ['runuser', '-u', a.user, '--']
     def process_list():
-        return json.loads(subprocess.check_output(prefix + ['pm2', 'jlist'], env=env, text=True))
+        raw = subprocess.check_output(prefix + ['pm2', 'jlist'], env=env, text=True)
+        # PM2 may prefix JSON with a daemon-version notice. Never log its env.
+        for line in raw.splitlines():
+            if line.startswith('[{') or line.strip() == '[]':
+                return json.loads(line)
+        raise RuntimeError('PM2 did not return a process list')
     processes = process_list()
     def live_path():
         if not a.live_process:
@@ -70,6 +76,8 @@ def main():
             path = path.parent
         return path
     live = live_path()
+    if a.public_root and not str(Path(a.public_root).resolve(strict=True)).startswith(str(live) + '/'):
+        raise RuntimeError('API and frontend must use the same live release before cleanup')
     old = candidates(base, live, base if a.live_process else None)
     run(['curl', '--max-time', '30', '-fsS', a.health_url, '-o', '/dev/null'])
     nginx = subprocess.check_output(['nginx', '-T'], stderr=subprocess.DEVNULL, text=True)
@@ -127,7 +135,7 @@ def main():
             raise RuntimeError('Live release changed during cleanup')
         shutil.rmtree(str(path))
     if a.source:
-        run(prefix + ['git', '-C', a.source, 'worktree', 'prune'], env=env)
+        run(prefix + ['git', '-c', 'safe.directory=' + a.source, '-C', a.source, 'worktree', 'prune'], env=env)
     for path in base.glob('build-*.log'):
         if path.is_file() and not path.is_symlink() and time.time() - path.stat().st_mtime > 7 * 86400:
             path.unlink()
